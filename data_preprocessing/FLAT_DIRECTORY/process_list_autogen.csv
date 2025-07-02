@@ -1,0 +1,2 @@
+slide_id,process,status,seg_level,sthresh,mthresh,close,use_otsu,keep_ids,exclude_ids,a_t,a_h,max_n_holes,vis_level,line_thickness,use_padding,contour_fn
+TCGA-AY-4070-01Z-00-DX1.dd650ac6-8480-4fd8-85b8-15a7840a5933.svs,1,tbp,-1,8,7,4,False,none,none,100.0,16.0,8,-1,250,True,four_pt
