@@ -1,0 +1,151 @@
+# Phase 4 Report — Reporting layer
+
+**Date:** 2026-08-04
+**Branch:** `dev`
+
+Phase 4 turns the corrected results into things a reviewer reads: one workbook, one results document, one figure set, and one before/after comparison. Nothing in it is transcribed by hand — every artifact is regenerated from the result files, so re-running an experiment and re-running the reporting keeps them consistent by construction.
+
+---
+
+## 1. Task 4.1 — Consolidated workbook
+
+`slide_classification/best_of_all_exps_metric.xlsx`, built by `tools/build_report.py`.
+
+**Five sheets, canonically named:** `TCGA-CV` · `PAIP-IV` · `PAIP-EV` · `SurGen-CV` · `SurGen-EV`. The old `PAIP` sheet is gone with PAIP-CV (Task 2.2).
+
+Each experiment additionally gets a `<exp>_TITAN_PRISM` sheet and a `<exp>_Detail` sheet, plus a workbook-level `Coverage` sheet stamping every result file with its machine, git commit and timestamp.
+
+### Two defects in the previous builder, fixed
+
+1. **It would have mixed pre- and post-correction numbers into one sheet.** The old builder globbed `*_Results` folders and derived the sheet name by splitting on `_Results`. Archived trees are named `TCGA_Results_ARCHIVED_20260804` — which *also* matches, and *also* yields the sheet name `TCGA`. Every archive created during this remediation would have silently merged into the live sheet. The new builder reads the provenance-stamped `result_*.json` files and skips anything under an `_ARCHIVED_` path.
+
+2. **TITAN and PRISM sat in the same table as the aggregation methods.** They are slide-level encoders with no patch-aggregation step — baselines, not aggregation strategies. Task 4.3 separates them, and the report states why, so a reviewer does not read them as comparable rows.
+
+---
+
+## 2. Task 4.2 — Sorted summary tables
+
+One row per (aggregation method × foundation model × classifier), columns `Method`, `Model`, `Classifier`, `Variant`, `BalAcc`, `AUROC`, `Acc`, `MacroF1`, `N_test`.
+
+**Sort order** as specified: descending by BalAcc and AUROC jointly, AUROC winning ties. Implemented as a sort by AUROC descending followed by a **stable** sort by BalAcc descending — the stable second pass preserves AUROC ordering within equal BalAcc.
+
+Natural float metrics essentially never tie exactly, so the tie-break was verified against synthetic ties:
+
+```
+input   BalAcc 0.80 0.80 0.90 0.80 0.70
+        AUROC  0.60 0.95 0.50 0.75 0.99
+output  c(0.90) → b(0.80/0.95) → d(0.80/0.75) → a(0.80/0.60) → e(0.70)   PASS
+```
+
+Summary tables were previously missing for PAIP-EV and SurGen. All five experiments now have one.
+
+---
+
+## 3. Task 4.4 — Radar plots
+
+`tools/make_radar_plots.py` → `Analysis_and_Visualization/Radar_Plots/<experiment>/`, 20 figures (5 experiments × 2 metrics × light/dark). The pre-correction `3_agg_methods` and `4_agg_methods` folders are archived, not deleted — their underlying numbers predate every Phase 1 and Phase 2 correction.
+
+### The design is faceted, and that was forced by the data, not taste
+
+The obvious layout — five foundation models overlaid on one radar — **cannot be made colourblind-safe**. Five simultaneously-visible series is the "all pairs" case for colour separation. An exhaustive search over the palette found:
+
+- **11 of 56** five-colour subsets pass the separation floors in light mode
+- **none of those 11** passes in dark mode
+
+So the foundation models became small multiples and the *aggregation methods* — the actual experimental variable — became the four series. That subset validates cleanly in both modes:
+
+```
+light  #2a78d6,#eda100,#e87ba4,#008300   CVD ΔE 13.0, normal-vision ΔE 19.6   ALL PASS
+dark   #3987e5,#c98500,#d55181,#008300   CVD ΔE  6.9, normal-vision ΔE 19.3   ALL PASS
+```
+
+Both warnings that came with that result are discharged rather than ignored:
+
+- the dark-mode CVD ΔE 6.9 (green vs yellow) sits in the 6–8 band, which is legal **only** with secondary encoding — so every series also carries its own line style and marker shape, and identity is never colour-alone;
+- the light-mode contrast warning on yellow and magenta triggers the relief rule — met by an always-present legend and the same numbers available as a table in the workbook.
+
+### Two layout bugs the colour validator cannot catch
+
+Found by rendering the figures and looking at them:
+
+1. **The legend was built from the last panel's artists.** A panel with partial coverage produced a short, mislabeled legend — one entry showing two overlapping glyphs. Now a figure-level legend built from explicit proxies for the methods actually present.
+2. **Row-2 panel titles collided with row-1 spoke labels**, because polar tick labels sit outside the axes and `tight_layout` does not account for them. Fixed with explicit subplot spacing.
+
+**Acceptance:** every plot title carries the canonical experiment name and the test-set N, e.g. `TCGA-CV — AUROC by aggregation method (N = 413)`.
+
+---
+
+## 4. Task 4.5 — `RESULTS.md`
+
+Generated by `tools/write_results_md.py`. Per experiment: definition, cohort, N, split description, coverage matrix, sorted summary, TITAN/PRISM block.
+
+It **leads** with the cohort-size table and its reconciliation against the raw label files, because the modelled N differs from the label-file count in all three cohorts and that is the first thing a reviewer will check:
+
+| Cohort | In label file | Modelled | Excluded |
+|---|---|---|---|
+| TCGA | 416 | **413** | `TCGA-AD-6895_MSIH`, `TCGA-AD-6899_nonMSIH`, `TCGA-CM-6680_nonMSIH` |
+| PAIP | 78 | **73** | `training_data_19/30/41/42/46` |
+| SurGen | 624 usable | **622** | `SR386_40X_HE_T086_01`, `SR386_40X_HE_T339_01` |
+
+Closes with seven caveats for Methods, including that all pre-2026-08-04 SurGen numbers are leak-inflated and all pre-2026-08-04 ANN numbers are affected by three separate defects.
+
+---
+
+## 5. Beyond the work order — comparison and supplementary sections
+
+### `tools/compare_to_archive.py`
+
+Builds the old-vs-new table directly from both result trees rather than from recollection, reconciling two different formats (the old wide `Metric`/`AvgFolds` xlsx and the new JSON records) and attributing which corrections apply to which experiment.
+
+**Baseline selection matters and is explicit.** Re-running an experiment archives whatever was there, so this remediation produced several archives per experiment. "Previous results" in a supplementary report means what was published *before* the remediation, so the comparison uses the first archive (bare date, no `_N` suffix) and merely reports the interim ones.
+
+### `tools/build_supplementary_results.py`
+
+Emits `Supplementary_Results_UPDATED.docx` — a **companion** document, not an in-place edit. The original draft is 23 MB with 45 embedded figures; a scripted rewrite would put those at risk for no benefit, so the owner controls the splice.
+
+It opens by mapping each old heading to its replacement, because three of the four existing results headings misname their protocol:
+
+| Previous heading | Now | Reason |
+|---|---|---|
+| 4.1 TCGA **(IV)** Validation Results | 4.1 TCGA-CV | it is 4-fold cross-validation, not a provider split |
+| 4.2 PAIP **(IV)** Validation Results | 4.2 PAIP-IV | the old PAIP cross-validation is retired |
+| 4.3 TCGA → PAIP (EV) | 4.3 PAIP-EV | protocol unchanged; now three variants |
+| 4.4 SurGen **(IV)** Validation Results | 4.4 SurGen-CV | cross-validation, now case-grouped |
+| (did not exist) | 4.5 SurGen-EV | new |
+
+Internal validation and cross-validation are different protocols, and a reviewer reads the distinction as claimed rather than incidental.
+
+---
+
+## 6. The wider ANN grid, measured in the full pipeline
+
+The 32-pair probe predicted the direction; the full re-run measured it. Narrow vs wide grid, TCGA-CV, 110 (combination × classifier) rows:
+
+| Classifier | BalAcc | AUROC | MacroF1 | Acc |
+|---|---|---|---|---|
+| **ann** | **+0.0025** | **+0.0020** | **+0.0122** | **+0.0151** |
+| lin | 0.0000 | 0.0000 | 0.0000 | 0.0000 |
+| knn | 0.0000 | 0.0000 | 0.0000 | 0.0000 |
+| proto | 0.0000 | 0.0000 | 0.0000 | 0.0000 |
+| rf | 0.0000 | 0.0000 | 0.0000 | 0.0000 |
+
+The four non-ANN classifiers being **exactly** zero is the control: it confirms the only thing that changed was the ANN grid, and independently demonstrates that the pipeline is now fully deterministic — the same code on the same data reproduces the same numbers to the last decimal, which was **not** true before Phase 1 (the old train `DataLoader` shuffled unseeded, and Random Forest's bootstrap depends on row order).
+
+The realised ANN gain is smaller than the probe's point estimate (BalAcc +0.0025 vs +0.0115 predicted), which is the expected regression toward the mean when moving from 32 probe pairs to 22 full combinations. It is positive on all four metrics, and largest on macro-F1 and accuracy — consistent with the probe's finding that the gain lands there rather than on AUROC.
+
+**Honest framing for the paper:** widening the ANN search space improved macro-F1 and accuracy modestly and left AUROC and balanced accuracy essentially unchanged. Its stronger justification is methodological — the previous grid demonstrably truncated, with the selected optimum sitting at the grid maximum in 61% (`h1`) and 65% (`h2`) of validation selections.
+
+---
+
+## 7. Reproducing the reporting layer
+
+```bash
+python tools/build_report.py                  # 4.1-4.3  workbook, five canonical sheets
+python tools/make_radar_plots.py --archive    # 4.4      20 figures, light + dark
+python tools/write_results_md.py              # 4.5      RESULTS.md
+python tools/compare_to_archive.py            #          old vs new
+python tools/build_supplementary_results.py   #          supplementary sections
+python tools/merge_results.py <tree> [<tree>] #          after the server run
+```
+
+All five read the same provenance-stamped result files and are safe to re-run at any time.
