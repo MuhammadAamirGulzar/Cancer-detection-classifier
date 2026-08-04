@@ -1,15 +1,16 @@
 {
   "schema_version": 1,
-  "last_updated": "2026-08-04T03:26:17Z",
+  "last_updated": "2026-08-04T13:05:00Z",
   "phases": {
     "0": {
       "0.1_git_protect": {
-        "status": "in_progress",
-        "notes": "Repo already had a git history (8 commits) and an origin remote (github.com/fahamin5149/Cancer-detection-classifier) that local master already matched exactly. New remote 'aamir' created at github.com/MuhammadAamirGulzar/Cancer-detection-classifier (private) per live user instruction. .gitignore expanded beyond the doc's literal list (see OPEN_QUESTIONS.md #1). Checkpoint commit + push pending."
+        "status": "done",
+        "commit": "be0cbf7 (checkpoint), 93d591f (checkpoint-file cleanup)",
+        "notes": "Repo already had a git history (8 commits) and an origin remote (github.com/fahamin5149/Cancer-detection-classifier) that local master already matched exactly - left untouched. New remote 'aamir' created at github.com/MuhammadAamirGulzar/Cancer-detection-classifier (private) per live user instruction, pushed successfully (1370 objects, 777 files / ~318MB in the checkpoint commit). .gitignore expanded beyond the doc's literal list (see OPEN_QUESTIONS.md #1) after a pre-commit size audit found several 100MB-1.9GB raw per-patch CSVs that would otherwise have been staged. First push attempt hung indefinitely on a stuck git-credential-manager subprocess (699+ CPU-seconds, no progress) - fixed via `gh auth setup-git` to wire gh as the github.com credential helper; retry succeeded immediately. Follow-up commit removed 9 pre-existing tracked .ipynb_checkpoints files (one still held a live token my source-only scanner had skipped)."
       },
       "0.2_purge_credentials": {
         "status": "code_fixed_revocation_deferred",
-        "notes": "Found 3 distinct tokens across 22 files (doc estimated 4/21 - close but re-verified against actual code, see PHASE_0_REPORT.md). All replaced with os.environ[\"HF_TOKEN\"] / load_dotenv() pattern. .env already existed locally with HF_TOKEN set and gitignored. Revocation explicitly deferred by owner (live chat instruction, 2026-08-04) until project completion - working with existing tokens meanwhile. TOKENS_TO_REVOKE.md written (redacted) for the eventual revocation step."
+        "notes": "Found 3 distinct tokens across 22 files (doc estimated 4/21 - close but re-verified against actual code, see PHASE_0_REPORT.md) plus 1 more in a stale tracked .ipynb_checkpoints file found post-push. All replaced with os.environ[\"HF_TOKEN\"] / load_dotenv() pattern. .env already existed locally with HF_TOKEN set and gitignored. Revocation explicitly deferred by owner (live chat instruction, 2026-08-04) until project completion - working with existing tokens meanwhile. TOKENS_TO_REVOKE.md written (redacted) for the eventual revocation step. Verified zero remaining hf_ tokens in tracked source (both my source-only scanner and the doc's literal grep command) after the checkpoint-file cleanup."
       }
     },
     "1": {
