@@ -1,0 +1,6 @@
+cohort,method,model,task,wsi_id,reason
+paip,Averaging,Conch1_5,MSIH,training_data_19_nonMSIH,labelled_but_no_features
+paip,Averaging,Conch1_5,MSIH,training_data_30_MSIH,labelled_but_no_features
+paip,Averaging,Conch1_5,MSIH,training_data_41_nonMSIH,labelled_but_no_features
+paip,Averaging,Conch1_5,MSIH,training_data_42_MSIH,labelled_but_no_features
+paip,Averaging,Conch1_5,MSIH,training_data_46_nonMSIH,labelled_but_no_features

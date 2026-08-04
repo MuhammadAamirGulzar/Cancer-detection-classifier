@@ -1,0 +1,24 @@
+{
+  "classifier": "knn",
+  "hparams": {
+    "n_neighbors": 3
+  },
+  "seed": 44,
+  "n_train": 413,
+  "n_early_stop": 0,
+  "cohort": "TCGA",
+  "n_cohort": 413,
+  "trained_on": "all 413 TCGA slides",
+  "reused_from_seed": 42,
+  "determinism": {
+    "verified": true,
+    "probe_seeds": [
+      42,
+      43
+    ],
+    "max_abs_diff": 0.0
+  },
+  "machine": "local",
+  "timestamp": "2026-08-04T16:59:14+00:00",
+  "git_commit": "6ccfba1"
+}

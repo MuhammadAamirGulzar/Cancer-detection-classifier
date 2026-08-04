@@ -1,0 +1,19 @@
+{
+  "classifier": "ann",
+  "hparams": {
+    "hidden_dim1": 128,
+    "hidden_dim2": 128,
+    "max_iter": 500
+  },
+  "seed": 46,
+  "n_train": 351,
+  "n_early_stop": 62,
+  "cohort": "TCGA",
+  "n_cohort": 413,
+  "trained_on": "stratified 85% of 413",
+  "reused_from_seed": null,
+  "determinism": null,
+  "machine": "local",
+  "timestamp": "2026-08-04T16:49:17+00:00",
+  "git_commit": "6ccfba1"
+}

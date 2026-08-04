@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "last_updated": "2026-08-04T15:36:24+00:00",
+  "last_updated": "2026-08-04T17:09:05+00:00",
   "phases": {
     "0": {
       "0.1_git_protect": {
@@ -102,135 +102,539 @@
   "runs": {
     "TCGA-CV|Averaging|H-Optimus-1|default|seed42": {
       "status": "done",
-      "updated": "2026-08-04T14:50:02+00:00",
+      "updated": "2026-08-04T15:56:41+00:00",
       "n_slides": 413,
       "output": "D:\\Aamir Gulzar\\KSA_project2\\Cancer-detection-classifier\\slide_classification\\TCGA_Results\\Averaging\\H-Optimus-1\\1-MSIH\\Output"
     },
     "TCGA-CV|Averaging|Conch1_5|default|seed42": {
       "status": "done",
-      "updated": "2026-08-04T14:50:23+00:00",
+      "updated": "2026-08-04T15:56:55+00:00",
       "n_slides": 413,
       "output": "D:\\Aamir Gulzar\\KSA_project2\\Cancer-detection-classifier\\slide_classification\\TCGA_Results\\Averaging\\Conch1_5\\1-MSIH\\Output"
     },
     "TCGA-CV|Averaging|UNI2|default|seed42": {
       "status": "done",
-      "updated": "2026-08-04T14:50:52+00:00",
+      "updated": "2026-08-04T15:57:12+00:00",
       "n_slides": 413,
       "output": "D:\\Aamir Gulzar\\KSA_project2\\Cancer-detection-classifier\\slide_classification\\TCGA_Results\\Averaging\\UNI2\\1-MSIH\\Output"
     },
     "TCGA-CV|Averaging|Virchow2|default|seed42": {
       "status": "done",
-      "updated": "2026-08-04T14:51:30+00:00",
+      "updated": "2026-08-04T15:57:39+00:00",
       "n_slides": 413,
       "output": "D:\\Aamir Gulzar\\KSA_project2\\Cancer-detection-classifier\\slide_classification\\TCGA_Results\\Averaging\\Virchow2\\1-MSIH\\Output"
     },
     "TCGA-CV|Averaging|ConchV1|default|seed42": {
       "status": "done",
-      "updated": "2026-08-04T14:51:52+00:00",
+      "updated": "2026-08-04T15:57:58+00:00",
       "n_slides": 413,
       "output": "D:\\Aamir Gulzar\\KSA_project2\\Cancer-detection-classifier\\slide_classification\\TCGA_Results\\Averaging\\ConchV1\\1-MSIH\\Output"
     },
     "TCGA-CV|Caption_based_aggregation|H-Optimus-1|default|seed42": {
       "status": "done",
-      "updated": "2026-08-04T14:55:25+00:00",
+      "updated": "2026-08-04T16:00:11+00:00",
       "n_slides": 413,
       "output": "D:\\Aamir Gulzar\\KSA_project2\\Cancer-detection-classifier\\slide_classification\\TCGA_Results\\Caption_based_aggregation\\H-Optimus-1\\1-MSIH\\Output"
     },
     "TCGA-CV|Caption_based_aggregation|Conch1_5|default|seed42": {
       "status": "done",
-      "updated": "2026-08-04T14:57:21+00:00",
+      "updated": "2026-08-04T16:01:23+00:00",
       "n_slides": 413,
       "output": "D:\\Aamir Gulzar\\KSA_project2\\Cancer-detection-classifier\\slide_classification\\TCGA_Results\\Caption_based_aggregation\\Conch1_5\\1-MSIH\\Output"
     },
     "TCGA-CV|Caption_based_aggregation|UNI2|default|seed42": {
       "status": "done",
-      "updated": "2026-08-04T15:00:42+00:00",
+      "updated": "2026-08-04T16:03:33+00:00",
       "n_slides": 413,
       "output": "D:\\Aamir Gulzar\\KSA_project2\\Cancer-detection-classifier\\slide_classification\\TCGA_Results\\Caption_based_aggregation\\UNI2\\1-MSIH\\Output"
     },
     "TCGA-CV|Caption_based_aggregation|Virchow2|default|seed42": {
       "status": "done",
-      "updated": "2026-08-04T15:06:28+00:00",
+      "updated": "2026-08-04T16:07:12+00:00",
       "n_slides": 413,
       "output": "D:\\Aamir Gulzar\\KSA_project2\\Cancer-detection-classifier\\slide_classification\\TCGA_Results\\Caption_based_aggregation\\Virchow2\\1-MSIH\\Output"
     },
     "TCGA-CV|Caption_based_aggregation|ConchV1|default|seed42": {
       "status": "done",
-      "updated": "2026-08-04T15:08:24+00:00",
+      "updated": "2026-08-04T16:08:03+00:00",
       "n_slides": 413,
       "output": "D:\\Aamir Gulzar\\KSA_project2\\Cancer-detection-classifier\\slide_classification\\TCGA_Results\\Caption_based_aggregation\\ConchV1\\1-MSIH\\Output"
     },
     "TCGA-CV|Caption_based_aggregation_15_classes|H-Optimus-1|default|seed42": {
       "status": "done",
-      "updated": "2026-08-04T15:12:24+00:00",
+      "updated": "2026-08-04T16:10:22+00:00",
       "n_slides": 413,
       "output": "D:\\Aamir Gulzar\\KSA_project2\\Cancer-detection-classifier\\slide_classification\\TCGA_Results\\Caption_based_aggregation_15_classes\\H-Optimus-1\\1-MSIH\\Output"
     },
     "TCGA-CV|Caption_based_aggregation_15_classes|Conch1_5|default|seed42": {
       "status": "done",
-      "updated": "2026-08-04T15:14:26+00:00",
+      "updated": "2026-08-04T16:11:37+00:00",
       "n_slides": 413,
       "output": "D:\\Aamir Gulzar\\KSA_project2\\Cancer-detection-classifier\\slide_classification\\TCGA_Results\\Caption_based_aggregation_15_classes\\Conch1_5\\1-MSIH\\Output"
     },
     "TCGA-CV|Caption_based_aggregation_15_classes|UNI2|default|seed42": {
       "status": "done",
-      "updated": "2026-08-04T15:18:13+00:00",
+      "updated": "2026-08-04T16:13:49+00:00",
       "n_slides": 413,
       "output": "D:\\Aamir Gulzar\\KSA_project2\\Cancer-detection-classifier\\slide_classification\\TCGA_Results\\Caption_based_aggregation_15_classes\\UNI2\\1-MSIH\\Output"
     },
     "TCGA-CV|Caption_based_aggregation_15_classes|Virchow2|default|seed42": {
       "status": "done",
-      "updated": "2026-08-04T15:23:53+00:00",
+      "updated": "2026-08-04T16:17:35+00:00",
       "n_slides": 413,
       "output": "D:\\Aamir Gulzar\\KSA_project2\\Cancer-detection-classifier\\slide_classification\\TCGA_Results\\Caption_based_aggregation_15_classes\\Virchow2\\1-MSIH\\Output"
     },
     "TCGA-CV|Caption_based_aggregation_15_classes|ConchV1|default|seed42": {
       "status": "done",
-      "updated": "2026-08-04T15:25:13+00:00",
+      "updated": "2026-08-04T16:18:32+00:00",
       "n_slides": 413,
       "output": "D:\\Aamir Gulzar\\KSA_project2\\Cancer-detection-classifier\\slide_classification\\TCGA_Results\\Caption_based_aggregation_15_classes\\ConchV1\\1-MSIH\\Output"
     },
     "TCGA-CV|Tissue_Type_Clustering|H-Optimus-1|default|seed42": {
       "status": "done",
-      "updated": "2026-08-04T15:27:19+00:00",
+      "updated": "2026-08-04T16:20:03+00:00",
       "n_slides": 413,
       "output": "D:\\Aamir Gulzar\\KSA_project2\\Cancer-detection-classifier\\slide_classification\\TCGA_Results\\Tissue_Type_Clustering\\H-Optimus-1\\1-MSIH\\Output"
     },
     "TCGA-CV|Tissue_Type_Clustering|Conch1_5|default|seed42": {
       "status": "done",
-      "updated": "2026-08-04T15:28:32+00:00",
+      "updated": "2026-08-04T16:20:53+00:00",
       "n_slides": 413,
       "output": "D:\\Aamir Gulzar\\KSA_project2\\Cancer-detection-classifier\\slide_classification\\TCGA_Results\\Tissue_Type_Clustering\\Conch1_5\\1-MSIH\\Output"
     },
     "TCGA-CV|Tissue_Type_Clustering|UNI2|default|seed42": {
       "status": "done",
-      "updated": "2026-08-04T15:30:49+00:00",
+      "updated": "2026-08-04T16:22:20+00:00",
       "n_slides": 413,
       "output": "D:\\Aamir Gulzar\\KSA_project2\\Cancer-detection-classifier\\slide_classification\\TCGA_Results\\Tissue_Type_Clustering\\UNI2\\1-MSIH\\Output"
     },
     "TCGA-CV|Tissue_Type_Clustering|Virchow2|default|seed42": {
       "status": "done",
-      "updated": "2026-08-04T15:34:28+00:00",
+      "updated": "2026-08-04T16:24:33+00:00",
       "n_slides": 413,
       "output": "D:\\Aamir Gulzar\\KSA_project2\\Cancer-detection-classifier\\slide_classification\\TCGA_Results\\Tissue_Type_Clustering\\Virchow2\\1-MSIH\\Output"
     },
     "TCGA-CV|Tissue_Type_Clustering|ConchV1|default|seed42": {
       "status": "done",
-      "updated": "2026-08-04T15:35:30+00:00",
+      "updated": "2026-08-04T16:25:11+00:00",
       "n_slides": 413,
       "output": "D:\\Aamir Gulzar\\KSA_project2\\Cancer-detection-classifier\\slide_classification\\TCGA_Results\\Tissue_Type_Clustering\\ConchV1\\1-MSIH\\Output"
     },
     "TCGA-CV|TITAN|Conch1_5|default|seed42": {
       "status": "done",
-      "updated": "2026-08-04T15:35:55+00:00",
+      "updated": "2026-08-04T16:25:32+00:00",
       "n_slides": 413,
       "output": "D:\\Aamir Gulzar\\KSA_project2\\Cancer-detection-classifier\\slide_classification\\TCGA_Results\\TITAN\\Conch1_5\\1-MSIH\\Output"
     },
     "TCGA-CV|PRISM|PRISM|default|seed42": {
       "status": "done",
-      "updated": "2026-08-04T15:36:24+00:00",
+      "updated": "2026-08-04T16:25:54+00:00",
       "n_slides": 413,
       "output": "D:\\Aamir Gulzar\\KSA_project2\\Cancer-detection-classifier\\slide_classification\\TCGA_Results\\PRISM\\1-MSIH\\Output"
+    },
+    "SurGen-CV|Averaging|H-Optimus-1|default|seed42": {
+      "status": "skipped",
+      "updated": "2026-08-04T16:26:16+00:00",
+      "reason": "features_not_on_this_machine"
+    },
+    "SurGen-CV|Averaging|Conch1_5|default|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T16:26:50+00:00",
+      "n_slides": 622,
+      "output": "D:\\Aamir Gulzar\\KSA_project2\\Cancer-detection-classifier\\slide_classification\\SurGen_Results\\Averaging\\Conch1_5\\1-MSIH\\Output"
+    },
+    "SurGen-CV|Averaging|UNI2|default|seed42": {
+      "status": "skipped",
+      "updated": "2026-08-04T16:26:50+00:00",
+      "reason": "features_not_on_this_machine"
+    },
+    "SurGen-CV|Averaging|Virchow2|default|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T16:27:20+00:00",
+      "n_slides": 622,
+      "output": "D:\\Aamir Gulzar\\KSA_project2\\Cancer-detection-classifier\\slide_classification\\SurGen_Results\\Averaging\\Virchow2\\1-MSIH\\Output"
+    },
+    "SurGen-CV|Averaging|ConchV1|default|seed42": {
+      "status": "skipped",
+      "updated": "2026-08-04T16:27:20+00:00",
+      "reason": "features_not_on_this_machine"
+    },
+    "SurGen-CV|Caption_based_aggregation|H-Optimus-1|default|seed42": {
+      "status": "skipped",
+      "updated": "2026-08-04T16:27:20+00:00",
+      "reason": "features_not_on_this_machine"
+    },
+    "SurGen-CV|Caption_based_aggregation|Conch1_5|default|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T16:28:40+00:00",
+      "n_slides": 622,
+      "output": "D:\\Aamir Gulzar\\KSA_project2\\Cancer-detection-classifier\\slide_classification\\SurGen_Results\\Caption_based_aggregation\\Conch1_5\\1-MSIH\\Output"
+    },
+    "SurGen-CV|Caption_based_aggregation|UNI2|default|seed42": {
+      "status": "skipped",
+      "updated": "2026-08-04T16:28:40+00:00",
+      "reason": "features_not_on_this_machine"
+    },
+    "SurGen-CV|Caption_based_aggregation|Virchow2|default|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T16:32:47+00:00",
+      "n_slides": 622,
+      "output": "D:\\Aamir Gulzar\\KSA_project2\\Cancer-detection-classifier\\slide_classification\\SurGen_Results\\Caption_based_aggregation\\Virchow2\\1-MSIH\\Output"
+    },
+    "SurGen-CV|Caption_based_aggregation|ConchV1|default|seed42": {
+      "status": "skipped",
+      "updated": "2026-08-04T16:32:47+00:00",
+      "reason": "features_not_on_this_machine"
+    },
+    "SurGen-CV|Caption_based_aggregation_15_classes|H-Optimus-1|default|seed42": {
+      "status": "skipped",
+      "updated": "2026-08-04T16:32:47+00:00",
+      "reason": "features_not_on_this_machine"
+    },
+    "SurGen-CV|Caption_based_aggregation_15_classes|Conch1_5|default|seed42": {
+      "status": "skipped",
+      "updated": "2026-08-04T16:32:47+00:00",
+      "reason": "features_not_on_this_machine"
+    },
+    "SurGen-CV|Caption_based_aggregation_15_classes|UNI2|default|seed42": {
+      "status": "skipped",
+      "updated": "2026-08-04T16:32:47+00:00",
+      "reason": "features_not_on_this_machine"
+    },
+    "SurGen-CV|Caption_based_aggregation_15_classes|Virchow2|default|seed42": {
+      "status": "skipped",
+      "updated": "2026-08-04T16:32:47+00:00",
+      "reason": "features_not_on_this_machine"
+    },
+    "SurGen-CV|Caption_based_aggregation_15_classes|ConchV1|default|seed42": {
+      "status": "skipped",
+      "updated": "2026-08-04T16:32:47+00:00",
+      "reason": "features_not_on_this_machine"
+    },
+    "SurGen-CV|Tissue_Type_Clustering|H-Optimus-1|default|seed42": {
+      "status": "skipped",
+      "updated": "2026-08-04T16:32:47+00:00",
+      "reason": "features_not_on_this_machine"
+    },
+    "SurGen-CV|Tissue_Type_Clustering|Conch1_5|default|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T16:33:44+00:00",
+      "n_slides": 622,
+      "output": "D:\\Aamir Gulzar\\KSA_project2\\Cancer-detection-classifier\\slide_classification\\SurGen_Results\\Tissue_Type_Clustering\\Conch1_5\\1-MSIH\\Output"
+    },
+    "SurGen-CV|Tissue_Type_Clustering|UNI2|default|seed42": {
+      "status": "skipped",
+      "updated": "2026-08-04T16:33:44+00:00",
+      "reason": "features_not_on_this_machine"
+    },
+    "SurGen-CV|Tissue_Type_Clustering|Virchow2|default|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T16:36:31+00:00",
+      "n_slides": 622,
+      "output": "D:\\Aamir Gulzar\\KSA_project2\\Cancer-detection-classifier\\slide_classification\\SurGen_Results\\Tissue_Type_Clustering\\Virchow2\\1-MSIH\\Output"
+    },
+    "SurGen-CV|Tissue_Type_Clustering|ConchV1|default|seed42": {
+      "status": "skipped",
+      "updated": "2026-08-04T16:36:31+00:00",
+      "reason": "features_not_on_this_machine"
+    },
+    "SurGen-CV|TITAN|Conch1_5|default|seed42": {
+      "status": "skipped",
+      "updated": "2026-08-04T16:36:31+00:00",
+      "reason": "features_not_on_this_machine"
+    },
+    "SurGen-CV|PRISM|PRISM|default|seed42": {
+      "status": "skipped",
+      "updated": "2026-08-04T16:36:31+00:00",
+      "reason": "features_not_on_this_machine"
+    },
+    "PAIP-IV|Averaging|H-Optimus-1|default|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T16:36:57+00:00"
+    },
+    "PAIP-IV|Averaging|Conch1_5|default|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T16:37:11+00:00"
+    },
+    "PAIP-IV|Averaging|UNI2|default|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T16:37:26+00:00"
+    },
+    "PAIP-IV|Averaging|Virchow2|default|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T16:37:43+00:00"
+    },
+    "PAIP-IV|Averaging|ConchV1|default|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T16:37:57+00:00"
+    },
+    "PAIP-IV|Caption_based_aggregation|H-Optimus-1|default|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T16:38:34+00:00"
+    },
+    "PAIP-IV|Caption_based_aggregation|Conch1_5|default|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T16:38:59+00:00"
+    },
+    "PAIP-IV|Caption_based_aggregation|UNI2|default|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T16:39:35+00:00"
+    },
+    "PAIP-IV|Caption_based_aggregation|Virchow2|default|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T16:40:30+00:00"
+    },
+    "PAIP-IV|Caption_based_aggregation|ConchV1|default|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T16:40:50+00:00"
+    },
+    "PAIP-IV|Caption_based_aggregation_15_classes|H-Optimus-1|default|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T16:41:27+00:00"
+    },
+    "PAIP-IV|Caption_based_aggregation_15_classes|Conch1_5|default|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T16:41:52+00:00"
+    },
+    "PAIP-IV|Caption_based_aggregation_15_classes|UNI2|default|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T16:42:31+00:00"
+    },
+    "PAIP-IV|Caption_based_aggregation_15_classes|Virchow2|default|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T16:43:35+00:00"
+    },
+    "PAIP-IV|Caption_based_aggregation_15_classes|ConchV1|default|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T16:43:59+00:00"
+    },
+    "PAIP-IV|Tissue_Type_Clustering|H-Optimus-1|default|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T16:44:30+00:00"
+    },
+    "PAIP-IV|Tissue_Type_Clustering|Conch1_5|default|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T16:44:53+00:00"
+    },
+    "PAIP-IV|Tissue_Type_Clustering|UNI2|default|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T16:45:25+00:00"
+    },
+    "PAIP-IV|Tissue_Type_Clustering|Virchow2|default|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T16:46:08+00:00"
+    },
+    "PAIP-IV|Tissue_Type_Clustering|ConchV1|default|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T16:46:28+00:00"
+    },
+    "PAIP-IV|TITAN|Conch1_5|default|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T16:46:45+00:00"
+    },
+    "PAIP-IV|PRISM|PRISM|default|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T16:47:03+00:00"
+    },
+    "PAIP-EV|Averaging|H-Optimus-1|ev|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T17:06:36+00:00"
+    },
+    "PAIP-EV|Averaging|Conch1_5|ev|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T17:06:40+00:00"
+    },
+    "PAIP-EV|Averaging|UNI2|ev|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T17:06:44+00:00"
+    },
+    "PAIP-EV|Averaging|Virchow2|ev|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T17:06:48+00:00"
+    },
+    "PAIP-EV|Averaging|ConchV1|ev|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T17:06:52+00:00"
+    },
+    "PAIP-EV|Caption_based_aggregation|H-Optimus-1|ev|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T17:06:57+00:00"
+    },
+    "PAIP-EV|Caption_based_aggregation|Conch1_5|ev|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T17:07:03+00:00"
+    },
+    "PAIP-EV|Caption_based_aggregation|UNI2|ev|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T17:07:10+00:00"
+    },
+    "PAIP-EV|Caption_based_aggregation|Virchow2|ev|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T17:07:16+00:00"
+    },
+    "PAIP-EV|Caption_based_aggregation|ConchV1|ev|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T17:07:20+00:00"
+    },
+    "PAIP-EV|Caption_based_aggregation_15_classes|H-Optimus-1|ev|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T17:07:29+00:00"
+    },
+    "PAIP-EV|Caption_based_aggregation_15_classes|Conch1_5|ev|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T17:07:34+00:00"
+    },
+    "PAIP-EV|Caption_based_aggregation_15_classes|UNI2|ev|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T17:07:39+00:00"
+    },
+    "PAIP-EV|Caption_based_aggregation_15_classes|Virchow2|ev|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T17:07:46+00:00"
+    },
+    "PAIP-EV|Caption_based_aggregation_15_classes|ConchV1|ev|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T17:07:51+00:00"
+    },
+    "PAIP-EV|Tissue_Type_Clustering|H-Optimus-1|ev|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T17:07:56+00:00"
+    },
+    "PAIP-EV|Tissue_Type_Clustering|Conch1_5|ev|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T17:08:00+00:00"
+    },
+    "PAIP-EV|Tissue_Type_Clustering|UNI2|ev|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T17:08:04+00:00"
+    },
+    "PAIP-EV|Tissue_Type_Clustering|Virchow2|ev|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T17:08:12+00:00"
+    },
+    "PAIP-EV|Tissue_Type_Clustering|ConchV1|ev|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T17:08:16+00:00"
+    },
+    "PAIP-EV|TITAN|Conch1_5|ev|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T17:08:19+00:00"
+    },
+    "PAIP-EV|PRISM|PRISM|ev|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T17:08:23+00:00"
+    },
+    "SurGen-EV|Averaging|Conch1_5|ev|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T17:08:30+00:00"
+    },
+    "SurGen-EV|Averaging|Virchow2|ev|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T17:08:36+00:00"
+    },
+    "SurGen-EV|Caption_based_aggregation|Conch1_5|ev|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T17:08:46+00:00"
+    },
+    "SurGen-EV|Caption_based_aggregation|Virchow2|ev|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T17:08:54+00:00"
+    },
+    "SurGen-EV|Tissue_Type_Clustering|Conch1_5|ev|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T17:08:56+00:00"
+    },
+    "SurGen-EV|Tissue_Type_Clustering|Virchow2|ev|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T17:09:05+00:00"
+    },
+    "TCGA-FULL|Averaging|H-Optimus-1|artifact|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T16:49:18+00:00"
+    },
+    "TCGA-FULL|Averaging|Conch1_5|artifact|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T16:49:29+00:00"
+    },
+    "TCGA-FULL|Averaging|UNI2|artifact|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T16:49:41+00:00"
+    },
+    "TCGA-FULL|Averaging|Virchow2|artifact|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T16:49:57+00:00"
+    },
+    "TCGA-FULL|Averaging|ConchV1|artifact|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T16:50:08+00:00"
+    },
+    "TCGA-FULL|Caption_based_aggregation|H-Optimus-1|artifact|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T16:51:24+00:00"
+    },
+    "TCGA-FULL|Caption_based_aggregation|Conch1_5|artifact|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T16:52:06+00:00"
+    },
+    "TCGA-FULL|Caption_based_aggregation|UNI2|artifact|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T16:53:23+00:00"
+    },
+    "TCGA-FULL|Caption_based_aggregation|Virchow2|artifact|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T16:55:24+00:00"
+    },
+    "TCGA-FULL|Caption_based_aggregation|ConchV1|artifact|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T16:55:54+00:00"
+    },
+    "TCGA-FULL|Caption_based_aggregation_15_classes|H-Optimus-1|artifact|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T16:57:16+00:00"
+    },
+    "TCGA-FULL|Caption_based_aggregation_15_classes|Conch1_5|artifact|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T16:58:04+00:00"
+    },
+    "TCGA-FULL|Caption_based_aggregation_15_classes|UNI2|artifact|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T16:59:24+00:00"
+    },
+    "TCGA-FULL|Caption_based_aggregation_15_classes|Virchow2|artifact|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T17:01:36+00:00"
+    },
+    "TCGA-FULL|Caption_based_aggregation_15_classes|ConchV1|artifact|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T17:02:08+00:00"
+    },
+    "TCGA-FULL|Tissue_Type_Clustering|H-Optimus-1|artifact|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T17:02:58+00:00"
+    },
+    "TCGA-FULL|Tissue_Type_Clustering|Conch1_5|artifact|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T17:03:27+00:00"
+    },
+    "TCGA-FULL|Tissue_Type_Clustering|UNI2|artifact|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T17:04:17+00:00"
+    },
+    "TCGA-FULL|Tissue_Type_Clustering|Virchow2|artifact|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T17:05:43+00:00"
+    },
+    "TCGA-FULL|Tissue_Type_Clustering|ConchV1|artifact|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T17:06:04+00:00"
+    },
+    "TCGA-FULL|TITAN|Conch1_5|artifact|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T17:06:15+00:00"
+    },
+    "TCGA-FULL|PRISM|PRISM|artifact|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T17:06:27+00:00"
     }
   }
 }

@@ -1,0 +1,25 @@
+{
+  "classifier": "lin",
+  "hparams": {
+    "C": 10,
+    "max_iter": 300
+  },
+  "seed": 43,
+  "n_train": 413,
+  "n_early_stop": 0,
+  "cohort": "TCGA",
+  "n_cohort": 413,
+  "trained_on": "all 413 TCGA slides",
+  "reused_from_seed": null,
+  "determinism": {
+    "verified": true,
+    "probe_seeds": [
+      42,
+      43
+    ],
+    "max_abs_diff": 0.0
+  },
+  "machine": "local",
+  "timestamp": "2026-08-04T16:49:09+00:00",
+  "git_commit": "6ccfba1"
+}

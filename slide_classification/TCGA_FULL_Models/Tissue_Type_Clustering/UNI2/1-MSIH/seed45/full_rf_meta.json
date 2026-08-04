@@ -1,0 +1,25 @@
+{
+  "classifier": "rf",
+  "hparams": {
+    "n_estimators": 500,
+    "max_depth": null,
+    "min_samples_split": 5,
+    "min_samples_leaf": 1,
+    "class_weight": {
+      "0": 1,
+      "1": 10
+    },
+    "prediction_threshold": 0.3
+  },
+  "seed": 45,
+  "n_train": 413,
+  "n_early_stop": 0,
+  "cohort": "TCGA",
+  "n_cohort": 413,
+  "trained_on": "all 413 TCGA slides",
+  "reused_from_seed": null,
+  "determinism": null,
+  "machine": "local",
+  "timestamp": "2026-08-04T17:04:15+00:00",
+  "git_commit": "6ccfba1"
+}

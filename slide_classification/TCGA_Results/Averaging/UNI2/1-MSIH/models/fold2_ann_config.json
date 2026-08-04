@@ -7,5 +7,5 @@
   "selection_metric": "val_ann_macro_f1",
   "selection_value": 0.6817226890756303,
   "softmax_in_graph": false,
-  "saved_at": "2026-08-04T14:50:29+00:00"
+  "saved_at": "2026-08-04T15:56:56+00:00"
 }

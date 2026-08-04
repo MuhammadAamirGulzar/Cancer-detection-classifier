@@ -1,0 +1,11 @@
+{
+  "input_dim": 13824,
+  "hidden_dim1": 128,
+  "hidden_dim2": 128,
+  "max_iter": 500,
+  "checkpoint": "foldfull_ann_13824_128_128.pth",
+  "selection_metric": "",
+  "selection_value": null,
+  "softmax_in_graph": false,
+  "saved_at": "2026-08-04T17:04:15+00:00"
+}

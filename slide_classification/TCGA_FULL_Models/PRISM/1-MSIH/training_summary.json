@@ -1,0 +1,290 @@
+{
+  "method": "PRISM",
+  "model": "PRISM",
+  "task": "MSIH",
+  "n_train_total": 413,
+  "dim": 1280,
+  "seeds": {
+    "42": {
+      "lin": {
+        "n_train": 413,
+        "n_early_stop": 0,
+        "hparams": {
+          "C": 10,
+          "max_iter": 300
+        },
+        "reused_from_seed": null
+      },
+      "ann": {
+        "n_train": 351,
+        "n_early_stop": 62,
+        "hparams": {
+          "hidden_dim1": 256,
+          "hidden_dim2": 128,
+          "max_iter": 500
+        },
+        "reused_from_seed": null
+      },
+      "knn": {
+        "n_train": 413,
+        "n_early_stop": 0,
+        "hparams": {
+          "n_neighbors": 3
+        },
+        "reused_from_seed": null
+      },
+      "proto": {
+        "n_train": 413,
+        "n_early_stop": 0,
+        "hparams": {},
+        "reused_from_seed": null
+      },
+      "rf": {
+        "n_train": 413,
+        "n_early_stop": 0,
+        "hparams": {
+          "n_estimators": 500,
+          "max_depth": null,
+          "min_samples_split": 5,
+          "min_samples_leaf": 1,
+          "class_weight": {
+            "0": 1,
+            "1": 10
+          },
+          "prediction_threshold": 0.3
+        },
+        "reused_from_seed": null
+      }
+    },
+    "43": {
+      "lin": {
+        "n_train": 413,
+        "n_early_stop": 0,
+        "hparams": {
+          "C": 10,
+          "max_iter": 300
+        },
+        "reused_from_seed": null
+      },
+      "ann": {
+        "n_train": 351,
+        "n_early_stop": 62,
+        "hparams": {
+          "hidden_dim1": 256,
+          "hidden_dim2": 128,
+          "max_iter": 500
+        },
+        "reused_from_seed": null
+      },
+      "knn": {
+        "n_train": 413,
+        "n_early_stop": 0,
+        "hparams": {
+          "n_neighbors": 3
+        },
+        "reused_from_seed": null
+      },
+      "proto": {
+        "n_train": 413,
+        "n_early_stop": 0,
+        "hparams": {},
+        "reused_from_seed": null
+      },
+      "rf": {
+        "n_train": 413,
+        "n_early_stop": 0,
+        "hparams": {
+          "n_estimators": 500,
+          "max_depth": null,
+          "min_samples_split": 5,
+          "min_samples_leaf": 1,
+          "class_weight": {
+            "0": 1,
+            "1": 10
+          },
+          "prediction_threshold": 0.3
+        },
+        "reused_from_seed": null
+      }
+    },
+    "44": {
+      "lin": {
+        "n_train": 413,
+        "n_early_stop": 0,
+        "hparams": {
+          "C": 10,
+          "max_iter": 300
+        },
+        "reused_from_seed": 42
+      },
+      "ann": {
+        "n_train": 351,
+        "n_early_stop": 62,
+        "hparams": {
+          "hidden_dim1": 256,
+          "hidden_dim2": 128,
+          "max_iter": 500
+        },
+        "reused_from_seed": null
+      },
+      "knn": {
+        "n_train": 413,
+        "n_early_stop": 0,
+        "hparams": {
+          "n_neighbors": 3
+        },
+        "reused_from_seed": 42
+      },
+      "proto": {
+        "n_train": 413,
+        "n_early_stop": 0,
+        "hparams": {},
+        "reused_from_seed": 42
+      },
+      "rf": {
+        "n_train": 413,
+        "n_early_stop": 0,
+        "hparams": {
+          "n_estimators": 500,
+          "max_depth": null,
+          "min_samples_split": 5,
+          "min_samples_leaf": 1,
+          "class_weight": {
+            "0": 1,
+            "1": 10
+          },
+          "prediction_threshold": 0.3
+        },
+        "reused_from_seed": null
+      }
+    },
+    "45": {
+      "lin": {
+        "n_train": 413,
+        "n_early_stop": 0,
+        "hparams": {
+          "C": 10,
+          "max_iter": 300
+        },
+        "reused_from_seed": 42
+      },
+      "ann": {
+        "n_train": 351,
+        "n_early_stop": 62,
+        "hparams": {
+          "hidden_dim1": 256,
+          "hidden_dim2": 128,
+          "max_iter": 500
+        },
+        "reused_from_seed": null
+      },
+      "knn": {
+        "n_train": 413,
+        "n_early_stop": 0,
+        "hparams": {
+          "n_neighbors": 3
+        },
+        "reused_from_seed": 42
+      },
+      "proto": {
+        "n_train": 413,
+        "n_early_stop": 0,
+        "hparams": {},
+        "reused_from_seed": 42
+      },
+      "rf": {
+        "n_train": 413,
+        "n_early_stop": 0,
+        "hparams": {
+          "n_estimators": 500,
+          "max_depth": null,
+          "min_samples_split": 5,
+          "min_samples_leaf": 1,
+          "class_weight": {
+            "0": 1,
+            "1": 10
+          },
+          "prediction_threshold": 0.3
+        },
+        "reused_from_seed": null
+      }
+    },
+    "46": {
+      "lin": {
+        "n_train": 413,
+        "n_early_stop": 0,
+        "hparams": {
+          "C": 10,
+          "max_iter": 300
+        },
+        "reused_from_seed": 42
+      },
+      "ann": {
+        "n_train": 351,
+        "n_early_stop": 62,
+        "hparams": {
+          "hidden_dim1": 256,
+          "hidden_dim2": 128,
+          "max_iter": 500
+        },
+        "reused_from_seed": null
+      },
+      "knn": {
+        "n_train": 413,
+        "n_early_stop": 0,
+        "hparams": {
+          "n_neighbors": 3
+        },
+        "reused_from_seed": 42
+      },
+      "proto": {
+        "n_train": 413,
+        "n_early_stop": 0,
+        "hparams": {},
+        "reused_from_seed": 42
+      },
+      "rf": {
+        "n_train": 413,
+        "n_early_stop": 0,
+        "hparams": {
+          "n_estimators": 500,
+          "max_depth": null,
+          "min_samples_split": 5,
+          "min_samples_leaf": 1,
+          "class_weight": {
+            "0": 1,
+            "1": 10
+          },
+          "prediction_threshold": 0.3
+        },
+        "reused_from_seed": null
+      }
+    }
+  },
+  "determinism": {
+    "lin": {
+      "verified": true,
+      "probe_seeds": [
+        42,
+        43
+      ],
+      "max_abs_diff": 0.0
+    },
+    "knn": {
+      "verified": true,
+      "probe_seeds": [
+        42,
+        43
+      ],
+      "max_abs_diff": 0.0
+    },
+    "proto": {
+      "verified": true,
+      "probe_seeds": [
+        42,
+        43
+      ],
+      "max_abs_diff": 0.0
+    }
+  }
+}

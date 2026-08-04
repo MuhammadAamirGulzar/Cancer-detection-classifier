@@ -1,0 +1,1088 @@
+{
+  "_meta": {
+    "machine": "local",
+    "timestamp": "2026-08-04T16:25:58+00:00",
+    "git_commit": "b4a7548",
+    "policy": "configuration selected most often across the 4 TCGA-CV folds; ties broken by best mean VALIDATION macro-F1",
+    "source_experiment": "TCGA-CV",
+    "external_data_used": "none"
+  },
+  "Averaging|H-Optimus-1|MSIH": {
+    "lin": {
+      "C": 10,
+      "max_iter": 300,
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    },
+    "ann": {
+      "hidden_dim1": 128,
+      "hidden_dim2": 128,
+      "max_iter": 500,
+      "_source": "majority vote (2/4 folds)",
+      "_per_fold_selected": [
+        "128_128_500",
+        "256_64_500",
+        "256_128_500",
+        "128_128_500"
+      ],
+      "_mean_val_macro_f1_by_config": {
+        "128_64_500": 0.32358,
+        "128_128_500": 0.726947,
+        "256_64_500": 0.667053,
+        "256_128_500": 0.726322
+      },
+      "_n_folds": 4
+    },
+    "knn": {
+      "n_neighbors": 3,
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    },
+    "proto": {
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    },
+    "rf": {
+      "n_estimators": 500,
+      "max_depth": null,
+      "min_samples_split": 5,
+      "min_samples_leaf": 1,
+      "class_weight": {
+        "0": 1,
+        "1": 10
+      },
+      "prediction_threshold": 0.3,
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    }
+  },
+  "Averaging|Conch1_5|MSIH": {
+    "lin": {
+      "C": 10,
+      "max_iter": 300,
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    },
+    "ann": {
+      "hidden_dim1": 256,
+      "hidden_dim2": 128,
+      "max_iter": 500,
+      "_source": "2-way tie at 2/4 folds, broken by mean validation macro-F1 = 0.597496",
+      "_per_fold_selected": [
+        "256_64_500",
+        "256_128_500",
+        "256_64_500",
+        "256_128_500"
+      ],
+      "_mean_val_macro_f1_by_config": {
+        "128_64_500": 0.130229,
+        "128_128_500": 0.49219,
+        "256_64_500": 0.596698,
+        "256_128_500": 0.597496
+      },
+      "_n_folds": 4
+    },
+    "knn": {
+      "n_neighbors": 3,
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    },
+    "proto": {
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    },
+    "rf": {
+      "n_estimators": 500,
+      "max_depth": null,
+      "min_samples_split": 5,
+      "min_samples_leaf": 1,
+      "class_weight": {
+        "0": 1,
+        "1": 10
+      },
+      "prediction_threshold": 0.3,
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    }
+  },
+  "Averaging|UNI2|MSIH": {
+    "lin": {
+      "C": 10,
+      "max_iter": 300,
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    },
+    "ann": {
+      "hidden_dim1": 256,
+      "hidden_dim2": 128,
+      "max_iter": 500,
+      "_source": "majority vote (4/4 folds)",
+      "_per_fold_selected": [
+        "256_128_500",
+        "256_128_500",
+        "256_128_500",
+        "256_128_500"
+      ],
+      "_mean_val_macro_f1_by_config": {
+        "128_64_500": 0.135091,
+        "128_128_500": 0.572861,
+        "256_64_500": 0.37101,
+        "256_128_500": 0.706631
+      },
+      "_n_folds": 4
+    },
+    "knn": {
+      "n_neighbors": 3,
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    },
+    "proto": {
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    },
+    "rf": {
+      "n_estimators": 500,
+      "max_depth": null,
+      "min_samples_split": 5,
+      "min_samples_leaf": 1,
+      "class_weight": {
+        "0": 1,
+        "1": 10
+      },
+      "prediction_threshold": 0.3,
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    }
+  },
+  "Averaging|Virchow2|MSIH": {
+    "lin": {
+      "C": 10,
+      "max_iter": 300,
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    },
+    "ann": {
+      "hidden_dim1": 128,
+      "hidden_dim2": 64,
+      "max_iter": 500,
+      "_source": "majority vote (2/4 folds)",
+      "_per_fold_selected": [
+        "128_64_500",
+        "256_128_500",
+        "128_64_500",
+        "256_64_500"
+      ],
+      "_mean_val_macro_f1_by_config": {
+        "128_64_500": 0.704035,
+        "128_128_500": 0.413491,
+        "256_64_500": 0.684076,
+        "256_128_500": 0.66262
+      },
+      "_n_folds": 4
+    },
+    "knn": {
+      "n_neighbors": 3,
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    },
+    "proto": {
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    },
+    "rf": {
+      "n_estimators": 500,
+      "max_depth": null,
+      "min_samples_split": 5,
+      "min_samples_leaf": 1,
+      "class_weight": {
+        "0": 1,
+        "1": 10
+      },
+      "prediction_threshold": 0.3,
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    }
+  },
+  "Averaging|ConchV1|MSIH": {
+    "lin": {
+      "C": 10,
+      "max_iter": 300,
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    },
+    "ann": {
+      "hidden_dim1": 256,
+      "hidden_dim2": 128,
+      "max_iter": 500,
+      "_source": "majority vote (3/4 folds)",
+      "_per_fold_selected": [
+        "256_128_500",
+        "256_128_500",
+        "256_64_500",
+        "256_128_500"
+      ],
+      "_mean_val_macro_f1_by_config": {
+        "128_64_500": 0.391838,
+        "128_128_500": 0.44206,
+        "256_64_500": 0.612676,
+        "256_128_500": 0.622432
+      },
+      "_n_folds": 4
+    },
+    "knn": {
+      "n_neighbors": 3,
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    },
+    "proto": {
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    },
+    "rf": {
+      "n_estimators": 500,
+      "max_depth": null,
+      "min_samples_split": 5,
+      "min_samples_leaf": 1,
+      "class_weight": {
+        "0": 1,
+        "1": 10
+      },
+      "prediction_threshold": 0.3,
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    }
+  },
+  "Caption_based_aggregation|H-Optimus-1|MSIH": {
+    "lin": {
+      "C": 10,
+      "max_iter": 300,
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    },
+    "ann": {
+      "hidden_dim1": 256,
+      "hidden_dim2": 128,
+      "max_iter": 500,
+      "_source": "2-way tie at 2/4 folds, broken by mean validation macro-F1 = 0.764686",
+      "_per_fold_selected": [
+        "256_128_500",
+        "256_128_500",
+        "128_128_500",
+        "128_128_500"
+      ],
+      "_mean_val_macro_f1_by_config": {
+        "128_64_500": 0.687777,
+        "128_128_500": 0.760067,
+        "256_64_500": 0.756679,
+        "256_128_500": 0.764686
+      },
+      "_n_folds": 4
+    },
+    "knn": {
+      "n_neighbors": 3,
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    },
+    "proto": {
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    },
+    "rf": {
+      "n_estimators": 500,
+      "max_depth": null,
+      "min_samples_split": 5,
+      "min_samples_leaf": 1,
+      "class_weight": {
+        "0": 1,
+        "1": 10
+      },
+      "prediction_threshold": 0.3,
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    }
+  },
+  "Caption_based_aggregation|Conch1_5|MSIH": {
+    "lin": {
+      "C": 10,
+      "max_iter": 300,
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    },
+    "ann": {
+      "hidden_dim1": 256,
+      "hidden_dim2": 64,
+      "max_iter": 500,
+      "_source": "2-way tie at 2/4 folds, broken by mean validation macro-F1 = 0.662264",
+      "_per_fold_selected": [
+        "128_128_500",
+        "256_64_500",
+        "128_128_500",
+        "256_64_500"
+      ],
+      "_mean_val_macro_f1_by_config": {
+        "128_64_500": 0.60347,
+        "128_128_500": 0.658234,
+        "256_64_500": 0.662264,
+        "256_128_500": 0.639141
+      },
+      "_n_folds": 4
+    },
+    "knn": {
+      "n_neighbors": 3,
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    },
+    "proto": {
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    },
+    "rf": {
+      "n_estimators": 500,
+      "max_depth": null,
+      "min_samples_split": 5,
+      "min_samples_leaf": 1,
+      "class_weight": {
+        "0": 1,
+        "1": 10
+      },
+      "prediction_threshold": 0.3,
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    }
+  },
+  "Caption_based_aggregation|UNI2|MSIH": {
+    "lin": {
+      "C": 10,
+      "max_iter": 300,
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    },
+    "ann": {
+      "hidden_dim1": 128,
+      "hidden_dim2": 128,
+      "max_iter": 500,
+      "_source": "2-way tie at 2/4 folds, broken by mean validation macro-F1 = 0.734519",
+      "_per_fold_selected": [
+        "128_128_500",
+        "128_128_500",
+        "256_128_500",
+        "256_128_500"
+      ],
+      "_mean_val_macro_f1_by_config": {
+        "128_64_500": 0.664563,
+        "128_128_500": 0.734519,
+        "256_64_500": 0.715763,
+        "256_128_500": 0.72731
+      },
+      "_n_folds": 4
+    },
+    "knn": {
+      "n_neighbors": 3,
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    },
+    "proto": {
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    },
+    "rf": {
+      "n_estimators": 500,
+      "max_depth": null,
+      "min_samples_split": 5,
+      "min_samples_leaf": 1,
+      "class_weight": {
+        "0": 1,
+        "1": 10
+      },
+      "prediction_threshold": 0.3,
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    }
+  },
+  "Caption_based_aggregation|Virchow2|MSIH": {
+    "lin": {
+      "C": 10,
+      "max_iter": 300,
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    },
+    "ann": {
+      "hidden_dim1": 128,
+      "hidden_dim2": 128,
+      "max_iter": 500,
+      "_source": "majority vote (3/4 folds)",
+      "_per_fold_selected": [
+        "128_128_500",
+        "256_128_500",
+        "128_128_500",
+        "128_128_500"
+      ],
+      "_mean_val_macro_f1_by_config": {
+        "128_64_500": 0.660868,
+        "128_128_500": 0.706949,
+        "256_64_500": 0.692697,
+        "256_128_500": 0.672251
+      },
+      "_n_folds": 4
+    },
+    "knn": {
+      "n_neighbors": 3,
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    },
+    "proto": {
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    },
+    "rf": {
+      "n_estimators": 500,
+      "max_depth": null,
+      "min_samples_split": 5,
+      "min_samples_leaf": 1,
+      "class_weight": {
+        "0": 1,
+        "1": 10
+      },
+      "prediction_threshold": 0.3,
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    }
+  },
+  "Caption_based_aggregation|ConchV1|MSIH": {
+    "lin": {
+      "C": 10,
+      "max_iter": 300,
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    },
+    "ann": {
+      "hidden_dim1": 128,
+      "hidden_dim2": 64,
+      "max_iter": 500,
+      "_source": "majority vote (2/4 folds)",
+      "_per_fold_selected": [
+        "256_64_500",
+        "128_64_500",
+        "128_64_500",
+        "256_128_500"
+      ],
+      "_mean_val_macro_f1_by_config": {
+        "128_64_500": 0.653918,
+        "128_128_500": 0.581511,
+        "256_64_500": 0.629502,
+        "256_128_500": 0.636758
+      },
+      "_n_folds": 4
+    },
+    "knn": {
+      "n_neighbors": 3,
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    },
+    "proto": {
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    },
+    "rf": {
+      "n_estimators": 500,
+      "max_depth": null,
+      "min_samples_split": 5,
+      "min_samples_leaf": 1,
+      "class_weight": {
+        "0": 1,
+        "1": 10
+      },
+      "prediction_threshold": 0.3,
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    }
+  },
+  "Caption_based_aggregation_15_classes|H-Optimus-1|MSIH": {
+    "lin": {
+      "C": 10,
+      "max_iter": 300,
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    },
+    "ann": {
+      "hidden_dim1": 256,
+      "hidden_dim2": 64,
+      "max_iter": 500,
+      "_source": "majority vote (2/4 folds)",
+      "_per_fold_selected": [
+        "128_128_500",
+        "256_64_500",
+        "256_64_500",
+        "256_128_500"
+      ],
+      "_mean_val_macro_f1_by_config": {
+        "128_64_500": 0.683618,
+        "128_128_500": 0.713099,
+        "256_64_500": 0.736177,
+        "256_128_500": 0.717474
+      },
+      "_n_folds": 4
+    },
+    "knn": {
+      "n_neighbors": 3,
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    },
+    "proto": {
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    },
+    "rf": {
+      "n_estimators": 500,
+      "max_depth": null,
+      "min_samples_split": 5,
+      "min_samples_leaf": 1,
+      "class_weight": {
+        "0": 1,
+        "1": 10
+      },
+      "prediction_threshold": 0.3,
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    }
+  },
+  "Caption_based_aggregation_15_classes|Conch1_5|MSIH": {
+    "lin": {
+      "C": 10,
+      "max_iter": 300,
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    },
+    "ann": {
+      "hidden_dim1": 128,
+      "hidden_dim2": 128,
+      "max_iter": 500,
+      "_source": "4-way tie at 1/4 folds, broken by mean validation macro-F1 = 0.617726",
+      "_per_fold_selected": [
+        "128_64_500",
+        "256_64_500",
+        "256_128_500",
+        "128_128_500"
+      ],
+      "_mean_val_macro_f1_by_config": {
+        "128_64_500": 0.56017,
+        "128_128_500": 0.617726,
+        "256_64_500": 0.603949,
+        "256_128_500": 0.60899
+      },
+      "_n_folds": 4
+    },
+    "knn": {
+      "n_neighbors": 3,
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    },
+    "proto": {
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    },
+    "rf": {
+      "n_estimators": 500,
+      "max_depth": null,
+      "min_samples_split": 5,
+      "min_samples_leaf": 1,
+      "class_weight": {
+        "0": 1,
+        "1": 10
+      },
+      "prediction_threshold": 0.3,
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    }
+  },
+  "Caption_based_aggregation_15_classes|UNI2|MSIH": {
+    "lin": {
+      "C": 10,
+      "max_iter": 300,
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    },
+    "ann": {
+      "hidden_dim1": 256,
+      "hidden_dim2": 128,
+      "max_iter": 500,
+      "_source": "majority vote (3/4 folds)",
+      "_per_fold_selected": [
+        "256_128_500",
+        "256_64_500",
+        "256_128_500",
+        "256_128_500"
+      ],
+      "_mean_val_macro_f1_by_config": {
+        "128_64_500": 0.636316,
+        "128_128_500": 0.674171,
+        "256_64_500": 0.718435,
+        "256_128_500": 0.72917
+      },
+      "_n_folds": 4
+    },
+    "knn": {
+      "n_neighbors": 3,
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    },
+    "proto": {
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    },
+    "rf": {
+      "n_estimators": 500,
+      "max_depth": null,
+      "min_samples_split": 5,
+      "min_samples_leaf": 1,
+      "class_weight": {
+        "0": 1,
+        "1": 10
+      },
+      "prediction_threshold": 0.3,
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    }
+  },
+  "Caption_based_aggregation_15_classes|Virchow2|MSIH": {
+    "lin": {
+      "C": 10,
+      "max_iter": 300,
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    },
+    "ann": {
+      "hidden_dim1": 256,
+      "hidden_dim2": 128,
+      "max_iter": 500,
+      "_source": "majority vote (2/4 folds)",
+      "_per_fold_selected": [
+        "256_128_500",
+        "256_128_500",
+        "128_128_500",
+        "256_64_500"
+      ],
+      "_mean_val_macro_f1_by_config": {
+        "128_64_500": 0.626199,
+        "128_128_500": 0.684471,
+        "256_64_500": 0.675299,
+        "256_128_500": 0.675033
+      },
+      "_n_folds": 4
+    },
+    "knn": {
+      "n_neighbors": 3,
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    },
+    "proto": {
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    },
+    "rf": {
+      "n_estimators": 500,
+      "max_depth": null,
+      "min_samples_split": 5,
+      "min_samples_leaf": 1,
+      "class_weight": {
+        "0": 1,
+        "1": 10
+      },
+      "prediction_threshold": 0.3,
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    }
+  },
+  "Caption_based_aggregation_15_classes|ConchV1|MSIH": {
+    "lin": {
+      "C": 10,
+      "max_iter": 300,
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    },
+    "ann": {
+      "hidden_dim1": 128,
+      "hidden_dim2": 64,
+      "max_iter": 500,
+      "_source": "majority vote (3/4 folds)",
+      "_per_fold_selected": [
+        "128_128_500",
+        "128_64_500",
+        "128_64_500",
+        "128_64_500"
+      ],
+      "_mean_val_macro_f1_by_config": {
+        "128_64_500": 0.656051,
+        "128_128_500": 0.627641,
+        "256_64_500": 0.601025,
+        "256_128_500": 0.623996
+      },
+      "_n_folds": 4
+    },
+    "knn": {
+      "n_neighbors": 3,
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    },
+    "proto": {
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    },
+    "rf": {
+      "n_estimators": 500,
+      "max_depth": null,
+      "min_samples_split": 5,
+      "min_samples_leaf": 1,
+      "class_weight": {
+        "0": 1,
+        "1": 10
+      },
+      "prediction_threshold": 0.3,
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    }
+  },
+  "Tissue_Type_Clustering|H-Optimus-1|MSIH": {
+    "lin": {
+      "C": 10,
+      "max_iter": 300,
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    },
+    "ann": {
+      "hidden_dim1": 128,
+      "hidden_dim2": 128,
+      "max_iter": 500,
+      "_source": "majority vote (3/4 folds)",
+      "_per_fold_selected": [
+        "128_64_500",
+        "128_128_500",
+        "128_128_500",
+        "128_128_500"
+      ],
+      "_mean_val_macro_f1_by_config": {
+        "128_64_500": 0.721129,
+        "128_128_500": 0.751158,
+        "256_64_500": 0.67976,
+        "256_128_500": 0.702236
+      },
+      "_n_folds": 4
+    },
+    "knn": {
+      "n_neighbors": 3,
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    },
+    "proto": {
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    },
+    "rf": {
+      "n_estimators": 500,
+      "max_depth": null,
+      "min_samples_split": 5,
+      "min_samples_leaf": 1,
+      "class_weight": {
+        "0": 1,
+        "1": 10
+      },
+      "prediction_threshold": 0.3,
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    }
+  },
+  "Tissue_Type_Clustering|Conch1_5|MSIH": {
+    "lin": {
+      "C": 10,
+      "max_iter": 300,
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    },
+    "ann": {
+      "hidden_dim1": 256,
+      "hidden_dim2": 128,
+      "max_iter": 500,
+      "_source": "majority vote (2/4 folds)",
+      "_per_fold_selected": [
+        "256_128_500",
+        "256_64_500",
+        "128_64_500",
+        "256_128_500"
+      ],
+      "_mean_val_macro_f1_by_config": {
+        "128_64_500": 0.613185,
+        "128_128_500": 0.617345,
+        "256_64_500": 0.638786,
+        "256_128_500": 0.644933
+      },
+      "_n_folds": 4
+    },
+    "knn": {
+      "n_neighbors": 3,
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    },
+    "proto": {
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    },
+    "rf": {
+      "n_estimators": 500,
+      "max_depth": null,
+      "min_samples_split": 5,
+      "min_samples_leaf": 1,
+      "class_weight": {
+        "0": 1,
+        "1": 10
+      },
+      "prediction_threshold": 0.3,
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    }
+  },
+  "Tissue_Type_Clustering|UNI2|MSIH": {
+    "lin": {
+      "C": 10,
+      "max_iter": 300,
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    },
+    "ann": {
+      "hidden_dim1": 128,
+      "hidden_dim2": 128,
+      "max_iter": 500,
+      "_source": "majority vote (2/4 folds)",
+      "_per_fold_selected": [
+        "128_128_500",
+        "128_128_500",
+        "128_64_500",
+        "256_128_500"
+      ],
+      "_mean_val_macro_f1_by_config": {
+        "128_64_500": 0.65872,
+        "128_128_500": 0.695326,
+        "256_64_500": 0.545723,
+        "256_128_500": 0.700592
+      },
+      "_n_folds": 4
+    },
+    "knn": {
+      "n_neighbors": 3,
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    },
+    "proto": {
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    },
+    "rf": {
+      "n_estimators": 500,
+      "max_depth": null,
+      "min_samples_split": 5,
+      "min_samples_leaf": 1,
+      "class_weight": {
+        "0": 1,
+        "1": 10
+      },
+      "prediction_threshold": 0.3,
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    }
+  },
+  "Tissue_Type_Clustering|Virchow2|MSIH": {
+    "lin": {
+      "C": 10,
+      "max_iter": 300,
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    },
+    "ann": {
+      "hidden_dim1": 256,
+      "hidden_dim2": 64,
+      "max_iter": 500,
+      "_source": "majority vote (3/4 folds)",
+      "_per_fold_selected": [
+        "128_128_500",
+        "256_64_500",
+        "256_64_500",
+        "256_64_500"
+      ],
+      "_mean_val_macro_f1_by_config": {
+        "128_64_500": 0.670308,
+        "128_128_500": 0.680791,
+        "256_64_500": 0.707547,
+        "256_128_500": 0.673514
+      },
+      "_n_folds": 4
+    },
+    "knn": {
+      "n_neighbors": 3,
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    },
+    "proto": {
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    },
+    "rf": {
+      "n_estimators": 500,
+      "max_depth": null,
+      "min_samples_split": 5,
+      "min_samples_leaf": 1,
+      "class_weight": {
+        "0": 1,
+        "1": 10
+      },
+      "prediction_threshold": 0.3,
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    }
+  },
+  "Tissue_Type_Clustering|ConchV1|MSIH": {
+    "lin": {
+      "C": 10,
+      "max_iter": 300,
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    },
+    "ann": {
+      "hidden_dim1": 256,
+      "hidden_dim2": 128,
+      "max_iter": 500,
+      "_source": "majority vote (3/4 folds)",
+      "_per_fold_selected": [
+        "256_64_500",
+        "256_128_500",
+        "256_128_500",
+        "256_128_500"
+      ],
+      "_mean_val_macro_f1_by_config": {
+        "128_64_500": 0.632383,
+        "128_128_500": 0.576676,
+        "256_64_500": 0.641296,
+        "256_128_500": 0.682439
+      },
+      "_n_folds": 4
+    },
+    "knn": {
+      "n_neighbors": 3,
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    },
+    "proto": {
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    },
+    "rf": {
+      "n_estimators": 500,
+      "max_depth": null,
+      "min_samples_split": 5,
+      "min_samples_leaf": 1,
+      "class_weight": {
+        "0": 1,
+        "1": 10
+      },
+      "prediction_threshold": 0.3,
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    }
+  },
+  "TITAN|Conch1_5|MSIH": {
+    "lin": {
+      "C": 10,
+      "max_iter": 300,
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    },
+    "ann": {
+      "hidden_dim1": 256,
+      "hidden_dim2": 64,
+      "max_iter": 500,
+      "_source": "majority vote (2/4 folds)",
+      "_per_fold_selected": [
+        "256_64_500",
+        "256_128_500",
+        "128_128_500",
+        "256_64_500"
+      ],
+      "_mean_val_macro_f1_by_config": {
+        "128_64_500": 0.135023,
+        "128_128_500": 0.691347,
+        "256_64_500": 0.69148,
+        "256_128_500": 0.696822
+      },
+      "_n_folds": 4
+    },
+    "knn": {
+      "n_neighbors": 3,
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    },
+    "proto": {
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    },
+    "rf": {
+      "n_estimators": 500,
+      "max_depth": null,
+      "min_samples_split": 5,
+      "min_samples_leaf": 1,
+      "class_weight": {
+        "0": 1,
+        "1": 10
+      },
+      "prediction_threshold": 0.3,
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    }
+  },
+  "PRISM|PRISM|MSIH": {
+    "lin": {
+      "C": 10,
+      "max_iter": 300,
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    },
+    "ann": {
+      "hidden_dim1": 256,
+      "hidden_dim2": 128,
+      "max_iter": 500,
+      "_source": "majority vote (3/4 folds)",
+      "_per_fold_selected": [
+        "256_128_500",
+        "256_128_500",
+        "256_128_500",
+        "128_128_500"
+      ],
+      "_mean_val_macro_f1_by_config": {
+        "128_64_500": 0.685324,
+        "128_128_500": 0.715299,
+        "256_64_500": 0.609821,
+        "256_128_500": 0.72772
+      },
+      "_n_folds": 4
+    },
+    "knn": {
+      "n_neighbors": 3,
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    },
+    "proto": {
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    },
+    "rf": {
+      "n_estimators": 500,
+      "max_depth": null,
+      "min_samples_split": 5,
+      "min_samples_leaf": 1,
+      "class_weight": {
+        "0": 1,
+        "1": 10
+      },
+      "prediction_threshold": 0.3,
+      "_source": "single-point grid; no selection occurs",
+      "_n_folds": 4
+    }
+  }
+}
