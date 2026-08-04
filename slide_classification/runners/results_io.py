@@ -15,6 +15,7 @@ variant)``, each stamped with ``machine``, ``timestamp``, ``git_commit`` and
 from __future__ import annotations
 
 import json
+import shutil
 from datetime import date
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set
@@ -55,8 +56,33 @@ def archive_experiment_tree(experiment: str, when: str = None) -> Optional[Path]
     while dest.exists():
         n += 1
         dest = tree.with_name(f"{tree.name}_ARCHIVED_{stamp}_{n}")
-    tree.rename(dest)
-    print(f"[ARCHIVE] {tree.name} -> {dest.name} (pre-correction results preserved)")
+
+    n_before = sum(1 for _ in tree.rglob("*") if _.is_file())
+
+    try:
+        tree.rename(dest)
+        print(f"[ARCHIVE] {tree.name} -> {dest.name} "
+              f"({n_before} files, pre-correction results preserved)")
+        return dest
+    except OSError as exc:
+        # Windows refuses to rename a directory while anything holds a handle on
+        # it (a file watcher, an indexer, or a virus scanner is enough). Falling
+        # back to a verified copy still satisfies the rule that matters - the old
+        # numbers remain auditable - after which new results overwrite the live
+        # tree file by file.
+        print(f"[ARCHIVE] rename failed ({type(exc).__name__}: {exc}); "
+              f"falling back to copy")
+
+    shutil.copytree(tree, dest, dirs_exist_ok=False)
+    n_after = sum(1 for _ in dest.rglob("*") if _.is_file())
+    if n_after != n_before:
+        raise RuntimeError(
+            f"Archive copy of {tree.name} is incomplete: {n_after} files copied "
+            f"vs {n_before} in the source. Refusing to continue - pre-correction "
+            f"results must be preserved intact before they are overwritten."
+        )
+    print(f"[ARCHIVE] {tree.name} -> {dest.name} (copied, {n_after} files verified; "
+          f"live tree will be overwritten in place)")
     return dest
 
 
