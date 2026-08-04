@@ -228,11 +228,11 @@ def labels_path(cohort: str, task: str = "MSIH") -> Path:
             return SLIDE_CLS_ROOT / "kfolds_IDARS_fixed.csv"
         return SLIDE_CLS_ROOT / f"kfold_{task}.csv"
     if cohort == "paip":
-        # Task 2.3 renames the misleading 'paip_kfolds_71.csv' (78 rows, no
-        # folds) to 'paip_78_labels.csv'. Prefer the new name, fall back to the
-        # old one so this module works before and after that rename lands.
-        new = SLIDE_CLS_ROOT / "paip_78_labels.csv"
-        return new if new.exists() else SLIDE_CLS_ROOT / "paip_kfolds_71.csv"
+        # Task 2.3 (done 2026-08-04): renamed from 'paip_kfolds_71.csv', which
+        # held 78 rows and no fold column at all - it is a label table, and the
+        # name had it being read as a fold table. PAIP has no folds: PAIP-CV is
+        # retired (Task 2.2) and PAIP uses the provider's own 47/31 split.
+        return SLIDE_CLS_ROOT / "paip_78_labels.csv"
     if cohort == "surgen":
         return SLIDE_CLS_ROOT / "surgen_labels.csv"
     raise ValueError(f"Unknown cohort {cohort!r}; expected one of {COHORTS}")

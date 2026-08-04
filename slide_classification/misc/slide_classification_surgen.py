@@ -1,3 +1,34 @@
+# ===========================================================================
+# RETIRED 2026-08-04 - work order Tasks 2.1 / 1.0. Superseded, do not run.
+#
+# Why (three independent defects, all fixed elsewhere):
+#
+#  1. LEAKAGE - build_runtime_folds() below deals *slide* IDs round-robin into
+#     folds. 70 of SurGen's 554 labelled cases contribute two slides each, so
+#     49 of those 70 cases (70%) landed with one slide in train and the other in
+#     test - the same patient on both sides. Two sections from one tumour are far
+#     more alike than two different tumours, so this inflated every SurGen number.
+#     Measured cost of the leak, across 3 (method, model) combinations x 5
+#     classifiers: mean BalAcc -0.0252, AUROC -0.0342 once corrected. All 15
+#     BalAcc deltas were negative.
+#     TCGA was immune - it has exactly one slide per patient - which is why the
+#     same code was safe there and was carried over unchanged.
+#
+#  2. ANN hyperparameters selected on the TEST fold (work order Task 1.1) - see
+#     the `eval_metrics['ann_macro_f1']` comparison in train_and_evaluate.
+#
+#  3. Its own copy of WSIDataset, re-reading every .pt file ~20x per
+#     (method, model), plus hardcoded machine-specific data roots.
+#
+# Superseded by:
+#   slide_classification/runners/surgen_folds.py  - case-level folds, asserts no
+#       case spans folds; build_slide_level_folds_legacy() there reproduces this
+#       file's behaviour for before/after measurement only.
+#   slide_classification/runners/cv_runner.py     - the shared CV runner
+#       (python -m runners.cv_runner --experiment SurGen-CV)
+#   slide_classification/data_layer.py            - the single WSIDataset
+#   slide_classification/config/paths.py          - MACHINE-keyed data roots
+# ===========================================================================
 import torch
 import torchvision
 import os

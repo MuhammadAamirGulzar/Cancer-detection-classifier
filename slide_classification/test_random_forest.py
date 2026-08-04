@@ -18,7 +18,7 @@ from typing import Dict, List, Tuple, Optional
 # Configuration
 MODEL_DIR = r"TCGA_Results_Updated\Caption_based_aggregation\Conch1_5\1-MSIH\models"
 PAIP_FEATURE_DIR = r"D:\Aamir Gulzar\KSA_project2\paip_data\slide_aggregation\Caption_Based_Clustering_FiveCrop\conch_CC_fivecrop"
-GROUND_TRUTH_PATH = r"D:\Aamir Gulzar\KSA_project2\paip_data\labels\paip_kfolds_71.csv"
+GROUND_TRUTH_PATH = r"D:\Aamir Gulzar\KSA_project2\paip_data\labels\paip_78_labels.csv"
 
 def parse_label(raw) -> Optional[int]:
     """Convert label to binary (0=nonMSIH, 1=MSIH)"""

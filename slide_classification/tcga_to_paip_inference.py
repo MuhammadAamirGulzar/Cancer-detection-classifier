@@ -26,7 +26,7 @@ warnings.filterwarnings('ignore')
 # ============================================
 TCGA_MODELS_BASE = r"D:\Aamir Gulzar\KSA_project2\Cancer-detection-classifier\slide_classification\TCGA_Result\5-Caption_based_aggregation"
 PAIP_DATA_BASE = r"D:\Aamir Gulzar\KSA_project2\paip_data\slide_aggregation\Caption_Based_Clustering_FiveCrop"
-GROUND_TRUTH_PATH = r"D:\Aamir Gulzar\KSA_project2\paip_data\labels\paip_kfolds_71.csv"
+GROUND_TRUTH_PATH = r"D:\Aamir Gulzar\KSA_project2\paip_data\labels\paip_78_labels.csv"
 OUTPUT_PATH = r"D:\Aamir Gulzar\KSA_project2\Cancer-detection-classifier\slide_classification\Inference_Results"
 os.makedirs(OUTPUT_PATH, exist_ok=True)
 

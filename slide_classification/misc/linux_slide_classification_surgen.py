@@ -1,3 +1,34 @@
+# ===========================================================================
+# RETIRED 2026-08-04 - work order Tasks 2.1 / 1.0. Superseded, do not run.
+#
+# Why (three independent defects, all fixed elsewhere):
+#
+#  1. LEAKAGE - build_runtime_folds() below deals *slide* IDs round-robin into
+#     folds. 70 of SurGen's 554 labelled cases contribute two slides each, so
+#     49 of those 70 cases (70%) landed with one slide in train and the other in
+#     test - the same patient on both sides. Two sections from one tumour are far
+#     more alike than two different tumours, so this inflated every SurGen number.
+#     Measured cost of the leak, across 3 (method, model) combinations x 5
+#     classifiers: mean BalAcc -0.0252, AUROC -0.0342 once corrected. All 15
+#     BalAcc deltas were negative.
+#     TCGA was immune - it has exactly one slide per patient - which is why the
+#     same code was safe there and was carried over unchanged.
+#
+#  2. ANN hyperparameters selected on the TEST fold (work order Task 1.1) - see
+#     the `eval_metrics['ann_macro_f1']` comparison in train_and_evaluate.
+#
+#  3. Its own copy of WSIDataset, re-reading every .pt file ~20x per
+#     (method, model), plus hardcoded machine-specific data roots.
+#
+# Superseded by:
+#   slide_classification/runners/surgen_folds.py  - case-level folds, asserts no
+#       case spans folds; build_slide_level_folds_legacy() there reproduces this
+#       file's behaviour for before/after measurement only.
+#   slide_classification/runners/cv_runner.py     - the shared CV runner
+#       (python -m runners.cv_runner --experiment SurGen-CV)
+#   slide_classification/data_layer.py            - the single WSIDataset
+#   slide_classification/config/paths.py          - MACHINE-keyed data roots
+# ===========================================================================
 import torch
 import torchvision
 import os
@@ -31,30 +62,26 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(device)
 
 # --- DYNAMIC CONFIGURATIONS ---
-# WINDOWS RUN — conch1-5 and virchow2 were saved to two DIFFERENT drives
-# (D: and F:), so there's no single PROJECT_ROOT that both live under like
-# on the Linux machine. MODEL_NAME is set to the real saved folder name for
-# each, and DATA_PATH/RESULT_ROOT are built per-model from MODEL_ROOTS below
-# instead of one shared PROJECT_ROOT + MODEL_NAME join.
-AGGREGATION_METHODS = ["Averaging", "Tissue_Type_Clustering", "Caption_based_aggregation"]  # ["Averaging", "Caption_based_aggregation", "Tissue_Type_Clustering", "TITAN", "PRISM"]
-MODEL_NAMES = ["conch1-5", "virchow2"]  # Conch1_5, Virchow2 — real saved folder names
-
-# Root directory each model's "features" folder lives directly under.
-# (conch1-5 -> D: drive, virchow2 -> D: drive — separate roots, separate drives.)
-MODEL_ROOTS = {
-    "conch1-5": r"D:\Aamir Gulzar\KSA_project2\surgen_data\surgen_processed\conch1-5",
-    "virchow2": r"D:\Aamir Gulzar\KSA_project2\surgen_data\surgen_processed\virchow2",
-}
-
-# Where results get written. Both models now write into this single shared
-# results folder (instead of each writing under its own model_root/drive).
-RESULT_ROOT_BASE = r"D:\Aamir Gulzar\KSA_project2\Cancer-detection-classifier\slide_classification\SurGen_Results"
+# LINUX RUN — h-optimus-1, uni2-h, conch-v1 all live under the same
+# PROJECT_ROOT on this machine, so MODEL_NAME here is set to the EXACT
+# folder name each model's features were actually saved under (confirmed
+# from the Averaging/TTC/Caption scripts we built). No name-mapping needed
+# because DATA_PATH nests MODEL_NAME both as the top-level folder and as
+# the leaf folder under slide_aggregation/<method>/, and both match on disk
+# for these three.
+#
+# NOTE: "uni2-h" path is carried over from your existing uni2-h scripts —
+# we didn't build those, so double check it still points at the right place.
+AGGREGATION_METHODS = ["Averaging", "Tissue_Type_Clustering"]  # ["Averaging", "Caption_based_aggregation", "Tissue_Type_Clustering", "TITAN", "PRISM"]
+MODEL_NAMES = ["conch-v1", "h-optimus-1", "uni2-h"]  # ConchV1, H-Optimus-1, UNI2 — real saved folder names
+RESULT_FOLDER = "SurGen_Results"
 
 # Define Base Dimensions for each model (keys must match MODEL_NAMES exactly)
 MODEL_BASE_DIMS = {
-    "conch1-5": 768,
-    "virchow2": 2560,
-    "PRISM": 1280,  # inactive — no PRISM entry in MODEL_NAMES, no known path on this machine
+    "h-optimus-1": 1536,
+    "uni2-h": 1536,
+    "conch-v1": 512,
+    "PRISM": 1280,  # inactive — no PRISM entry in MODEL_NAMES
 }
 
 # Define Multipliers for each aggregation method
@@ -86,11 +113,11 @@ RANDOM_SEED = 42
 # This is ONLY used to attach labels to each slide id discovered on disk —
 # fold membership itself is no longer read from this file, it's generated
 # at runtime from whatever slide ids exist in DATA_PATH.
-LABELS_CSV_PATH = r"D:\Aamir Gulzar\KSA_project2\Cancer-detection-classifier\slide_classification\surgen_labels.csv"
+LABELS_CSV_PATH = "/home/mle/Aamir/Azfaar/surgen_processing/surgen_labels.csv"
 
-# No shared PROJECT_ROOT on this machine — conch1-5 and virchow2 live on
-# separate drives (see MODEL_ROOTS above). DATA_PATH / RESULT_ROOT are built
-# per-model further down instead.
+# Linux paths for SurGen (adjust if your base differs)
+BASE_ROOT = "/media/dp-psau/Datum/Aamir/Azfaar"
+PROJECT_ROOT = os.path.join(BASE_ROOT, "surgen_processed")
 
 sheet_name = "baseline"
 
@@ -175,18 +202,24 @@ for AGGREGATION_METHOD in AGGREGATION_METHODS:
             VECTOR_DIM = base * mult
 
         if AGGREGATION_METHOD == "PRISM":
-            # Not currently reachable — no "PRISM" entry in MODEL_ROOTS on this
-            # machine. Add one to MODEL_ROOTS above before enabling this.
-            raise ValueError(
-                "PRISM has no known root path on this machine. "
-                "Add MODEL_ROOTS['PRISM'] before using AGGREGATION_METHOD='PRISM'."
+            DATA_PATH = os.path.join(
+                PROJECT_ROOT,
+                "PRISM",
+                "features",
+                "slide_aggregation",
+                "PRISM"
+            )
+
+            RESULT_ROOT = os.path.join(
+                PROJECT_ROOT,
+                RESULT_FOLDER,
+                "PRISM"
             )
 
         else:
-            model_root = MODEL_ROOTS[MODEL_NAME]
-
             DATA_PATH = os.path.join(
-                model_root,
+                PROJECT_ROOT,
+                MODEL_NAME,
                 "features",
                 "slide_aggregation",
                 AGGREGATION_METHOD,
@@ -194,7 +227,8 @@ for AGGREGATION_METHOD in AGGREGATION_METHODS:
             )
 
             RESULT_ROOT = os.path.join(
-                RESULT_ROOT_BASE,
+                PROJECT_ROOT,
+                RESULT_FOLDER,
                 AGGREGATION_METHOD,
                 MODEL_NAME
             )
@@ -358,9 +392,9 @@ for AGGREGATION_METHOD in AGGREGATION_METHODS:
 
                 elif model_type == 'ann':
                     param_grid = {
-                        'hidden_dim1': [64, 128, 256, 512],
-                        'hidden_dim2': [32, 64, 128, 256],
-                        'max_iter': [300, 500]
+                        'hidden_dim1': [128, 256],
+                        'hidden_dim2': [64, 128],
+                        'max_iter': [500]
                     }
                     for h1, h2, max_iter in product(param_grid['hidden_dim1'], param_grid['hidden_dim2'], param_grid['max_iter']):
                         eval_metrics, eval_dump = eval_ANN(
@@ -384,7 +418,7 @@ for AGGREGATION_METHOD in AGGREGATION_METHODS:
                             best_params = (h1, h2, max_iter)
 
                 elif model_type == 'knn':
-                    for k in [3,5,7]:
+                    for k in [3]:
                         eval_metrics, eval_dump = eval_knn(
                             fold=fold,
                             train_feats=train_feats,

@@ -121,13 +121,33 @@ sheet_name         = "tissue_search"
 
 
 def build_runtime_folds(slide_ids: List[str], num_folds: int = NUM_FOLDS, seed: int = RANDOM_SEED) -> List[List[str]]:
-    ids = list(slide_ids)
-    rng = random.Random(seed)
-    rng.shuffle(ids)
+    """Case-level folds. Returns the same List[List[str]] shape as before.
 
-    folds = [[] for _ in range(num_folds)]
-    for i, sid in enumerate(ids):
-        folds[i % num_folds].append(sid)
+    [CORRECTION 2026-08-04, work order Task 2.1] This function used to shuffle
+    *slide* IDs and deal them round-robin - without even stratifying by label.
+    70 of SurGen's 554 labelled cases contribute two slides each, so sibling
+    slides landed in different folds ~70% of the time, putting the same patient
+    in train and test. Measured cost across 3 (method, model) combinations x 5
+    classifiers once corrected: mean BalAcc -0.0252, AUROC -0.0342, with all 15
+    BalAcc deltas negative.
+
+    It now delegates to the shared case-level builder, which keeps whole cases
+    together, stratifies on the case-level label, and asserts that no case spans
+    folds. Any SurGen result produced by this script before this date is
+    leak-inflated and must be regenerated.
+    """
+    import os
+    import sys
+
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    from runners.surgen_folds import build_case_level_folds
+
+    fold_map = build_case_level_folds(
+        num_folds=num_folds, seed=seed, restrict_to=slide_ids, verbose=True
+    )
+    folds: List[List[str]] = [[] for _ in range(num_folds)]
+    for wsi_id, fold in fold_map.items():
+        folds[fold - 1].append(wsi_id)   # builder numbers folds 1..K
     return folds
 
 
