@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "last_updated": "2026-08-04T13:05:00Z",
+  "last_updated": "2026-08-04T13:53:52+00:00",
   "phases": {
     "0": {
       "0.1_git_protect": {
@@ -14,30 +14,79 @@
       }
     },
     "1": {
-      "1.0_data_layer_refactor": {"status": "pending"},
-      "1.1_ann_hparam_selection_on_val": {"status": "pending"},
-      "1.2_ann_checkpoint_save_fix": {"status": "pending"},
-      "1.3_ann_double_softmax_fix": {"status": "pending"},
-      "1.4_fail_loud_missing_slides": {"status": "pending"},
-      "1.5_retire_stale_scripts": {"status": "pending"}
+      "1.0_data_layer_refactor": {
+        "status": "done",
+        "commit": "5aad5fe, 61c2e21",
+        "notes": "config/paths.py (MACHINE-keyed roots, canonical->on-disk model map, availability scan) + data_layer.py (single WSIDataset replacement) + runners/ (classifiers, cv_runner, results_io, thresholds, runlog). Parity vs old code path: data bit-identical on all 12 splits, metrics max|delta|=0.00e+00 across lin/knn/proto/rf/ann (tol 1e-6). Data-path speedup 41.5x warm-OS-cache, 162x with .npz cache (target was >=5x). Also found+fixed a reproducibility defect not in the work order: old train DataLoader used shuffle=True unseeded, and RF bootstrap depends on row order, so old RF numbers were not reproducible run-to-run."
+      },
+      "1.1_ann_hparam_selection_on_val": {
+        "status": "done",
+        "notes": "eval_ANN returns val_-prefixed validation metrics; all selection sites use them. Measured bias on TCGA/TTC/H-Optimus-1: folds 2 and 3 select a different architecture, fold 3 by +0.0330 test macro-F1; mean +0.0085. Found a SECOND form the work order's grep misses: metric_key = f'{model_type}_macro_f1' indirection in best_k notebook cells 7/11/15/19, TTC_exp cell 8, and slide_classification_surgen_best_k_labels_exp.py - all with real 2x2 ANN grids, all patched. Verified lin/knn/proto/rf grids are still single-point (unbiased). eval_knn's internal GridSearchCV is a legitimate nested search on training data, not test selection."
+      },
+      "1.2_ann_checkpoint_save_fix": {
+        "status": "done",
+        "notes": "torch.save removed from inside the grid loop (input_dim constant across the grid meant all 4 configs overwrote one path; disk always held the LAST entry, 256/128). save_ann_checkpoint() writes fold{f}_ann_{dim}_{h1}_{h2}.pth + fold{f}_ann_config.json after selection; load_ann_checkpoint() reads it with state-dict-shape inference as a legacy fallback. Verified state dict == config.json == selected config."
+      },
+      "1.3_ann_double_softmax_fix": {
+        "status": "done",
+        "notes": "nn.Softmax removed from the training graph (was fed to CrossEntropyLoss, which applies log-softmax internally). Softmax now only in predict_proba. One fold before/after: bacc 0.8148->0.8205, AUROC 0.8742->0.8879, macro-F1 0.7308->0.7412, acc 0.8252->0.8350. Improvement on every metric. ALL ANN checkpoints and results must be regenerated - sequenced with Phase 3."
+      },
+      "1.4_fail_loud_missing_slides": {
+        "status": "done",
+        "notes": "data_layer warns and writes missing_slides.csv. Verified: TCGA N=413 not 416 (names the exact 3), PAIP N=73 not 78 (exact 5), SurGen N=622 not 624 - the 2 missing SurGen slides are SR386_40X_HE_T086_01 and SR386_40X_HE_T339_01, which answers a Task 3.2 question early. Undefined-`label` NameError in the BRAF/KRAS/TP53 branches is gone. Fold-size clarification: work order's 103/98/112/103 is the 416-label view; the modelled 413 view is 103/97/112/101 with MSI-H 15/13/20/12."
+      },
+      "1.5_retire_stale_scripts": {
+        "status": "done",
+        "notes": "external_validation_script.py, dataloader.py, plot_surgen_ttc_results.py moved to slide_classification/misc/ with superseded-by headers. No active code path imports any of them (all remaining references are commented out)."
+      },
+      "_deviations": {
+        "1c.2_repo_wide_path_grep": "DOES NOT PASS. 23 upstream feature-extraction/aggregation files still carry hardcoded roots; deferred (not re-run by Phases 1-4). Trigger to revisit: server-side SurGen feature generation for H-Optimus-1/UNI2/ConchV1. OPEN_QUESTIONS #4.",
+        "CIMP_not_binary": "OUTSTANDING - 4 levels, needs an owner dichotomisation decision before Phase 5. load_label_map raises rather than guessing. OPEN_QUESTIONS #5.",
+        "notebook_cell10_syntax": "Pre-existing at commit 4240546, untouched: whole cell body indented 4 spaces, does not parse. Scratch diagnostic, not a result path. Not a regression."
+      }
     },
     "2": {
-      "2.1_surgen_case_level_folds": {"status": "pending"},
-      "2.2_retire_paip_cv": {"status": "pending"},
-      "2.3_rename_paip_label_files": {"status": "pending"}
+      "2.1_surgen_case_level_folds": {
+        "status": "pending"
+      },
+      "2.2_retire_paip_cv": {
+        "status": "pending"
+      },
+      "2.3_rename_paip_label_files": {
+        "status": "pending"
+      }
     },
     "3": {
-      "3.0_tcga_full_artifact": {"status": "pending"},
-      "3.1_paip_iv": {"status": "pending"},
-      "3.2_surgen_ev": {"status": "pending"},
-      "3.3_coverage_gaps": {"status": "pending"}
+      "3.0_tcga_full_artifact": {
+        "status": "pending"
+      },
+      "3.1_paip_iv": {
+        "status": "pending"
+      },
+      "3.2_surgen_ev": {
+        "status": "pending"
+      },
+      "3.3_coverage_gaps": {
+        "status": "pending"
+      }
     },
     "4": {
-      "4.1_consolidated_workbook": {"status": "pending"},
-      "4.2_summary_tables": {"status": "pending"},
-      "4.3_titan_prism_tables": {"status": "pending"},
-      "4.4_radar_plots": {"status": "pending"},
-      "4.5_results_md": {"status": "pending"}
+      "4.1_consolidated_workbook": {
+        "status": "pending"
+      },
+      "4.2_summary_tables": {
+        "status": "pending"
+      },
+      "4.3_titan_prism_tables": {
+        "status": "pending"
+      },
+      "4.4_radar_plots": {
+        "status": "pending"
+      },
+      "4.5_results_md": {
+        "status": "pending"
+      }
     }
-  }
+  },
+  "branch": "dev (all remediation work; master preserves pre-remediation state)"
 }

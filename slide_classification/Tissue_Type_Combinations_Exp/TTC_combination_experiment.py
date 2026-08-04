@@ -326,7 +326,10 @@ def _run_kfold(
 
     metric_key = {
         "lin":   "lin_macro_f1",
-        "ann":   "ann_macro_f1",
+        # [CORRECTION 2026-08-04, Task 1.1] validation, not test. This grid is
+        # currently single-point ([256],[64],[500]) so no selection occurs today,
+        # but the key must not silently become test-based if it is widened.
+        "ann":   "val_ann_macro_f1",
         "knn":   "knn_macro_f1",
         "proto": "proto_macro_f1",
         "rf":    "rf_macro_f1",

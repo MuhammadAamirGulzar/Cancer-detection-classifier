@@ -330,7 +330,11 @@ def _run_one_combo_kfold(
     Updates `tracker` after every fold.
     """
     vector_dim       = len(row_indices) * feature_dim
-    metric_key       = f"{model_type}_macro_f1"
+    # [CORRECTION 2026-08-04, work order Task 1.1] For the ANN this resolved to
+    # "ann_macro_f1", computed by eval_ANN on the TEST set, so the best of the 4
+    # grid configurations was selected on test performance. Other classifiers have
+    # single-point grids, so no selection occurs and their key is unchanged.
+    metric_key       = f"val_{model_type}_macro_f1" if model_type == "ann" else f"{model_type}_macro_f1"
     results_per_fold = []
     num_folds        = len(folds)
 
