@@ -1,3 +1,15 @@
+# ===========================================================================
+# RETIRED 2026-08-04 - work order Task 1.5. Superseded, do not run.
+#
+# Why: imported nowhere (every reference in the repo is commented out), carries
+# stale Windows paths, and derives labels from filename substrings rather than
+# from the label CSV - which silently disagrees with the fold tables.
+#
+# Superseded by: slide_classification/data_layer.py, the single WSIDataset
+# replacement (Task 1.0). Labels there resolve through the label CSV via an O(1)
+# dict, and slides that are labelled but have no features are reported rather
+# than silently dropped (Task 1.4).
+# ===========================================================================
 import os
 import torch
 from torch.utils.data import Dataset

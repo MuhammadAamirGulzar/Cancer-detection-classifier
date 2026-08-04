@@ -1,3 +1,18 @@
+# ===========================================================================
+# RETIRED 2026-08-04 - work order Task 1.5. Superseded, do not run.
+#
+# Why: this script hardcodes the ANN architecture as hidden_dim=256,
+# hidden_dim2=64. Every saved TCGA ANN checkpoint is 256/128, so it would fail
+# with a shape mismatch the moment it loaded one. It could not have produced the
+# published PAIP-EV numbers.
+#
+# What produced the current PAIP-EV results instead: Slide_Classification.ipynb
+# cell 14, which infers the architecture from the state dict and is correct.
+#
+# Superseded by: slide_classification/runners/ev_runner.py (Phase 3, Task 3.0/3.2),
+# which loads architecture from fold{f}_ann_config.json (Task 1.2) and applies the
+# tau_TCGA threshold policy (section 1b).
+# ===========================================================================
 #!/usr/bin/env python3
 """
 Universal External Validation Script - TCGA to PAIP

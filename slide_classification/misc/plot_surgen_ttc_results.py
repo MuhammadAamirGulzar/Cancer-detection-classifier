@@ -1,3 +1,15 @@
+# ===========================================================================
+# RETIRED 2026-08-04 - work order Task 1.5. Superseded, do not run.
+#
+# Why: reads /media/dp-psau/Datum/Aamir/Azfaar/... which does not exist on this
+# workstation, and expects filenames (tissue_topk_summary_surgen_k{k}.xlsx) that
+# come from slide_classification_surgen_best_k_labels_exp.py - a different script
+# from the one that produced the local SurGen_Results/ tree
+# (tissue_combo_summary_k{k}.xlsx). It cannot run as-is from this repo.
+#
+# Superseded by: Analysis_and_Visualization/Analysis.ipynb (Phase 4), which reads
+# through config/paths.py and so resolves correctly on both machines.
+# ===========================================================================
 import pandas as pd
 import os
 import matplotlib.pyplot as plt

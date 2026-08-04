@@ -20,4 +20,23 @@ The doc frames Task 0.2 revocation as a near-immediate hard stop ("the user must
 
 ---
 
+### 4. Hardcoded-path sweep scope: classification pipeline now, upstream stages deferred — RESOLVED, narrower than the doc's literal acceptance
+
+Work order §1c.2 item 1 says to remove every hardcoded `D:\Aamir Gulzar\...` / `/media/dp-psau/...` path from **every** script and notebook, with a repo-wide grep as the acceptance check. A census found **34 files** carrying such roots, split across two very different groups:
+
+- **Classification pipeline (11 files, in `slide_classification/`)** — this is what Phases 1–4 actually execute. Swept: all active drivers now resolve roots through `config/paths.py`. Three of the offenders were retired to `misc/` by Task 1.5; the three SurGen CV scripts are superseded by `runners/cv_runner.py` in Task 2.1.
+- **Upstream feature-extraction / aggregation (23 files, in `Complete_Pipeline/`, `slide_aggregation/`, `data_preprocessing/`, `Analysis_and_Visualization/`)** — these produce the `.pt` features that the classification pipeline consumes. They are **not re-run** by this remediation; Phases 1–4 read their output as given.
+
+**Decision:** sweep the classification pipeline now; defer the upstream 23. Reasoning: converting them is mechanical but touches code that is not being executed or validated in this run, so a typo there would be undetectable until someone next re-extracts features — the change would carry risk with no offsetting benefit inside Phases 1–4. Making them depend on `slide_classification/config/paths.py` would also invert the dependency direction (feature extraction importing from slide classification).
+
+**Consequence / when this must be revisited:** the upstream sweep becomes necessary the moment SurGen features for H-Optimus-1 / UNI2 / ConchV1 need to be generated on the server (work order Task 3.2 anticipates exactly this). At that point the aggregation scripts should either import a repo-root-level shared config or take their roots as CLI arguments. Until then, the repo-wide grep in §1c.2's acceptance check does **not** pass — it passes for `slide_classification/` only. Flagged rather than quietly claimed.
+
+### 5. CIMP is not a binary task — OUTSTANDING (Phase 5 blocker, no action needed yet)
+
+`kfold_CIMP.csv` carries `HypermethylationCategory` with **four** levels (`Non-CIMP` 182, `CRC CIMP-L` 178, `CIMP-H` 54, `GEA CIMP-L` 2) and a matching 4-level `label_id`. Every other task (MSIH/BRAF/KRAS/TP53) is binary. The work order lists CIMP alongside them in Phase 5 without saying how to dichotomise it — `CIMP-H` vs rest, or `{CIMP-H, CRC CIMP-L, GEA CIMP-L}` vs `Non-CIMP`, are both defensible and give very different positive rates (54/416 vs 234/416).
+
+**Decision:** `data_layer.load_label_map` raises `NotImplementedError` for CIMP with an explicit message rather than guessing. Phase 5 is deferred and out of scope, so this blocks nothing today. **Needs an owner decision before CIMP is enabled.**
+
+---
+
 *(New entries append below as they come up.)*
