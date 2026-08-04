@@ -1,0 +1,408 @@
+{
+  "machine": "local",
+  "scanned_at": "2026-08-04T13:30:46+00:00",
+  "base_root": "D:\\Aamir Gulzar\\KSA_project2",
+  "n_combinations": 50,
+  "combinations": {
+    "tcga|Averaging|H-Optimus-1": {
+      "cohort": "tcga",
+      "method": "Averaging",
+      "model": "H-Optimus-1",
+      "path": "D:\\Aamir Gulzar\\KSA_project2\\dataset\\slide_aggregation\\Averaging\\H-Optimus-1",
+      "n_files": 417,
+      "expected_dim": 1536
+    },
+    "tcga|Averaging|Conch1_5": {
+      "cohort": "tcga",
+      "method": "Averaging",
+      "model": "Conch1_5",
+      "path": "D:\\Aamir Gulzar\\KSA_project2\\dataset\\slide_aggregation\\Averaging\\Conch1_5",
+      "n_files": 417,
+      "expected_dim": 768
+    },
+    "tcga|Averaging|UNI2": {
+      "cohort": "tcga",
+      "method": "Averaging",
+      "model": "UNI2",
+      "path": "D:\\Aamir Gulzar\\KSA_project2\\dataset\\slide_aggregation\\Averaging\\UNI2",
+      "n_files": 417,
+      "expected_dim": 1536
+    },
+    "tcga|Averaging|Virchow2": {
+      "cohort": "tcga",
+      "method": "Averaging",
+      "model": "Virchow2",
+      "path": "D:\\Aamir Gulzar\\KSA_project2\\dataset\\slide_aggregation\\Averaging\\Virchow2",
+      "n_files": 417,
+      "expected_dim": 2560
+    },
+    "tcga|Averaging|ConchV1": {
+      "cohort": "tcga",
+      "method": "Averaging",
+      "model": "ConchV1",
+      "path": "D:\\Aamir Gulzar\\KSA_project2\\dataset\\slide_aggregation\\Averaging\\ConchV1",
+      "n_files": 417,
+      "expected_dim": 512
+    },
+    "tcga|Caption_based_aggregation|H-Optimus-1": {
+      "cohort": "tcga",
+      "method": "Caption_based_aggregation",
+      "model": "H-Optimus-1",
+      "path": "D:\\Aamir Gulzar\\KSA_project2\\dataset\\slide_aggregation\\Caption_based_aggregation\\H-Optimus-1",
+      "n_files": 417,
+      "expected_dim": 21504
+    },
+    "tcga|Caption_based_aggregation|Conch1_5": {
+      "cohort": "tcga",
+      "method": "Caption_based_aggregation",
+      "model": "Conch1_5",
+      "path": "D:\\Aamir Gulzar\\KSA_project2\\dataset\\slide_aggregation\\Caption_based_aggregation\\Conch1_5",
+      "n_files": 417,
+      "expected_dim": 10752
+    },
+    "tcga|Caption_based_aggregation|UNI2": {
+      "cohort": "tcga",
+      "method": "Caption_based_aggregation",
+      "model": "UNI2",
+      "path": "D:\\Aamir Gulzar\\KSA_project2\\dataset\\slide_aggregation\\Caption_based_aggregation\\UNI2",
+      "n_files": 417,
+      "expected_dim": 21504
+    },
+    "tcga|Caption_based_aggregation|Virchow2": {
+      "cohort": "tcga",
+      "method": "Caption_based_aggregation",
+      "model": "Virchow2",
+      "path": "D:\\Aamir Gulzar\\KSA_project2\\dataset\\slide_aggregation\\Caption_based_aggregation\\Virchow2",
+      "n_files": 417,
+      "expected_dim": 35840
+    },
+    "tcga|Caption_based_aggregation|ConchV1": {
+      "cohort": "tcga",
+      "method": "Caption_based_aggregation",
+      "model": "ConchV1",
+      "path": "D:\\Aamir Gulzar\\KSA_project2\\dataset\\slide_aggregation\\Caption_based_aggregation\\ConchV1",
+      "n_files": 417,
+      "expected_dim": 7168
+    },
+    "tcga|Caption_based_aggregation_15_classes|H-Optimus-1": {
+      "cohort": "tcga",
+      "method": "Caption_based_aggregation_15_classes",
+      "model": "H-Optimus-1",
+      "path": "D:\\Aamir Gulzar\\KSA_project2\\dataset\\slide_aggregation\\Caption_based_aggregation_15_classes\\H-Optimus-1",
+      "n_files": 417,
+      "expected_dim": 23040
+    },
+    "tcga|Caption_based_aggregation_15_classes|Conch1_5": {
+      "cohort": "tcga",
+      "method": "Caption_based_aggregation_15_classes",
+      "model": "Conch1_5",
+      "path": "D:\\Aamir Gulzar\\KSA_project2\\dataset\\slide_aggregation\\Caption_based_aggregation_15_classes\\Conch1_5",
+      "n_files": 417,
+      "expected_dim": 11520
+    },
+    "tcga|Caption_based_aggregation_15_classes|UNI2": {
+      "cohort": "tcga",
+      "method": "Caption_based_aggregation_15_classes",
+      "model": "UNI2",
+      "path": "D:\\Aamir Gulzar\\KSA_project2\\dataset\\slide_aggregation\\Caption_based_aggregation_15_classes\\UNI2",
+      "n_files": 417,
+      "expected_dim": 23040
+    },
+    "tcga|Caption_based_aggregation_15_classes|Virchow2": {
+      "cohort": "tcga",
+      "method": "Caption_based_aggregation_15_classes",
+      "model": "Virchow2",
+      "path": "D:\\Aamir Gulzar\\KSA_project2\\dataset\\slide_aggregation\\Caption_based_aggregation_15_classes\\Virchow2",
+      "n_files": 417,
+      "expected_dim": 38400
+    },
+    "tcga|Caption_based_aggregation_15_classes|ConchV1": {
+      "cohort": "tcga",
+      "method": "Caption_based_aggregation_15_classes",
+      "model": "ConchV1",
+      "path": "D:\\Aamir Gulzar\\KSA_project2\\dataset\\slide_aggregation\\Caption_based_aggregation_15_classes\\ConchV1",
+      "n_files": 417,
+      "expected_dim": 7680
+    },
+    "tcga|Tissue_Type_Clustering|H-Optimus-1": {
+      "cohort": "tcga",
+      "method": "Tissue_Type_Clustering",
+      "model": "H-Optimus-1",
+      "path": "D:\\Aamir Gulzar\\KSA_project2\\dataset\\slide_aggregation\\Tissue_Type_Clustering\\H-Optimus-1",
+      "n_files": 417,
+      "expected_dim": 13824
+    },
+    "tcga|Tissue_Type_Clustering|Conch1_5": {
+      "cohort": "tcga",
+      "method": "Tissue_Type_Clustering",
+      "model": "Conch1_5",
+      "path": "D:\\Aamir Gulzar\\KSA_project2\\dataset\\slide_aggregation\\Tissue_Type_Clustering\\Conch1_5",
+      "n_files": 417,
+      "expected_dim": 6912
+    },
+    "tcga|Tissue_Type_Clustering|UNI2": {
+      "cohort": "tcga",
+      "method": "Tissue_Type_Clustering",
+      "model": "UNI2",
+      "path": "D:\\Aamir Gulzar\\KSA_project2\\dataset\\slide_aggregation\\Tissue_Type_Clustering\\UNI2",
+      "n_files": 417,
+      "expected_dim": 13824
+    },
+    "tcga|Tissue_Type_Clustering|Virchow2": {
+      "cohort": "tcga",
+      "method": "Tissue_Type_Clustering",
+      "model": "Virchow2",
+      "path": "D:\\Aamir Gulzar\\KSA_project2\\dataset\\slide_aggregation\\Tissue_Type_Clustering\\Virchow2",
+      "n_files": 417,
+      "expected_dim": 23040
+    },
+    "tcga|Tissue_Type_Clustering|ConchV1": {
+      "cohort": "tcga",
+      "method": "Tissue_Type_Clustering",
+      "model": "ConchV1",
+      "path": "D:\\Aamir Gulzar\\KSA_project2\\dataset\\slide_aggregation\\Tissue_Type_Clustering\\ConchV1",
+      "n_files": 417,
+      "expected_dim": 4608
+    },
+    "tcga|TITAN|Conch1_5": {
+      "cohort": "tcga",
+      "method": "TITAN",
+      "model": "Conch1_5",
+      "path": "D:\\Aamir Gulzar\\KSA_project2\\dataset\\slide_aggregation\\TITAN\\Conch1_5",
+      "n_files": 417,
+      "expected_dim": 768
+    },
+    "tcga|PRISM|PRISM": {
+      "cohort": "tcga",
+      "method": "PRISM",
+      "model": "PRISM",
+      "path": "D:\\Aamir Gulzar\\KSA_project2\\dataset\\slide_aggregation\\PRISM",
+      "n_files": 417,
+      "expected_dim": 1280
+    },
+    "paip|Averaging|H-Optimus-1": {
+      "cohort": "paip",
+      "method": "Averaging",
+      "model": "H-Optimus-1",
+      "path": "D:\\Aamir Gulzar\\KSA_project2\\paip_data\\slide_aggregation\\Averaging\\H-Optimus-1",
+      "n_files": 73,
+      "expected_dim": 1536
+    },
+    "paip|Averaging|Conch1_5": {
+      "cohort": "paip",
+      "method": "Averaging",
+      "model": "Conch1_5",
+      "path": "D:\\Aamir Gulzar\\KSA_project2\\paip_data\\slide_aggregation\\Averaging\\Conch1_5",
+      "n_files": 73,
+      "expected_dim": 768
+    },
+    "paip|Averaging|UNI2": {
+      "cohort": "paip",
+      "method": "Averaging",
+      "model": "UNI2",
+      "path": "D:\\Aamir Gulzar\\KSA_project2\\paip_data\\slide_aggregation\\Averaging\\UNI2",
+      "n_files": 73,
+      "expected_dim": 1536
+    },
+    "paip|Averaging|Virchow2": {
+      "cohort": "paip",
+      "method": "Averaging",
+      "model": "Virchow2",
+      "path": "D:\\Aamir Gulzar\\KSA_project2\\paip_data\\slide_aggregation\\Averaging\\Virchow2",
+      "n_files": 73,
+      "expected_dim": 2560
+    },
+    "paip|Averaging|ConchV1": {
+      "cohort": "paip",
+      "method": "Averaging",
+      "model": "ConchV1",
+      "path": "D:\\Aamir Gulzar\\KSA_project2\\paip_data\\slide_aggregation\\Averaging\\ConchV1",
+      "n_files": 73,
+      "expected_dim": 512
+    },
+    "paip|Caption_based_aggregation|H-Optimus-1": {
+      "cohort": "paip",
+      "method": "Caption_based_aggregation",
+      "model": "H-Optimus-1",
+      "path": "D:\\Aamir Gulzar\\KSA_project2\\paip_data\\slide_aggregation\\Caption_based_aggregation\\H-Optimus-1",
+      "n_files": 73,
+      "expected_dim": 21504
+    },
+    "paip|Caption_based_aggregation|Conch1_5": {
+      "cohort": "paip",
+      "method": "Caption_based_aggregation",
+      "model": "Conch1_5",
+      "path": "D:\\Aamir Gulzar\\KSA_project2\\paip_data\\slide_aggregation\\Caption_based_aggregation\\Conch1_5",
+      "n_files": 73,
+      "expected_dim": 10752
+    },
+    "paip|Caption_based_aggregation|UNI2": {
+      "cohort": "paip",
+      "method": "Caption_based_aggregation",
+      "model": "UNI2",
+      "path": "D:\\Aamir Gulzar\\KSA_project2\\paip_data\\slide_aggregation\\Caption_based_aggregation\\UNI2",
+      "n_files": 73,
+      "expected_dim": 21504
+    },
+    "paip|Caption_based_aggregation|Virchow2": {
+      "cohort": "paip",
+      "method": "Caption_based_aggregation",
+      "model": "Virchow2",
+      "path": "D:\\Aamir Gulzar\\KSA_project2\\paip_data\\slide_aggregation\\Caption_based_aggregation\\Virchow2",
+      "n_files": 73,
+      "expected_dim": 35840
+    },
+    "paip|Caption_based_aggregation|ConchV1": {
+      "cohort": "paip",
+      "method": "Caption_based_aggregation",
+      "model": "ConchV1",
+      "path": "D:\\Aamir Gulzar\\KSA_project2\\paip_data\\slide_aggregation\\Caption_based_aggregation\\ConchV1",
+      "n_files": 73,
+      "expected_dim": 7168
+    },
+    "paip|Caption_based_aggregation_15_classes|H-Optimus-1": {
+      "cohort": "paip",
+      "method": "Caption_based_aggregation_15_classes",
+      "model": "H-Optimus-1",
+      "path": "D:\\Aamir Gulzar\\KSA_project2\\paip_data\\slide_aggregation\\Caption_based_aggregation_15_classes\\H-Optimus-1",
+      "n_files": 73,
+      "expected_dim": 23040
+    },
+    "paip|Caption_based_aggregation_15_classes|Conch1_5": {
+      "cohort": "paip",
+      "method": "Caption_based_aggregation_15_classes",
+      "model": "Conch1_5",
+      "path": "D:\\Aamir Gulzar\\KSA_project2\\paip_data\\slide_aggregation\\Caption_based_aggregation_15_classes\\Conch1_5",
+      "n_files": 73,
+      "expected_dim": 11520
+    },
+    "paip|Caption_based_aggregation_15_classes|UNI2": {
+      "cohort": "paip",
+      "method": "Caption_based_aggregation_15_classes",
+      "model": "UNI2",
+      "path": "D:\\Aamir Gulzar\\KSA_project2\\paip_data\\slide_aggregation\\Caption_based_aggregation_15_classes\\UNI2",
+      "n_files": 73,
+      "expected_dim": 23040
+    },
+    "paip|Caption_based_aggregation_15_classes|Virchow2": {
+      "cohort": "paip",
+      "method": "Caption_based_aggregation_15_classes",
+      "model": "Virchow2",
+      "path": "D:\\Aamir Gulzar\\KSA_project2\\paip_data\\slide_aggregation\\Caption_based_aggregation_15_classes\\Virchow2",
+      "n_files": 73,
+      "expected_dim": 38400
+    },
+    "paip|Caption_based_aggregation_15_classes|ConchV1": {
+      "cohort": "paip",
+      "method": "Caption_based_aggregation_15_classes",
+      "model": "ConchV1",
+      "path": "D:\\Aamir Gulzar\\KSA_project2\\paip_data\\slide_aggregation\\Caption_based_aggregation_15_classes\\ConchV1",
+      "n_files": 73,
+      "expected_dim": 7680
+    },
+    "paip|Tissue_Type_Clustering|H-Optimus-1": {
+      "cohort": "paip",
+      "method": "Tissue_Type_Clustering",
+      "model": "H-Optimus-1",
+      "path": "D:\\Aamir Gulzar\\KSA_project2\\paip_data\\slide_aggregation\\Tissue_Type_Clustering\\H-Optimus-1",
+      "n_files": 73,
+      "expected_dim": 13824
+    },
+    "paip|Tissue_Type_Clustering|Conch1_5": {
+      "cohort": "paip",
+      "method": "Tissue_Type_Clustering",
+      "model": "Conch1_5",
+      "path": "D:\\Aamir Gulzar\\KSA_project2\\paip_data\\slide_aggregation\\Tissue_Type_Clustering\\Conch1_5",
+      "n_files": 73,
+      "expected_dim": 6912
+    },
+    "paip|Tissue_Type_Clustering|UNI2": {
+      "cohort": "paip",
+      "method": "Tissue_Type_Clustering",
+      "model": "UNI2",
+      "path": "D:\\Aamir Gulzar\\KSA_project2\\paip_data\\slide_aggregation\\Tissue_Type_Clustering\\UNI2",
+      "n_files": 73,
+      "expected_dim": 13824
+    },
+    "paip|Tissue_Type_Clustering|Virchow2": {
+      "cohort": "paip",
+      "method": "Tissue_Type_Clustering",
+      "model": "Virchow2",
+      "path": "D:\\Aamir Gulzar\\KSA_project2\\paip_data\\slide_aggregation\\Tissue_Type_Clustering\\Virchow2",
+      "n_files": 73,
+      "expected_dim": 23040
+    },
+    "paip|Tissue_Type_Clustering|ConchV1": {
+      "cohort": "paip",
+      "method": "Tissue_Type_Clustering",
+      "model": "ConchV1",
+      "path": "D:\\Aamir Gulzar\\KSA_project2\\paip_data\\slide_aggregation\\Tissue_Type_Clustering\\ConchV1",
+      "n_files": 73,
+      "expected_dim": 4608
+    },
+    "paip|TITAN|Conch1_5": {
+      "cohort": "paip",
+      "method": "TITAN",
+      "model": "Conch1_5",
+      "path": "D:\\Aamir Gulzar\\KSA_project2\\paip_data\\slide_aggregation\\TITAN\\Conch1_5",
+      "n_files": 73,
+      "expected_dim": 768
+    },
+    "paip|PRISM|PRISM": {
+      "cohort": "paip",
+      "method": "PRISM",
+      "model": "PRISM",
+      "path": "D:\\Aamir Gulzar\\KSA_project2\\paip_data\\slide_aggregation\\PRISM",
+      "n_files": 73,
+      "expected_dim": 1280
+    },
+    "surgen|Averaging|Conch1_5": {
+      "cohort": "surgen",
+      "method": "Averaging",
+      "model": "Conch1_5",
+      "path": "D:\\Aamir Gulzar\\KSA_project2\\surgen_data\\surgen_processed\\conch1-5\\features\\slide_aggregation\\Averaging\\conch1-5",
+      "n_files": 622,
+      "expected_dim": 768
+    },
+    "surgen|Averaging|Virchow2": {
+      "cohort": "surgen",
+      "method": "Averaging",
+      "model": "Virchow2",
+      "path": "D:\\Aamir Gulzar\\KSA_project2\\surgen_data\\surgen_processed\\virchow2\\features\\slide_aggregation\\Averaging\\virchow2",
+      "n_files": 622,
+      "expected_dim": 2560
+    },
+    "surgen|Caption_based_aggregation|Conch1_5": {
+      "cohort": "surgen",
+      "method": "Caption_based_aggregation",
+      "model": "Conch1_5",
+      "path": "D:\\Aamir Gulzar\\KSA_project2\\surgen_data\\surgen_processed\\conch1-5\\features\\slide_aggregation\\Caption_based_aggregation\\conch1-5",
+      "n_files": 622,
+      "expected_dim": 10752
+    },
+    "surgen|Caption_based_aggregation|Virchow2": {
+      "cohort": "surgen",
+      "method": "Caption_based_aggregation",
+      "model": "Virchow2",
+      "path": "D:\\Aamir Gulzar\\KSA_project2\\surgen_data\\surgen_processed\\virchow2\\features\\slide_aggregation\\Caption_based_aggregation\\virchow2",
+      "n_files": 622,
+      "expected_dim": 35840
+    },
+    "surgen|Tissue_Type_Clustering|Conch1_5": {
+      "cohort": "surgen",
+      "method": "Tissue_Type_Clustering",
+      "model": "Conch1_5",
+      "path": "D:\\Aamir Gulzar\\KSA_project2\\surgen_data\\surgen_processed\\conch1-5\\features\\slide_aggregation\\Tissue_Type_Clustering\\conch1-5",
+      "n_files": 622,
+      "expected_dim": 6912
+    },
+    "surgen|Tissue_Type_Clustering|Virchow2": {
+      "cohort": "surgen",
+      "method": "Tissue_Type_Clustering",
+      "model": "Virchow2",
+      "path": "D:\\Aamir Gulzar\\KSA_project2\\surgen_data\\surgen_processed\\virchow2\\features\\slide_aggregation\\Tissue_Type_Clustering\\virchow2",
+      "n_files": 622,
+      "expected_dim": 23040
+    }
+  }
+}

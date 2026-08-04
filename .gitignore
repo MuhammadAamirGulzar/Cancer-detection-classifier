@@ -31,6 +31,11 @@ __pycache__/
 _otf_tmp/
 *.tmp
 
+# Assembled feature-matrix cache (work-order 1c.1 item 5). Pure memoisation of
+# the .pt tree - regenerable, and each .npz is 10-100MB. The sibling .meta.json
+# holds only the invalidation signature, so it is not worth tracking either.
+slide_classification/cache/
+
 # Raw per-patch dump CSVs (100MB-1.9GB each, millions of rows, duplicated
 # across multiple directories) - regenerable intermediate data, not the kind
 # of aggregate result the doc means by "keep *.csv tracked". Found via
