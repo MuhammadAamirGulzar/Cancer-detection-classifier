@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "last_updated": "2026-08-04T17:09:05+00:00",
+  "last_updated": "2026-08-04T17:56:06+00:00",
   "phases": {
     "0": {
       "0.1_git_protect": {
@@ -68,33 +68,52 @@
     },
     "3": {
       "3.0_tcga_full_artifact": {
-        "status": "pending"
+        "status": "done",
+        "notes": "tcga_full_hparams.json derived from TCGA-CV alone (majority vote across folds, ties by mean VALIDATION macro-F1); assert_no_external_data() enforces the acceptance. Trained on all 413 slides, seeds 42-46; ANN uses a seed-fixed stratified 15% carve-out (351+62). Three EV variants reported side by side. delta(TCGA-FULL - legacy) over 110 pairs: BalAcc +0.0158 (68/110), AUROC +0.0046 (79/110). FINDING: the 4-fold probability ENSEMBLE beats the single TCGA-FULL model on most classifiers (ann BalAcc 0.787 vs 0.760) despite each member training on half the data - worth more than 'robustness check' billing."
       },
       "3.1_paip_iv": {
-        "status": "pending"
+        "status": "done",
+        "notes": "22 combinations. Provider split 47/31 -> 42/31 with features; train MSI-H=10, test MSI-H=7; every confusion matrix sums to 31. Bootstrap 95% CIs, 1000 resamples. Best: Tissue_Type_Clustering/UNI2/knn BalAcc 0.958 [0.896,1.000], AUROC 0.964 [0.905,1.000]. THE CIs ARE THE FINDING: mean width 0.363 (AUROC) on 31 slides with 7 positives. FINDING: the ANN is the WORST classifier here (BalAcc 0.686) while plain logistic regression is best (0.788) - the reverse of TCGA-CV; with ~34 training slides it overfits."
       },
       "3.2_surgen_ev": {
-        "status": "pending"
+        "status": "done_partial_by_design",
+        "notes": "6 of 22 combinations ran (Conch1_5, Virchow2 across 3 methods); 16 skipped and logged to skipped_combinations.csv - SurGen features for H-Optimus-1/UNI2/ConchV1 exist only on the server. Run the identical code with MACHINE=server then merge with tools/merge_results.py. The 2 missing SurGen slides are SR386_40X_HE_T086_01 and SR386_40X_HE_T339_01; both are their case's only slide, so cases drop 554 -> 552 when restricted to slides with features."
       },
       "3.3_coverage_gaps": {
-        "status": "pending"
+        "status": "done",
+        "notes": "TITAN and PRISM re-enabled and run for TCGA-CV, PAIP-IV and PAIP-EV (22 combinations each, up from 20). SurGen has no TITAN/PRISM features on either machine. Caption_based_aggregation_15_classes is absent for SurGen locally."
+      },
+      "_findings": {
+        "threshold_policy_not_uniformly_optimal": "tau_TCGA rescues the random forest - which predicts ZERO positives at both 0.5 and its legacy 0.3 - but costs lin and proto a little. Principled, not uniformly optimal; AUROC is unaffected either way. Report it that way.",
+        "tau_ranges": "lin 0.006-0.246 (systematically under-confident on 15% positives - this IS the [[56,0],[15,2]] mechanism); rf 0.128-0.231 (all below the hardcoded 0.3); proto 0.498-0.505 (probabilities clustered at 0.5, operating point hypersensitive); knn quantised to multiples of 1/k; ann 0.39-0.66.",
+        "failures_and_handling": "(1) joblib loky worker crash on Windows re-importing scipy under a CUDA context - fixed with the threading backend. (2) class_weight int keys lost to JSON round-trip - fixed in load_hparams; the ValueError correctly halted its stage loudly while the orchestrator continued to independent stages. (3) Windows refused a directory rename - archiving falls back to a verified copy."
       }
     },
     "4": {
       "4.1_consolidated_workbook": {
-        "status": "pending"
+        "status": "done",
+        "notes": "Five canonical sheets + per-experiment TITAN_PRISM and Detail sheets + Coverage. The previous builder globbed '*_Results', which also matches *_ARCHIVED_* trees and yields the same sheet name - it would have merged pre- and post-correction numbers silently. New builder reads provenance-stamped JSON and skips archives."
       },
       "4.2_summary_tables": {
-        "status": "pending"
+        "status": "done",
+        "notes": "BalAcc primary, AUROC tie-break, implemented as sort-by-AUROC then STABLE sort-by-BalAcc. Verified against synthetic ties. Present for all five experiments; previously missing for PAIP-EV and SurGen."
       },
       "4.3_titan_prism_tables": {
-        "status": "pending"
+        "status": "done",
+        "notes": "TITAN and PRISM tabulated apart with the reason stated - slide-level encoders with no patch-aggregation step, baselines rather than aggregation strategies."
       },
       "4.4_radar_plots": {
-        "status": "pending"
+        "status": "done",
+        "notes": "20 figures (5 experiments x 2 metrics x light/dark). Faceted by foundation model because 5 overlaid series cannot be made colourblind-safe: exhaustive search found 11/56 five-subsets pass in light, NONE of those in dark. Aggregation methods are the 4 series; validated ALL PASS in both modes. Dark CVD warning discharged with per-series line style + marker. Two layout bugs found by rendering and looking: legend built from the wrong source, and title/label collisions. 3_agg_methods and 4_agg_methods archived."
       },
       "4.5_results_md": {
-        "status": "pending"
+        "status": "done",
+        "notes": "RESULTS.md, 26k chars, generated from the result files. Leads with the cohort-N reconciliation (416->413, 78->73, 624->622) with excluded slides named."
+      },
+      "_beyond_work_order": {
+        "comparison_tool": "tools/compare_to_archive.py - old vs new with corrections attributed per row; baseline is the FIRST archive, not an interim one.",
+        "supplementary_doc": "tools/build_supplementary_results.py -> Supplementary_Results_UPDATED.docx, a companion (the 23MB original with 45 figures is untouched). Opens with the heading-rename table: 3 of 4 existing headings misname their protocol.",
+        "ann_grid_widened": "Measured in the full pipeline: ann +0.0025 BalAcc / +0.0020 AUROC / +0.0122 macroF1 / +0.0151 acc; lin/knn/proto/rf EXACTLY 0.0000 - the control proving only the ANN grid changed and the pipeline is now fully deterministic."
       }
     }
   },
@@ -102,166 +121,166 @@
   "runs": {
     "TCGA-CV|Averaging|H-Optimus-1|default|seed42": {
       "status": "done",
-      "updated": "2026-08-04T15:56:41+00:00",
+      "updated": "2026-08-04T17:14:31+00:00",
       "n_slides": 413,
       "output": "D:\\Aamir Gulzar\\KSA_project2\\Cancer-detection-classifier\\slide_classification\\TCGA_Results\\Averaging\\H-Optimus-1\\1-MSIH\\Output"
     },
     "TCGA-CV|Averaging|Conch1_5|default|seed42": {
       "status": "done",
-      "updated": "2026-08-04T15:56:55+00:00",
+      "updated": "2026-08-04T17:14:49+00:00",
       "n_slides": 413,
       "output": "D:\\Aamir Gulzar\\KSA_project2\\Cancer-detection-classifier\\slide_classification\\TCGA_Results\\Averaging\\Conch1_5\\1-MSIH\\Output"
     },
     "TCGA-CV|Averaging|UNI2|default|seed42": {
       "status": "done",
-      "updated": "2026-08-04T15:57:12+00:00",
+      "updated": "2026-08-04T17:15:12+00:00",
       "n_slides": 413,
       "output": "D:\\Aamir Gulzar\\KSA_project2\\Cancer-detection-classifier\\slide_classification\\TCGA_Results\\Averaging\\UNI2\\1-MSIH\\Output"
     },
     "TCGA-CV|Averaging|Virchow2|default|seed42": {
       "status": "done",
-      "updated": "2026-08-04T15:57:39+00:00",
+      "updated": "2026-08-04T17:15:39+00:00",
       "n_slides": 413,
       "output": "D:\\Aamir Gulzar\\KSA_project2\\Cancer-detection-classifier\\slide_classification\\TCGA_Results\\Averaging\\Virchow2\\1-MSIH\\Output"
     },
     "TCGA-CV|Averaging|ConchV1|default|seed42": {
       "status": "done",
-      "updated": "2026-08-04T15:57:58+00:00",
+      "updated": "2026-08-04T17:15:57+00:00",
       "n_slides": 413,
       "output": "D:\\Aamir Gulzar\\KSA_project2\\Cancer-detection-classifier\\slide_classification\\TCGA_Results\\Averaging\\ConchV1\\1-MSIH\\Output"
     },
     "TCGA-CV|Caption_based_aggregation|H-Optimus-1|default|seed42": {
       "status": "done",
-      "updated": "2026-08-04T16:00:11+00:00",
+      "updated": "2026-08-04T17:17:51+00:00",
       "n_slides": 413,
       "output": "D:\\Aamir Gulzar\\KSA_project2\\Cancer-detection-classifier\\slide_classification\\TCGA_Results\\Caption_based_aggregation\\H-Optimus-1\\1-MSIH\\Output"
     },
     "TCGA-CV|Caption_based_aggregation|Conch1_5|default|seed42": {
       "status": "done",
-      "updated": "2026-08-04T16:01:23+00:00",
+      "updated": "2026-08-04T17:18:56+00:00",
       "n_slides": 413,
       "output": "D:\\Aamir Gulzar\\KSA_project2\\Cancer-detection-classifier\\slide_classification\\TCGA_Results\\Caption_based_aggregation\\Conch1_5\\1-MSIH\\Output"
     },
     "TCGA-CV|Caption_based_aggregation|UNI2|default|seed42": {
       "status": "done",
-      "updated": "2026-08-04T16:03:33+00:00",
+      "updated": "2026-08-04T17:20:50+00:00",
       "n_slides": 413,
       "output": "D:\\Aamir Gulzar\\KSA_project2\\Cancer-detection-classifier\\slide_classification\\TCGA_Results\\Caption_based_aggregation\\UNI2\\1-MSIH\\Output"
     },
     "TCGA-CV|Caption_based_aggregation|Virchow2|default|seed42": {
       "status": "done",
-      "updated": "2026-08-04T16:07:12+00:00",
+      "updated": "2026-08-04T17:23:49+00:00",
       "n_slides": 413,
       "output": "D:\\Aamir Gulzar\\KSA_project2\\Cancer-detection-classifier\\slide_classification\\TCGA_Results\\Caption_based_aggregation\\Virchow2\\1-MSIH\\Output"
     },
     "TCGA-CV|Caption_based_aggregation|ConchV1|default|seed42": {
       "status": "done",
-      "updated": "2026-08-04T16:08:03+00:00",
+      "updated": "2026-08-04T17:24:38+00:00",
       "n_slides": 413,
       "output": "D:\\Aamir Gulzar\\KSA_project2\\Cancer-detection-classifier\\slide_classification\\TCGA_Results\\Caption_based_aggregation\\ConchV1\\1-MSIH\\Output"
     },
     "TCGA-CV|Caption_based_aggregation_15_classes|H-Optimus-1|default|seed42": {
       "status": "done",
-      "updated": "2026-08-04T16:10:22+00:00",
+      "updated": "2026-08-04T17:26:40+00:00",
       "n_slides": 413,
       "output": "D:\\Aamir Gulzar\\KSA_project2\\Cancer-detection-classifier\\slide_classification\\TCGA_Results\\Caption_based_aggregation_15_classes\\H-Optimus-1\\1-MSIH\\Output"
     },
     "TCGA-CV|Caption_based_aggregation_15_classes|Conch1_5|default|seed42": {
       "status": "done",
-      "updated": "2026-08-04T16:11:37+00:00",
+      "updated": "2026-08-04T17:27:48+00:00",
       "n_slides": 413,
       "output": "D:\\Aamir Gulzar\\KSA_project2\\Cancer-detection-classifier\\slide_classification\\TCGA_Results\\Caption_based_aggregation_15_classes\\Conch1_5\\1-MSIH\\Output"
     },
     "TCGA-CV|Caption_based_aggregation_15_classes|UNI2|default|seed42": {
       "status": "done",
-      "updated": "2026-08-04T16:13:49+00:00",
+      "updated": "2026-08-04T17:29:50+00:00",
       "n_slides": 413,
       "output": "D:\\Aamir Gulzar\\KSA_project2\\Cancer-detection-classifier\\slide_classification\\TCGA_Results\\Caption_based_aggregation_15_classes\\UNI2\\1-MSIH\\Output"
     },
     "TCGA-CV|Caption_based_aggregation_15_classes|Virchow2|default|seed42": {
       "status": "done",
-      "updated": "2026-08-04T16:17:35+00:00",
+      "updated": "2026-08-04T17:33:01+00:00",
       "n_slides": 413,
       "output": "D:\\Aamir Gulzar\\KSA_project2\\Cancer-detection-classifier\\slide_classification\\TCGA_Results\\Caption_based_aggregation_15_classes\\Virchow2\\1-MSIH\\Output"
     },
     "TCGA-CV|Caption_based_aggregation_15_classes|ConchV1|default|seed42": {
       "status": "done",
-      "updated": "2026-08-04T16:18:32+00:00",
+      "updated": "2026-08-04T17:33:51+00:00",
       "n_slides": 413,
       "output": "D:\\Aamir Gulzar\\KSA_project2\\Cancer-detection-classifier\\slide_classification\\TCGA_Results\\Caption_based_aggregation_15_classes\\ConchV1\\1-MSIH\\Output"
     },
     "TCGA-CV|Tissue_Type_Clustering|H-Optimus-1|default|seed42": {
       "status": "done",
-      "updated": "2026-08-04T16:20:03+00:00",
+      "updated": "2026-08-04T17:35:10+00:00",
       "n_slides": 413,
       "output": "D:\\Aamir Gulzar\\KSA_project2\\Cancer-detection-classifier\\slide_classification\\TCGA_Results\\Tissue_Type_Clustering\\H-Optimus-1\\1-MSIH\\Output"
     },
     "TCGA-CV|Tissue_Type_Clustering|Conch1_5|default|seed42": {
       "status": "done",
-      "updated": "2026-08-04T16:20:53+00:00",
+      "updated": "2026-08-04T17:35:58+00:00",
       "n_slides": 413,
       "output": "D:\\Aamir Gulzar\\KSA_project2\\Cancer-detection-classifier\\slide_classification\\TCGA_Results\\Tissue_Type_Clustering\\Conch1_5\\1-MSIH\\Output"
     },
     "TCGA-CV|Tissue_Type_Clustering|UNI2|default|seed42": {
       "status": "done",
-      "updated": "2026-08-04T16:22:20+00:00",
+      "updated": "2026-08-04T17:37:21+00:00",
       "n_slides": 413,
       "output": "D:\\Aamir Gulzar\\KSA_project2\\Cancer-detection-classifier\\slide_classification\\TCGA_Results\\Tissue_Type_Clustering\\UNI2\\1-MSIH\\Output"
     },
     "TCGA-CV|Tissue_Type_Clustering|Virchow2|default|seed42": {
       "status": "done",
-      "updated": "2026-08-04T16:24:33+00:00",
+      "updated": "2026-08-04T17:39:23+00:00",
       "n_slides": 413,
       "output": "D:\\Aamir Gulzar\\KSA_project2\\Cancer-detection-classifier\\slide_classification\\TCGA_Results\\Tissue_Type_Clustering\\Virchow2\\1-MSIH\\Output"
     },
     "TCGA-CV|Tissue_Type_Clustering|ConchV1|default|seed42": {
       "status": "done",
-      "updated": "2026-08-04T16:25:11+00:00",
+      "updated": "2026-08-04T17:40:01+00:00",
       "n_slides": 413,
       "output": "D:\\Aamir Gulzar\\KSA_project2\\Cancer-detection-classifier\\slide_classification\\TCGA_Results\\Tissue_Type_Clustering\\ConchV1\\1-MSIH\\Output"
     },
     "TCGA-CV|TITAN|Conch1_5|default|seed42": {
       "status": "done",
-      "updated": "2026-08-04T16:25:32+00:00",
+      "updated": "2026-08-04T17:40:21+00:00",
       "n_slides": 413,
       "output": "D:\\Aamir Gulzar\\KSA_project2\\Cancer-detection-classifier\\slide_classification\\TCGA_Results\\TITAN\\Conch1_5\\1-MSIH\\Output"
     },
     "TCGA-CV|PRISM|PRISM|default|seed42": {
       "status": "done",
-      "updated": "2026-08-04T16:25:54+00:00",
+      "updated": "2026-08-04T17:40:42+00:00",
       "n_slides": 413,
       "output": "D:\\Aamir Gulzar\\KSA_project2\\Cancer-detection-classifier\\slide_classification\\TCGA_Results\\PRISM\\1-MSIH\\Output"
     },
     "SurGen-CV|Averaging|H-Optimus-1|default|seed42": {
       "status": "skipped",
-      "updated": "2026-08-04T16:26:16+00:00",
+      "updated": "2026-08-04T17:55:15+00:00",
       "reason": "features_not_on_this_machine"
     },
     "SurGen-CV|Averaging|Conch1_5|default|seed42": {
       "status": "done",
-      "updated": "2026-08-04T16:26:50+00:00",
+      "updated": "2026-08-04T17:55:37+00:00",
       "n_slides": 622,
       "output": "D:\\Aamir Gulzar\\KSA_project2\\Cancer-detection-classifier\\slide_classification\\SurGen_Results\\Averaging\\Conch1_5\\1-MSIH\\Output"
     },
     "SurGen-CV|Averaging|UNI2|default|seed42": {
       "status": "skipped",
-      "updated": "2026-08-04T16:26:50+00:00",
+      "updated": "2026-08-04T17:55:37+00:00",
       "reason": "features_not_on_this_machine"
     },
     "SurGen-CV|Averaging|Virchow2|default|seed42": {
       "status": "done",
-      "updated": "2026-08-04T16:27:20+00:00",
+      "updated": "2026-08-04T17:56:06+00:00",
       "n_slides": 622,
       "output": "D:\\Aamir Gulzar\\KSA_project2\\Cancer-detection-classifier\\slide_classification\\SurGen_Results\\Averaging\\Virchow2\\1-MSIH\\Output"
     },
     "SurGen-CV|Averaging|ConchV1|default|seed42": {
       "status": "skipped",
-      "updated": "2026-08-04T16:27:20+00:00",
+      "updated": "2026-08-04T17:56:06+00:00",
       "reason": "features_not_on_this_machine"
     },
     "SurGen-CV|Caption_based_aggregation|H-Optimus-1|default|seed42": {
       "status": "skipped",
-      "updated": "2026-08-04T16:27:20+00:00",
+      "updated": "2026-08-04T17:56:06+00:00",
       "reason": "features_not_on_this_machine"
     },
     "SurGen-CV|Caption_based_aggregation|Conch1_5|default|seed42": {
@@ -550,91 +569,91 @@
     },
     "TCGA-FULL|Averaging|H-Optimus-1|artifact|seed42": {
       "status": "done",
-      "updated": "2026-08-04T16:49:18+00:00"
+      "updated": "2026-08-04T17:41:03+00:00"
     },
     "TCGA-FULL|Averaging|Conch1_5|artifact|seed42": {
       "status": "done",
-      "updated": "2026-08-04T16:49:29+00:00"
+      "updated": "2026-08-04T17:41:11+00:00"
     },
     "TCGA-FULL|Averaging|UNI2|artifact|seed42": {
       "status": "done",
-      "updated": "2026-08-04T16:49:41+00:00"
+      "updated": "2026-08-04T17:41:20+00:00"
     },
     "TCGA-FULL|Averaging|Virchow2|artifact|seed42": {
       "status": "done",
-      "updated": "2026-08-04T16:49:57+00:00"
+      "updated": "2026-08-04T17:41:33+00:00"
     },
     "TCGA-FULL|Averaging|ConchV1|artifact|seed42": {
       "status": "done",
-      "updated": "2026-08-04T16:50:08+00:00"
+      "updated": "2026-08-04T17:41:40+00:00"
     },
     "TCGA-FULL|Caption_based_aggregation|H-Optimus-1|artifact|seed42": {
       "status": "done",
-      "updated": "2026-08-04T16:51:24+00:00"
+      "updated": "2026-08-04T17:42:45+00:00"
     },
     "TCGA-FULL|Caption_based_aggregation|Conch1_5|artifact|seed42": {
       "status": "done",
-      "updated": "2026-08-04T16:52:06+00:00"
+      "updated": "2026-08-04T17:43:20+00:00"
     },
     "TCGA-FULL|Caption_based_aggregation|UNI2|artifact|seed42": {
       "status": "done",
-      "updated": "2026-08-04T16:53:23+00:00"
+      "updated": "2026-08-04T17:44:27+00:00"
     },
     "TCGA-FULL|Caption_based_aggregation|Virchow2|artifact|seed42": {
       "status": "done",
-      "updated": "2026-08-04T16:55:24+00:00"
+      "updated": "2026-08-04T17:46:07+00:00"
     },
     "TCGA-FULL|Caption_based_aggregation|ConchV1|artifact|seed42": {
       "status": "done",
-      "updated": "2026-08-04T16:55:54+00:00"
+      "updated": "2026-08-04T17:46:32+00:00"
     },
     "TCGA-FULL|Caption_based_aggregation_15_classes|H-Optimus-1|artifact|seed42": {
       "status": "done",
-      "updated": "2026-08-04T16:57:16+00:00"
+      "updated": "2026-08-04T17:47:43+00:00"
     },
     "TCGA-FULL|Caption_based_aggregation_15_classes|Conch1_5|artifact|seed42": {
       "status": "done",
-      "updated": "2026-08-04T16:58:04+00:00"
+      "updated": "2026-08-04T17:48:20+00:00"
     },
     "TCGA-FULL|Caption_based_aggregation_15_classes|UNI2|artifact|seed42": {
       "status": "done",
-      "updated": "2026-08-04T16:59:24+00:00"
+      "updated": "2026-08-04T17:49:27+00:00"
     },
     "TCGA-FULL|Caption_based_aggregation_15_classes|Virchow2|artifact|seed42": {
       "status": "done",
-      "updated": "2026-08-04T17:01:36+00:00"
+      "updated": "2026-08-04T17:51:13+00:00"
     },
     "TCGA-FULL|Caption_based_aggregation_15_classes|ConchV1|artifact|seed42": {
       "status": "done",
-      "updated": "2026-08-04T17:02:08+00:00"
+      "updated": "2026-08-04T17:51:40+00:00"
     },
     "TCGA-FULL|Tissue_Type_Clustering|H-Optimus-1|artifact|seed42": {
       "status": "done",
-      "updated": "2026-08-04T17:02:58+00:00"
+      "updated": "2026-08-04T17:52:21+00:00"
     },
     "TCGA-FULL|Tissue_Type_Clustering|Conch1_5|artifact|seed42": {
       "status": "done",
-      "updated": "2026-08-04T17:03:27+00:00"
+      "updated": "2026-08-04T17:52:45+00:00"
     },
     "TCGA-FULL|Tissue_Type_Clustering|UNI2|artifact|seed42": {
       "status": "done",
-      "updated": "2026-08-04T17:04:17+00:00"
+      "updated": "2026-08-04T17:53:27+00:00"
     },
     "TCGA-FULL|Tissue_Type_Clustering|Virchow2|artifact|seed42": {
       "status": "done",
-      "updated": "2026-08-04T17:05:43+00:00"
+      "updated": "2026-08-04T17:54:37+00:00"
     },
     "TCGA-FULL|Tissue_Type_Clustering|ConchV1|artifact|seed42": {
       "status": "done",
-      "updated": "2026-08-04T17:06:04+00:00"
+      "updated": "2026-08-04T17:54:55+00:00"
     },
     "TCGA-FULL|TITAN|Conch1_5|artifact|seed42": {
       "status": "done",
-      "updated": "2026-08-04T17:06:15+00:00"
+      "updated": "2026-08-04T17:55:03+00:00"
     },
     "TCGA-FULL|PRISM|PRISM|artifact|seed42": {
       "status": "done",
-      "updated": "2026-08-04T17:06:27+00:00"
+      "updated": "2026-08-04T17:55:11+00:00"
     }
   }
 }
