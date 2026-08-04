@@ -1,2 +1,0 @@
-slide_id,process,status,seg_level,sthresh,mthresh,close,use_otsu,keep_ids,exclude_ids,a_t,a_h,max_n_holes,vis_level,line_thickness,use_padding,contour_fn
-TCGA-A6-2686-01Z-00-DX1.0540a027-2a0c-46c7-9af0-7b8672631de7.svs,0,processed,3,8,7,4,False,none,none,100.0,16.0,8,3,250,True,four_pt

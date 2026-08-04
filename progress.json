@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "last_updated": "2026-08-04T03:26:17Z",
+  "phases": {
+    "0": {
+      "0.1_git_protect": {
+        "status": "in_progress",
+        "notes": "Repo already had a git history (8 commits) and an origin remote (github.com/fahamin5149/Cancer-detection-classifier) that local master already matched exactly. New remote 'aamir' created at github.com/MuhammadAamirGulzar/Cancer-detection-classifier (private) per live user instruction. .gitignore expanded beyond the doc's literal list (see OPEN_QUESTIONS.md #1). Checkpoint commit + push pending."
+      },
+      "0.2_purge_credentials": {
+        "status": "code_fixed_revocation_deferred",
+        "notes": "Found 3 distinct tokens across 22 files (doc estimated 4/21 - close but re-verified against actual code, see PHASE_0_REPORT.md). All replaced with os.environ[\"HF_TOKEN\"] / load_dotenv() pattern. .env already existed locally with HF_TOKEN set and gitignored. Revocation explicitly deferred by owner (live chat instruction, 2026-08-04) until project completion - working with existing tokens meanwhile. TOKENS_TO_REVOKE.md written (redacted) for the eventual revocation step."
+      }
+    },
+    "1": {
+      "1.0_data_layer_refactor": {"status": "pending"},
+      "1.1_ann_hparam_selection_on_val": {"status": "pending"},
+      "1.2_ann_checkpoint_save_fix": {"status": "pending"},
+      "1.3_ann_double_softmax_fix": {"status": "pending"},
+      "1.4_fail_loud_missing_slides": {"status": "pending"},
+      "1.5_retire_stale_scripts": {"status": "pending"}
+    },
+    "2": {
+      "2.1_surgen_case_level_folds": {"status": "pending"},
+      "2.2_retire_paip_cv": {"status": "pending"},
+      "2.3_rename_paip_label_files": {"status": "pending"}
+    },
+    "3": {
+      "3.0_tcga_full_artifact": {"status": "pending"},
+      "3.1_paip_iv": {"status": "pending"},
+      "3.2_surgen_ev": {"status": "pending"},
+      "3.3_coverage_gaps": {"status": "pending"}
+    },
+    "4": {
+      "4.1_consolidated_workbook": {"status": "pending"},
+      "4.2_summary_tables": {"status": "pending"},
+      "4.3_titan_prism_tables": {"status": "pending"},
+      "4.4_radar_plots": {"status": "pending"},
+      "4.5_results_md": {"status": "pending"}
+    }
+  }
+}

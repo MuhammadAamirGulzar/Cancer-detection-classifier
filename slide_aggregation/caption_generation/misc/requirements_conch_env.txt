@@ -1,0 +1,9 @@
+transformers~=4.53.0
+torch>=2.3,<2.8
+einops==0.8.0
+environs==11.0.0
+sacremoses==0.1.1
+
+# # install xformers to use memory-efficient attention
+# # set env `PERCEIVER_MEM_EFF_ATTN=true` to enable
+# xformers==0.0.31

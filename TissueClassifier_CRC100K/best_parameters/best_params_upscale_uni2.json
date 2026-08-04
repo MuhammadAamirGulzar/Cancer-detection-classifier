@@ -1,0 +1,6 @@
+{
+    "hidden_dim1": 256,
+    "hidden_dim2": 128,
+    "C": 10.0,
+    "max_iter": 500
+}

@@ -1,0 +1,5 @@
+Classifier,Accuracy,Balanced Accuracy
+Zero-Shot,0.7482,0.7485
+Few-Shot Nearest Centroid (900 train patches),0.9594,0.9612
+Few-Shot Logistic Regression (900 train patches),0.9671,0.9683
+Ensemble (Zero-Shot + ProtoNet),0.9334,0.9347

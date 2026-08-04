@@ -1,0 +1,115 @@
+{
+    "0": {
+        "classnames": {
+            "ADI": [
+                "adipose",
+                "adipose tissue",
+                "adipocytes",
+                "fat",
+                "fat cells"
+            ],
+            "DEB": [
+                "debris",
+                "necrosis",
+                "necrotic tissue",
+                "necrotic debris",
+                "tissue necrosis"
+            ],
+            "TIL": [
+                "tumor infiltrating lymphocytes",
+                "TILs",
+                "intratumoral lymphocytes",
+                "lymphocytic infiltration",
+                "immune infiltrate"
+            ],
+            "PLC": [
+                "plasma cells",
+                "antibody-producing cells",
+                "plasmocytes",
+                "B-cell derived plasma cells"
+            ],
+            "LYA": [
+                "lymphoid aggregate",
+                "lymphoid cluster",
+                "lymphoid follicle",
+                "aggregated immune cells"
+            ],
+            "LYM": [
+                "lymphocytes",
+                "immune cells",
+                "lymphoid cells",
+                "white blood cells",
+                "lymphoid infiltrate"
+            ],
+            "MUS": [
+                "smooth muscle",
+                "skeletal muscle",
+                "muscle",
+                "muscularis propria",
+                "muscularis mucosa"
+            ],
+            "MUC": [
+                "mucus",
+                "mucin",
+                "mucus pool",
+                "mucin pool"
+            ],
+            "NORM": [
+                "normal mucosa",
+                "normal colon mucosa",
+                "benign mucosa",
+                "uninvolved mucosa"
+            ],
+            "ADE": [
+                "adenoma",
+                "benign glandular tumor",
+                "colorectal adenoma",
+                "glandular polyp"
+            ],
+            "STR": [
+                "tumor-associated stroma",
+                "cancer-associated stroma",
+                "stromal cells",
+                "stromal tissue",
+                "stroma"
+            ],
+            "CAR": [
+                "carcinoma",
+                "malignant epithelial tumor",
+                "cancer",
+                "epithelial carcinoma"
+            ],
+            "PDC": [
+                "poorly differentiated carcinoma",
+                "undifferentiated carcinoma",
+                "high-grade carcinoma"
+            ],
+            "SIG": [
+                "signet ring cell carcinoma",
+                "signet ring tumor",
+                "signet ring adenocarcinoma"
+            ],
+            "BACK": [
+                "background",
+                "empty slide region",
+                "blank",
+                "no tissue"
+            ]
+        },
+        "templates": [
+            "CLASSNAME.",
+            "a photomicrograph showing CLASSNAME.",
+            "an image of CLASSNAME.",
+            "an example of CLASSNAME.",
+            "CLASSNAME is shown.",
+            "this is CLASSNAME.",
+            "a histopathological image showing CLASSNAME.",
+            "a histopathological photograph showing CLASSNAME.",
+            "shows CLASSNAME.",
+            "CLASSNAME is present.",
+            "an H&E stained image showing CLASSNAME.",
+            "an H&E image showing CLASSNAME.",
+            "CLASSNAME, H&E."
+        ]
+    }
+}

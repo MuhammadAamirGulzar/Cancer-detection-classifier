@@ -1,0 +1,40 @@
+aggregation: slide
+cohorts:
+- TCGA
+ext_cohorts: []
+folds: 1
+label_dict:
+  Adipose-Fat: 0
+  Debris-Necrosis: 1
+  Lymphocytes: 2
+  Plasma Cells: 3
+  Lymphoid Aggregate: 4
+  Mucus-Mucin: 5
+  Smooth Muscle: 6
+  Normal Mucosa: 7
+  Adenoma: 8
+  Tumor Associated Stroma: 9
+  Mesenchymal: 10
+  Carcinoma: 11
+  Poorly Differentiated: 12
+  Signet Ring: 13
+metric: bacc
+num_classes: 14
+num_samples: 11186
+prompts:
+  Adipose-Fat: 'adipose, adipose tissue, adipocytes, fat, fat cells'
+  Debris-Necrosis: 'debris, necrosis, dead cells'
+  Lymphocytes: 'inflammatory, lymphocytes, immune cells, infiltrating lymphocytes'
+  Plasma Cells: 'plasma cells'
+  Lymphoid Aggregate: 'lymphoid aggregate, lymphoid follicles'
+  Mucus-Mucin: 'mucus, mucin, mucus pool, mucin pool'
+  Smooth Muscle: 'smooth muscle, muscularis propria'
+  Normal Mucosa: 'normal mucosa, uninvolved mucosa, benign'
+  Adenoma: 'adenoma'
+  Tumor Associated Stroma: 'tumor associated stroma'
+  Mesenchymal: 'stroma, connective tissue, mesenchymal'
+  Carcinoma: 'adenocarcinoma, malignant tumor, carcinoma'
+  Poorly Differentiated: 'poorly differentiated'
+  Signet Ring: 'signet ring, medullary tumor'
+target: OncoTreeCode
+task: multiclass

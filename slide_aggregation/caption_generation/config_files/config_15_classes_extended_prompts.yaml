@@ -1,0 +1,42 @@
+aggregation: slide
+cohorts:
+- TCGA
+ext_cohorts: []
+folds: 1
+label_dict:
+  Adipose-Fat: 0
+  Debris-Necrosis: 1
+  Tumor Infiltrating Lymphocytes: 2
+  Plasma Cells: 3
+  Lymphoid Aggregate: 4
+  Lymphocytes: 5
+  Muscle: 6
+  Mucus-Mucin: 7
+  Normal Mucosa: 8
+  Adenoma: 9
+  Tumor Associated Stroma: 10
+  Carcinoma: 11
+  Poorly Differentiated: 12
+  Signet Ring: 13
+  Background: 14
+metric: bacc
+num_classes: 15
+num_samples: 11186
+prompts:
+  Adipose-Fat: 'adipose, adipose tissue, adipocytes, fat, fat cells'
+  Debris-Necrosis: 'debris, necrosis, necrotic tissue, dead cells, necrotic debris'
+  Tumor Infiltrating Lymphocytes: 'tumor infiltrating lymphocytes, TILs, intratumoral lymphocytes, lymphocytic infiltration, immune infiltrate'
+  Plasma Cells: 'plasma cells, plasmocytes, antibody-producing cells, B-cell derived plasma cells'
+  Lymphoid Aggregate: 'lymphoid aggregate, lymphoid follicles, lymphoid cluster, aggregated immune cells'
+  Lymphocytes: 'lymphocytes, immune cells, lymphoid cells, white blood cells, lymphoid infiltrate'
+  Muscle: 'smooth muscle, skeletal muscle, muscle, muscularis propria, muscularis mucosa'
+  Mucus-Mucin: 'mucus, mucin, mucus pool, mucin pool, extracellular mucin'
+  Normal Mucosa: 'normal mucosa, uninvolved mucosa, benign mucosa, normal colon mucosa'
+  Adenoma: 'adenoma, benign glandular tumor, colorectal adenoma, glandular polyp'
+  Tumor Associated Stroma: 'tumor associated stroma, cancer-associated stroma, stromal cells, desmoplastic stroma'
+  Carcinoma: 'adenocarcinoma, malignant tumor, carcinoma, malignant epithelial tumor, cancer'
+  Poorly Differentiated: 'poorly differentiated, poorly differentiated carcinoma, undifferentiated carcinoma, high-grade carcinoma'
+  Signet Ring: 'signet ring, signet ring cell carcinoma, signet ring tumor, medullary tumor, signet ring adenocarcinoma'
+  Background: 'background, empty, blank, glass, no tissue, white background, slide background'
+target: OncoTreeCode
+task: multiclass

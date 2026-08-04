@@ -1,0 +1,56 @@
+# Environment / secrets
+.env
+
+# Python
+__pycache__/
+*.pyc
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Model / feature-tensor artifacts (large binaries, regenerable from features)
+*.pt
+*.pth
+*.pkl
+*.bin
+*.h5
+
+# Raw whole-slide image formats
+*.svs
+*.czi
+*.tif
+*.tiff
+
+# Patch-level imagery — 180k+ files repo-wide (patch thumbnails / tile dumps),
+# not analysis results. Result plots (radar plots, TTC summary charts) are the
+# rare exception; if specific ones need tracking, whitelist with an explicit
+# `!path/to/file.png` rule rather than relaxing this blanket exclude.
+*.png
+
+# Scratch / temp
+_otf_tmp/
+*.tmp
+
+# Raw per-patch dump CSVs (100MB-1.9GB each, millions of rows, duplicated
+# across multiple directories) - regenerable intermediate data, not the kind
+# of aggregate result the doc means by "keep *.csv tracked". Found via
+# `git diff --cached` size audit before the Phase 0 checkpoint commit.
+**/*labeled_df*.csv
+slide_aggregation/caption_generation/Results/classification_results_*.csv
+feature_extraction/final_merged_without_white.csv
+Complete_Pipeline/extracted_excluded_slides.csv
+data_cleaning/BG_SVM_training/crc100k_statistics.csv
+data_cleaning/BG_SVM_training/crc100k_clean_no_back.csv
+data_cleaning/PAIP_SVM/patch_labels.csv
+Analysis_and_Visualization/Results/CRC100K_ZeroShot_Statistics/crc100k_raw_predictions.csv
+
+# Run logs - regenerable, not audit-trail metrics (Complete_Pipeline/logs/ and
+# crash_diagnostics/ alone total 200MB+). The NEW logs/run_<timestamp>.log
+# infrastructure from work-order Section 1c.3.4 is written locally regardless.
+*.log
+
+# Large embedded-data HTML exports (Plotly iframe figures, ~20-25MB each)
+data_cleaning/iframe_figures/*.html
+
+# Kept intentionally (do not add rules for these): *.xlsx, *.csv, *.md, *.docx,
+# *.json, *.ipynb, *.py — these are the tracked record of what was run.

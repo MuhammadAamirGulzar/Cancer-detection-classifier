@@ -1,0 +1,159 @@
+{
+    "0": {
+        "classnames": {
+            "ADI": [
+                "adipose",
+                "adipose tissue",
+                "adipocytes",
+                "fat",
+                "fat cells",
+                "fatty tissue",
+                "lipocytes"
+            ],
+            "DEB": [
+                "debris",
+                "necrosis",
+                "necrotic tissue",
+                "necrotic debris",
+                "tissue necrosis",
+                "dead cells",
+                "cellular debris",
+                "necrotic cells"
+            ],
+            "TIL": [
+                "tumor infiltrating lymphocytes",
+                "TILs",
+                "intratumoral lymphocytes",
+                "lymphocytic infiltration within tumor",
+                "immune infiltrate",
+                "intraepithelial lymphocytes",
+                "tumor-associated immune cells"
+            ],
+            "PLC": [
+                "plasma cells",
+                "antibody-producing cells",
+                "plasmocytes",
+                "B-cell derived plasma cells",
+                "immunoglobulin-secreting cells",
+                "mature B cells"
+            ],
+            "LYA": [
+                "lymphoid aggregate",
+                "lymphoid cluster",
+                "lymphoid follicle",
+                "aggregated immune cells",
+                "lymphoid nodule",
+                "tertiary lymphoid structure"
+            ],
+            "LYM": [
+                "lymphocytes",
+                "immune cells",
+                "lymphoid cells",
+                "white blood cells",
+                "lymphoid infiltrate",
+                "inflammatory cells",
+                "mononuclear cells"
+            ],
+            "MUS": [
+                "smooth muscle",
+                "skeletal muscle",
+                "muscle",
+                "muscularis propria",
+                "muscularis mucosa",
+                "muscle tissue",
+                "muscular layer",
+                "myocytes"
+            ],
+            "MUC": [
+                "mucus",
+                "mucin",
+                "mucus pool",
+                "mucin pool",
+                "extracellular mucin",
+                "mucinous material",
+                "goblet cell secretions"
+            ],
+            "NORM": [
+                "normal mucosa",
+                "normal colon mucosa",
+                "benign mucosa",
+                "uninvolved mucosa",
+                "non-neoplastic mucosa",
+                "healthy colonic epithelium",
+                "regular crypts"
+            ],
+            "ADE": [
+                "adenoma",
+                "benign glandular tumor",
+                "colorectal adenoma",
+                "glandular polyp",
+                "tubular adenoma",
+                "villous adenoma",
+                "dysplastic epithelium"
+            ],
+            "STR": [
+                "tumor associated stroma",
+                "cancer-associated stroma",
+                "stromal cells",
+                "stromal tissue",
+                "desmoplastic stroma",
+                "reactive stroma",
+                "fibroblastic stroma",
+                "stroma"
+            ],
+            "CAR": [
+                "carcinoma",
+                "malignant epithelial tumor",
+                "cancer",
+                "epithelial carcinoma",
+                "adenocarcinoma",
+                "malignant glands",
+                "invasive carcinoma",
+                "colorectal cancer"
+            ],
+            "PDC": [
+                "poorly differentiated carcinoma",
+                "undifferentiated carcinoma",
+                "high-grade carcinoma",
+                "anaplastic carcinoma",
+                "poorly differentiated tumor",
+                "high-grade malignancy"
+            ],
+            "SIG": [
+                "signet ring cell carcinoma",
+                "signet ring tumor",
+                "signet ring adenocarcinoma",
+                "signet ring",
+                "medullary tumor",
+                "mucin-filled malignant cells",
+                "intracytoplasmic mucin"
+            ],
+            "BACK": [
+                "background",
+                "empty",
+                "blank",
+                "glass",
+                "no tissue",
+                "white background",
+                "slide background",
+                "empty slide region",
+                "artifactual region"
+            ]
+        },
+        "templates": [
+            "CLASSNAME.",
+            "a photomicrograph showing CLASSNAME.",
+            "an image of CLASSNAME.",
+            "an example of CLASSNAME.",
+            "CLASSNAME is shown.",
+            "this is CLASSNAME.",
+            "a histopathological image showing CLASSNAME.",
+            "a histopathological photograph showing CLASSNAME.",
+            "shows CLASSNAME.",
+            "CLASSNAME is present.",
+            "an H&E stained image showing CLASSNAME.",
+            "an H&E image showing CLASSNAME.",
+            "CLASSNAME, H&E."
+        ]
+    }
+}

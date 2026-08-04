@@ -1,0 +1,30 @@
+aggregation: slide
+cohorts:
+- TCGA
+ext_cohorts: []
+folds: 1
+label_dict:
+  Adipose-Fat: 0 
+  Background Tissue: 1
+  Debris-Necrosis: 2
+  Lymphocytes: 3
+  Mucus-Mucin: 4
+  Smooth Muscle: 5
+  Normal Mucosa: 6
+  Tumor Associated Stroma: 7
+  Carcinoma: 8
+metric: bacc
+num_classes: 14
+num_samples: 11186
+prompts:
+  Adipose-Fat: 'adipose, adipose tissue, adipocytes, fat, fat cells'
+  Background: 'background, background tissue, slide background, non-tissue region'
+  Debris-Necrosis: 'debris, necrosis, dead cells'
+  Lymphocytes: 'inflammatory, lymphocytes, immune cells, infiltrating lymphocytes'
+  Mucus-Mucin: 'mucus, mucin, mucus pool, mucin pool'
+  Smooth Muscle: 'smooth muscle, muscularis propria'
+  Normal Mucosa: 'normal mucosa, uninvolved mucosa, benign'
+  Tumor Associated Stroma: 'tumor associated stroma'
+  Carcinoma: 'adenocarcinoma, malignant tumor, carcinoma'
+target: OncoTreeCode
+task: multiclass
