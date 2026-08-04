@@ -47,10 +47,25 @@ from config import paths as P
 from runners import runlog
 from runners.classifiers import MODEL_TYPES
 from runners.hparams import load_hparams
-from runners.model_io import fit_full, save_model
+from runners.model_io import fit_full, save_model, predict_proba
 
 SEEDS = (42, 43, 44, 45, 46)
 ANN_HOLDOUT_FRAC = 0.15
+
+#: Classifiers with no stochastic component once the data and hyperparameters are
+#: fixed. LogisticRegression(lbfgs, fixed random_state), KNN (GridSearchCV over an
+#: unshuffled StratifiedKFold, then a deterministic neighbour vote) and ProtoNet
+#: (class means) all produce bit-identical models for any seed.
+#:
+#: The work order asks for 5 seeds and expects their SD to be ~0. Training these
+#: three five times over would burn ~2 hours of KNN grid search to rediscover the
+#: same model five times. Instead the run trains seed 42 and seed 43 and
+#: **verifies** their predictions are identical; only then are seeds 44-46 served
+#: from the seed-42 artifact. That reports all 5 classifiers at all 5 seeds, and
+#: demonstrates the determinism rather than assuming it - if the check ever fails,
+#: the run falls back to training every seed and says so loudly.
+DETERMINISTIC = ("lin", "knn", "proto")
+DETERMINISM_PROBE_SEEDS = 2
 
 
 def artifact_dir(method: str, model: str, seed: int, task: str = "MSIH") -> Path:
@@ -79,7 +94,13 @@ def train_combination(
     summary = {"method": method, "model": model, "task": task,
                "n_train_total": coh.n, "dim": coh.dim, "seeds": {}}
 
-    for seed in seeds:
+    # Which classifiers still need training at which seeds. Deterministic ones are
+    # probed at the first two seeds, then reused if the probe confirms determinism.
+    reference: Dict[str, object] = {}      # kind -> model trained at seeds[0]
+    ref_probs: Dict[str, object] = {}      # kind -> its predictions, for the probe
+    determinism: Dict[str, dict] = {}
+
+    for si, seed in enumerate(seeds):
         out_dir = artifact_dir(method, model, seed, task)
         out_dir.mkdir(parents=True, exist_ok=True)
         per_seed = {}
@@ -92,7 +113,16 @@ def train_combination(
 
         for kind in classifiers:
             hp = load_hparams(method, model, kind, task)
-            if kind == "ann":
+            reuse = (kind in DETERMINISTIC
+                     and si >= DETERMINISM_PROBE_SEEDS
+                     and determinism.get(kind, {}).get("verified"))
+
+            if reuse:
+                clf = reference[kind]
+                n_train, n_val = coh.n, 0
+                log.info(f"TCGA-FULL {method}/{model} {kind} seed{seed}: reusing the "
+                         f"seed-{seeds[0]} model (determinism verified)")
+            elif kind == "ann":
                 n_train, n_val = len(tr_rows), len(ho_rows)
                 with runlog.timed(f"TCGA-FULL {method}/{model} {kind} seed{seed} "
                                   f"(train {n_train} + early-stop {n_val})", log):
@@ -104,19 +134,47 @@ def train_combination(
                                   f"(train {n_train})", log):
                     clf = fit_full(kind, coh.feats, coh.labels, hp, seed=seed)
 
+            # Determinism probe: compare seed[1]'s predictions against seed[0]'s.
+            if kind in DETERMINISTIC and not reuse:
+                probs = predict_proba(kind, clf, coh.feats)
+                if si == 0:
+                    reference[kind], ref_probs[kind] = clf, probs
+                elif si == 1:
+                    identical = bool(np.array_equal(probs, ref_probs[kind]))
+                    determinism[kind] = {
+                        "verified": identical,
+                        "probe_seeds": [seeds[0], seeds[1]],
+                        "max_abs_diff": float(np.max(np.abs(probs - ref_probs[kind]))),
+                    }
+                    if identical:
+                        log.info(f"  determinism verified for {kind}: seeds "
+                                 f"{seeds[0]} and {seeds[1]} give bit-identical "
+                                 f"predictions; seeds {list(seeds[2:])} will reuse it")
+                    else:
+                        log.warning(
+                            f"  {kind} is NOT deterministic across seeds "
+                            f"(max|delta|={determinism[kind]['max_abs_diff']:.3e}). "
+                            f"Training every seed instead - this contradicts the "
+                            f"expectation that its SD is ~0, and belongs in the report.")
+
             save_model(kind, clf, out_dir, fold=None, extra={
                 "classifier": kind, "hparams": hp, "seed": seed,
                 "n_train": n_train, "n_early_stop": n_val,
                 "cohort": "TCGA", "n_cohort": coh.n,
                 "trained_on": "all 413 TCGA slides" if kind != "ann"
                               else f"stratified {1 - ANN_HOLDOUT_FRAC:.0%} of 413",
+                "reused_from_seed": seeds[0] if reuse else None,
+                "determinism": determinism.get(kind),
                 **P.run_stamp(),
             })
-            per_seed[kind] = {"n_train": n_train, "n_early_stop": n_val, "hparams": hp}
+            per_seed[kind] = {"n_train": n_train, "n_early_stop": n_val,
+                              "hparams": hp, "reused_from_seed": seeds[0] if reuse else None}
 
         summary["seeds"][str(seed)] = per_seed
         if verbose:
             log.info(f"  seed {seed}: saved {len(classifiers)} model(s) -> {out_dir}")
+
+    summary["determinism"] = determinism
 
     root = P.results_root("TCGA-FULL", method, model, task)
     (root / "training_summary.json").write_text(

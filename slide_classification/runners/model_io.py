@@ -101,8 +101,11 @@ def fit_full(
         # training data, so no external information enters.
         # Threading backend for the same reason as eval_knn: loky workers crash
         # re-importing scipy on Windows under an active torch/CUDA context.
+        # 'manhattan' rather than 'minkowski': sklearn's minkowski defaults to
+        # p=2, which is euclidean, so the old list explored only two distinct
+        # metrics while claiming three. Kept in sync with eval_knn.
         grid = {"n_neighbors": [3, 5, 7, 10, 15],
-                "metric": ["cosine", "euclidean", "minkowski"],
+                "metric": ["cosine", "euclidean", "manhattan"],
                 "weights": ["uniform", "distance"]}
         gs = GridSearchCV(KNeighborsClassifier(), grid, n_jobs=-1,
                           scoring="balanced_accuracy")

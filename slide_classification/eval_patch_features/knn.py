@@ -54,7 +54,14 @@ def eval_knn(
     # scipy.stats._continuous_distns, surfacing as TerminatedWorkerError and
     # killing the whole sweep. KNN's work is numpy/BLAS bound and releases the
     # GIL, so threads parallelise it nearly as well and spawn no processes.
-    param_grid = {'n_neighbors': [3, 5, 7, 10, 15], 'metric': ['cosine', 'euclidean','minkowski'], 'weights': ['uniform', 'distance']}
+    # [CORRECTION 2026-08-04] The metric list used to be
+    # ['cosine', 'euclidean', 'minkowski']. sklearn's 'minkowski' defaults to
+    # p=2, which IS 'euclidean' - so a third of every KNN grid search was
+    # recomputing a metric it had already evaluated, and the grid advertised
+    # three distinct metrics while exploring only two. 'manhattan'
+    # (minkowski p=1) replaces it: three genuinely distinct metrics for the same
+    # cost, and a strictly larger search space.
+    param_grid = {'n_neighbors': [3, 5, 7, 10, 15], 'metric': ['cosine', 'euclidean', 'manhattan'], 'weights': ['uniform', 'distance']}
     knn = GridSearchCV(KNeighborsClassifier(), param_grid, n_jobs=-1, verbose=0, scoring='balanced_accuracy')
     with joblib.parallel_backend('threading'):
         knn.fit(train_feats_np, train_labels_np)
