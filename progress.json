@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "last_updated": "2026-08-04T14:22:22+00:00",
+  "last_updated": "2026-08-04T14:55:25+00:00",
   "phases": {
     "0": {
       "0.1_git_protect": {
@@ -98,5 +98,47 @@
       }
     }
   },
-  "branch": "dev (all remediation work; master preserves pre-remediation state)"
+  "branch": "dev (all remediation work; master preserves pre-remediation state)",
+  "runs": {
+    "TCGA-CV|Averaging|H-Optimus-1|default|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T14:50:02+00:00",
+      "n_slides": 413,
+      "output": "D:\\Aamir Gulzar\\KSA_project2\\Cancer-detection-classifier\\slide_classification\\TCGA_Results\\Averaging\\H-Optimus-1\\1-MSIH\\Output"
+    },
+    "TCGA-CV|Averaging|Conch1_5|default|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T14:50:23+00:00",
+      "n_slides": 413,
+      "output": "D:\\Aamir Gulzar\\KSA_project2\\Cancer-detection-classifier\\slide_classification\\TCGA_Results\\Averaging\\Conch1_5\\1-MSIH\\Output"
+    },
+    "TCGA-CV|Averaging|UNI2|default|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T14:50:52+00:00",
+      "n_slides": 413,
+      "output": "D:\\Aamir Gulzar\\KSA_project2\\Cancer-detection-classifier\\slide_classification\\TCGA_Results\\Averaging\\UNI2\\1-MSIH\\Output"
+    },
+    "TCGA-CV|Averaging|Virchow2|default|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T14:51:30+00:00",
+      "n_slides": 413,
+      "output": "D:\\Aamir Gulzar\\KSA_project2\\Cancer-detection-classifier\\slide_classification\\TCGA_Results\\Averaging\\Virchow2\\1-MSIH\\Output"
+    },
+    "TCGA-CV|Averaging|ConchV1|default|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T14:51:52+00:00",
+      "n_slides": 413,
+      "output": "D:\\Aamir Gulzar\\KSA_project2\\Cancer-detection-classifier\\slide_classification\\TCGA_Results\\Averaging\\ConchV1\\1-MSIH\\Output"
+    },
+    "PAIP-IV|Averaging|Conch1_5|default|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T14:54:33+00:00"
+    },
+    "TCGA-CV|Caption_based_aggregation|H-Optimus-1|default|seed42": {
+      "status": "done",
+      "updated": "2026-08-04T14:55:25+00:00",
+      "n_slides": 413,
+      "output": "D:\\Aamir Gulzar\\KSA_project2\\Cancer-detection-classifier\\slide_classification\\TCGA_Results\\Caption_based_aggregation\\H-Optimus-1\\1-MSIH\\Output"
+    }
+  }
 }

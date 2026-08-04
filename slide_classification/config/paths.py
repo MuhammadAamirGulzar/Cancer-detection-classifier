@@ -281,6 +281,9 @@ _EXPERIMENT_FOLDERS: Dict[str, str] = {
     "PAIP-EV": "TCGA_PAIP_EV_Results",
     "SurGen-CV": "SurGen_Results",
     "SurGen-EV": "SurGen_EV_Results",
+    # Not an experiment - the trained artifact both EV experiments consume
+    # (work order Task 3.0a).
+    "TCGA-FULL": "TCGA_FULL_Models",
 }
 
 

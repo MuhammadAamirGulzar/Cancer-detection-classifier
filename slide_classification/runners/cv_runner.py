@@ -200,6 +200,20 @@ def sweep(
                 runlog.mark(key, "skipped", reason=str(exc)[:200])
                 skipped.append((method, model))
                 continue
+            except (AssertionError, ValueError, KeyError, TypeError):
+                # Correctness failures - a leaked case, a shape mismatch, an
+                # unresolvable label. These must halt the run loudly
+                # (work order 1c.3 item 5). Never downgrade one to a skip.
+                raise
+            except Exception as exc:
+                # Infrastructure failure (e.g. a joblib worker dying). One bad
+                # combination must not cost a multi-hour unattended sweep; the
+                # traceback is already in the log via runlog.timed.
+                runlog.record_skip(experiment, cohort, method, model,
+                                   "runtime_failure", f"{type(exc).__name__}: {exc}")
+                runlog.mark(key, "failed", reason=f"{type(exc).__name__}: {str(exc)[:200]}")
+                skipped.append((method, model))
+                continue
 
             if write_thresholds:
                 oof = acc.oof_frame()

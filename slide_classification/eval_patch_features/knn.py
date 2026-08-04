@@ -45,9 +45,19 @@ def eval_knn(
     test_labels_np = test_labels.numpy()
 
     # Train KNN classifier
+    #
+    # [FIX 2026-08-04] The threading backend is deliberate, not incidental.
+    # GridSearchCV defaults to joblib's process-based 'loky' backend, and on
+    # Windows the freshly spawned worker re-imports scipy inside a process that
+    # already holds a CUDA/OpenMP context from torch. That import intermittently
+    # dies with "Windows fatal exception: access violation" in
+    # scipy.stats._continuous_distns, surfacing as TerminatedWorkerError and
+    # killing the whole sweep. KNN's work is numpy/BLAS bound and releases the
+    # GIL, so threads parallelise it nearly as well and spawn no processes.
     param_grid = {'n_neighbors': [3, 5, 7, 10, 15], 'metric': ['cosine', 'euclidean','minkowski'], 'weights': ['uniform', 'distance']}
     knn = GridSearchCV(KNeighborsClassifier(), param_grid, n_jobs=-1, verbose=0, scoring='balanced_accuracy')
-    knn.fit(train_feats_np, train_labels_np)
+    with joblib.parallel_backend('threading'):
+        knn.fit(train_feats_np, train_labels_np)
     if verbose:
         print(f"Best Params: {knn.best_params_}")
         print(f"Best AUROC score: {knn.best_score_}")
