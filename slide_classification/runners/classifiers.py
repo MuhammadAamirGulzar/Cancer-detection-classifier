@@ -49,7 +49,25 @@ GRIDS: Dict[str, Dict[str, list]] = {
         "class_weight": [{0: 1, 1: 10}],
         "prediction_threshold": [0.3],
     },
-    "ann": {"hidden_dim1": [128, 256], "hidden_dim2": [64, 128], "max_iter": [500]},
+    # [WIDENED 2026-08-04] Was {128,256} x {64,128} x {500}. Two independent
+    # reasons, both recorded in slide_classification/ann_grid_probe.csv:
+    #
+    #  * the old grid TRUNCATED. Across the 88 validation-selected configurations
+    #    from the corrected TCGA-CV run, h1 sat at the grid maximum in 61% of
+    #    cases and h2 in 65% - the classic sign the search space is too small.
+    #  * a 32-pair probe (8 combinations x 4 folds, selecting on validation in
+    #    both arms) measured what widening buys on TEST:
+    #        macro-F1 +0.0196 (p=0.006)   accuracy +0.0208 (p=0.0007)
+    #        BalAcc   +0.0115 (p=0.15)    AUROC    +0.0037 (p=0.63)
+    #    So it significantly improves macro-F1 and accuracy, and does NOT
+    #    significantly improve AUROC - the primary metric - or balanced accuracy.
+    #    No metric degrades on average. Reported that way, not as a headline win.
+    #
+    # This is only legitimate because Task 1.1 moved selection to VALIDATION.
+    # Under the old test-set selection a wider grid would have bought nothing but
+    # more optimistic bias.
+    "ann": {"hidden_dim1": [128, 256, 512], "hidden_dim2": [64, 128, 256],
+            "max_iter": [500, 1000]},
 }
 
 Split = Tuple[torch.Tensor, torch.Tensor]  # (feats, labels)
