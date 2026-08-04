@@ -1,0 +1,254 @@
+{
+  "stamp": {
+    "machine": "local",
+    "timestamp": "2026-08-04T16:38:34+00:00",
+    "git_commit": "6ccfba1",
+    "experiment": "PAIP-IV",
+    "cohort": "paip",
+    "method": "Caption_based_aggregation",
+    "model": "H-Optimus-1",
+    "task": "MSIH",
+    "n_test": 31,
+    "n_train": 42,
+    "n_train_declared": 47,
+    "n_test_declared": 31,
+    "protocol": "single provider-defined split, no averaging",
+    "threshold_policy": "0.5 (internal experiment, section 1b rule 2)",
+    "bootstrap": "1000 resamples, 95% CI"
+  },
+  "results": {
+    "lin": {
+      "classifier": "lin",
+      "bacc": 0.8363095238095238,
+      "auroc": 0.8452380952380952,
+      "acc": 0.9032258064516129,
+      "macro_f1": 0.8540031397174255,
+      "weighted_f1": 0.9004912138552692,
+      "conf_matrix": [
+        [
+          23,
+          1
+        ],
+        [
+          2,
+          5
+        ]
+      ],
+      "threshold": 0.5,
+      "n_train": 42,
+      "n_ann_early_stop": 8,
+      "n_test": 31,
+      "bootstrap": {
+        "n_resamples": 1000,
+        "n_usable": 1000,
+        "n_degenerate_single_class": 0,
+        "level": 95,
+        "bacc_ci": [
+          0.6439123376623377,
+          1.0
+        ],
+        "auroc_ci": [
+          0.629465811965812,
+          1.0
+        ],
+        "bacc_boot_mean": 0.8380974314513221,
+        "auroc_boot_mean": 0.8483098985433098
+      },
+      "selection": null
+    },
+    "ann": {
+      "classifier": "ann",
+      "bacc": 0.6488095238095238,
+      "auroc": 0.7916666666666667,
+      "acc": 0.6129032258064516,
+      "macro_f1": 0.5772727272727273,
+      "weighted_f1": 0.6445747800586509,
+      "conf_matrix": [
+        [
+          14,
+          10
+        ],
+        [
+          2,
+          5
+        ]
+      ],
+      "threshold": 0.5,
+      "n_train": 42,
+      "n_ann_early_stop": 8,
+      "n_test": 31,
+      "bootstrap": {
+        "n_resamples": 1000,
+        "n_usable": 1000,
+        "n_degenerate_single_class": 0,
+        "level": 95,
+        "bacc_ci": [
+          0.4266657608695652,
+          0.8400000000000001
+        ],
+        "auroc_ci": [
+          0.5277626811594203,
+          1.0
+        ],
+        "bacc_boot_mean": 0.6517345605196634,
+        "auroc_boot_mean": 0.7944435766548581
+      },
+      "selection": {
+        "selected": {
+          "hidden_dim1": 128,
+          "hidden_dim2": 64,
+          "max_iter": 500
+        },
+        "selection_metric": "val_ann_macro_f1",
+        "selection_value": 0.8545454545454545,
+        "grid_trace": [
+          {
+            "hidden_dim1": 128,
+            "hidden_dim2": 64,
+            "max_iter": 500,
+            "val_macro_f1": 0.8545454545454545,
+            "test_macro_f1": 0.5772727272727273
+          },
+          {
+            "hidden_dim1": 128,
+            "hidden_dim2": 128,
+            "max_iter": 500,
+            "val_macro_f1": 0.8545454545454545,
+            "test_macro_f1": 0.7163398692810458
+          },
+          {
+            "hidden_dim1": 256,
+            "hidden_dim2": 64,
+            "max_iter": 500,
+            "val_macro_f1": 0.8545454545454545,
+            "test_macro_f1": 0.6868686868686869
+          },
+          {
+            "hidden_dim1": 256,
+            "hidden_dim2": 128,
+            "max_iter": 500,
+            "val_macro_f1": 0.8545454545454545,
+            "test_macro_f1": 0.7472826086956521
+          }
+        ]
+      }
+    },
+    "knn": {
+      "classifier": "knn",
+      "bacc": 0.8363095238095238,
+      "auroc": 0.8690476190476192,
+      "acc": 0.9032258064516129,
+      "macro_f1": 0.8540031397174255,
+      "weighted_f1": 0.9004912138552692,
+      "conf_matrix": [
+        [
+          23,
+          1
+        ],
+        [
+          2,
+          5
+        ]
+      ],
+      "threshold": 0.5,
+      "n_train": 42,
+      "n_ann_early_stop": 8,
+      "n_test": 31,
+      "bootstrap": {
+        "n_resamples": 1000,
+        "n_usable": 1000,
+        "n_degenerate_single_class": 0,
+        "level": 95,
+        "bacc_ci": [
+          0.6439123376623377,
+          1.0
+        ],
+        "auroc_ci": [
+          0.7023809523809523,
+          1.0
+        ],
+        "bacc_boot_mean": 0.8380974314513221,
+        "auroc_boot_mean": 0.8706272554913614
+      },
+      "selection": null
+    },
+    "proto": {
+      "classifier": "proto",
+      "bacc": 0.7946428571428572,
+      "auroc": 0.8392857142857143,
+      "acc": 0.8387096774193549,
+      "macro_f1": 0.7801418439716312,
+      "weighted_f1": 0.8423701670098375,
+      "conf_matrix": [
+        [
+          21,
+          3
+        ],
+        [
+          2,
+          5
+        ]
+      ],
+      "threshold": 0.5,
+      "n_train": 42,
+      "n_ann_early_stop": 8,
+      "n_test": 31,
+      "bootstrap": {
+        "n_resamples": 1000,
+        "n_usable": 1000,
+        "n_degenerate_single_class": 0,
+        "level": 95,
+        "bacc_ci": [
+          0.5879305555555556,
+          0.962962962962963
+        ],
+        "auroc_ci": [
+          0.6190476190476191,
+          1.0
+        ],
+        "bacc_boot_mean": 0.7979480272598047,
+        "auroc_boot_mean": 0.8415907431284652
+      },
+      "selection": null
+    },
+    "rf": {
+      "classifier": "rf",
+      "bacc": 0.8154761904761905,
+      "auroc": 0.8392857142857143,
+      "acc": 0.8709677419354839,
+      "macro_f1": 0.8154761904761905,
+      "weighted_f1": 0.8709677419354839,
+      "conf_matrix": [
+        [
+          22,
+          2
+        ],
+        [
+          2,
+          5
+        ]
+      ],
+      "threshold": 0.5,
+      "n_train": 42,
+      "n_ann_early_stop": 8,
+      "n_test": 31,
+      "bootstrap": {
+        "n_resamples": 1000,
+        "n_usable": 1000,
+        "n_degenerate_single_class": 0,
+        "level": 95,
+        "bacc_ci": [
+          0.6220238095238095,
+          0.9814814814814814
+        ],
+        "auroc_ci": [
+          0.6190476190476191,
+          1.0
+        ],
+        "bacc_boot_mean": 0.8173104777711917,
+        "auroc_boot_mean": 0.8415907431284652
+      },
+      "selection": null
+    }
+  }
+}

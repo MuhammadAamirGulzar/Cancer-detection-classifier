@@ -1,11 +1,11 @@
 {
   "input_dim": 35840,
-  "hidden_dim1": 128,
-  "hidden_dim2": 128,
+  "hidden_dim1": 512,
+  "hidden_dim2": 64,
   "max_iter": 500,
-  "checkpoint": "fold2_ann_35840_128_128.pth",
+  "checkpoint": "fold2_ann_35840_512_64.pth",
   "selection_metric": "val_ann_macro_f1",
-  "selection_value": 0.6817226890756303,
+  "selection_value": 0.7062446535500427,
   "softmax_in_graph": false,
-  "saved_at": "2026-08-04T16:03:41+00:00"
+  "saved_at": "2026-08-04T17:21:00+00:00"
 }

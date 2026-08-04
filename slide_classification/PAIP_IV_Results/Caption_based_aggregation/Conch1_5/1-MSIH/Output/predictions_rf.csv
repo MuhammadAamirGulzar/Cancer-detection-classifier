@@ -1,5 +1,5 @@
 WSI_ID,target,prob_pos,pred
-validation_data_01_nonMSIH,0,0.28989029003783107,0
+validation_data_01_nonMSIH,0,0.289890290037831,0
 validation_data_02_MSIH,1,0.395822905337472,1
 validation_data_03_nonMSIH,0,0.118,0
 validation_data_04_MSIH,1,0.4437583892084397,1

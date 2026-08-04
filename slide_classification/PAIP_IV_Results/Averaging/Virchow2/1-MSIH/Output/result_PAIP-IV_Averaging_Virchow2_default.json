@@ -1,8 +1,8 @@
 {
   "stamp": {
     "machine": "local",
-    "timestamp": "2026-08-04T16:37:43+00:00",
-    "git_commit": "6ccfba1",
+    "timestamp": "2026-08-04T18:04:43+00:00",
+    "git_commit": "5167683",
     "experiment": "PAIP-IV",
     "cohort": "paip",
     "method": "Averaging",
@@ -58,19 +58,19 @@
     },
     "ann": {
       "classifier": "ann",
-      "bacc": 0.6696428571428572,
-      "auroc": 0.7023809523809523,
-      "acc": 0.6451612903225806,
-      "macro_f1": 0.6039488966318234,
-      "weighted_f1": 0.6740099659061107,
+      "bacc": 0.6785714285714286,
+      "auroc": 0.6726190476190476,
+      "acc": 0.5806451612903226,
+      "macro_f1": 0.5643243243243243,
+      "weighted_f1": 0.610566695727986,
       "conf_matrix": [
         [
-          15,
-          9
+          12,
+          12
         ],
         [
-          2,
-          5
+          1,
+          6
         ]
       ],
       "threshold": 0.5,
@@ -83,24 +83,24 @@
         "n_degenerate_single_class": 0,
         "level": 95,
         "bacc_ci": [
-          0.45,
-          0.8572142857142857
+          0.49136334610472543,
+          0.8333333333333333
         ],
         "auroc_ci": [
-          0.43987962962962956,
-          0.9345403439153439
+          0.38878205128205134,
+          0.9239633655394526
         ],
-        "bacc_boot_mean": 0.6717922287348318,
-        "auroc_boot_mean": 0.7064163244051028
+        "bacc_boot_mean": 0.6797582280504594,
+        "auroc_boot_mean": 0.6765908152766842
       },
       "selection": {
         "selected": {
-          "hidden_dim1": 256,
+          "hidden_dim1": 512,
           "hidden_dim2": 64,
           "max_iter": 500
         },
         "selection_metric": "val_ann_macro_f1",
-        "selection_value": 0.7948717948717949,
+        "selection_value": 0.8545454545454545,
         "grid_trace": [
           {
             "hidden_dim1": 128,
@@ -111,8 +111,36 @@
           },
           {
             "hidden_dim1": 128,
+            "hidden_dim2": 64,
+            "max_iter": 1000,
+            "val_macro_f1": 0.6666666666666667,
+            "test_macro_f1": 0.5542483660130719
+          },
+          {
+            "hidden_dim1": 128,
             "hidden_dim2": 128,
             "max_iter": 500,
+            "val_macro_f1": 0.6666666666666667,
+            "test_macro_f1": 0.5571428571428572
+          },
+          {
+            "hidden_dim1": 128,
+            "hidden_dim2": 128,
+            "max_iter": 1000,
+            "val_macro_f1": 0.6666666666666667,
+            "test_macro_f1": 0.5571428571428572
+          },
+          {
+            "hidden_dim1": 128,
+            "hidden_dim2": 256,
+            "max_iter": 500,
+            "val_macro_f1": 0.6666666666666667,
+            "test_macro_f1": 0.5571428571428572
+          },
+          {
+            "hidden_dim1": 128,
+            "hidden_dim2": 256,
+            "max_iter": 1000,
             "val_macro_f1": 0.6666666666666667,
             "test_macro_f1": 0.5571428571428572
           },
@@ -125,10 +153,80 @@
           },
           {
             "hidden_dim1": 256,
+            "hidden_dim2": 64,
+            "max_iter": 1000,
+            "val_macro_f1": 0.7948717948717949,
+            "test_macro_f1": 0.6039488966318234
+          },
+          {
+            "hidden_dim1": 256,
             "hidden_dim2": 128,
             "max_iter": 500,
             "val_macro_f1": 0.6666666666666667,
             "test_macro_f1": 0.6477272727272727
+          },
+          {
+            "hidden_dim1": 256,
+            "hidden_dim2": 128,
+            "max_iter": 1000,
+            "val_macro_f1": 0.6666666666666667,
+            "test_macro_f1": 0.6477272727272727
+          },
+          {
+            "hidden_dim1": 256,
+            "hidden_dim2": 256,
+            "max_iter": 500,
+            "val_macro_f1": 0.6666666666666667,
+            "test_macro_f1": 0.6039488966318234
+          },
+          {
+            "hidden_dim1": 256,
+            "hidden_dim2": 256,
+            "max_iter": 1000,
+            "val_macro_f1": 0.6666666666666667,
+            "test_macro_f1": 0.6039488966318234
+          },
+          {
+            "hidden_dim1": 512,
+            "hidden_dim2": 64,
+            "max_iter": 500,
+            "val_macro_f1": 0.8545454545454545,
+            "test_macro_f1": 0.5643243243243243
+          },
+          {
+            "hidden_dim1": 512,
+            "hidden_dim2": 64,
+            "max_iter": 1000,
+            "val_macro_f1": 0.8545454545454545,
+            "test_macro_f1": 0.5643243243243243
+          },
+          {
+            "hidden_dim1": 512,
+            "hidden_dim2": 128,
+            "max_iter": 500,
+            "val_macro_f1": 0.8545454545454545,
+            "test_macro_f1": 0.5772727272727273
+          },
+          {
+            "hidden_dim1": 512,
+            "hidden_dim2": 128,
+            "max_iter": 1000,
+            "val_macro_f1": 0.8545454545454545,
+            "test_macro_f1": 0.5772727272727273
+          },
+          {
+            "hidden_dim1": 512,
+            "hidden_dim2": 256,
+            "max_iter": 500,
+            "val_macro_f1": 0.6666666666666667,
+            "test_macro_f1": 0.5319396051103369
+          },
+          {
+            "hidden_dim1": 512,
+            "hidden_dim2": 256,
+            "max_iter": 1000,
+            "val_macro_f1": 0.6666666666666667,
+            "test_macro_f1": 0.5319396051103369
           }
         ]
       }

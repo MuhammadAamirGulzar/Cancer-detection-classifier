@@ -53,20 +53,20 @@ Sorted by balanced accuracy, with AUROC as the tie-break. AUROC is the primary m
 
 | Method | Model | Classifier | Variant | BalAcc | AUROC | Acc | MacroF1 | N_test |
 |---|---|---|---|---|---|---|---|---|
-| Caption_based_aggregation_15_classes | H-Optimus-1 | ann | default | 0.8357 | 0.9186 | 0.8284 | 0.7402 | 413 |
-| Tissue_Type_Clustering | UNI2 | ann | default | 0.8132 | 0.8803 | 0.8492 | 0.7510 | 413 |
+| Caption_based_aggregation_15_classes | H-Optimus-1 | ann | default | 0.8283 | 0.9190 | 0.8751 | 0.7824 | 413 |
+| Caption_based_aggregation | H-Optimus-1 | ann | default | 0.8173 | 0.9131 | 0.8607 | 0.7627 | 413 |
+| Averaging | H-Optimus-1 | ann | default | 0.8004 | 0.8837 | 0.8213 | 0.7197 | 413 |
 | Caption_based_aggregation_15_classes | H-Optimus-1 | lin | default | 0.8004 | 0.9279 | 0.9230 | 0.8285 | 413 |
-| Caption_based_aggregation | H-Optimus-1 | ann | default | 0.7971 | 0.9139 | 0.8530 | 0.7487 | 413 |
-| Caption_based_aggregation_15_classes | UNI2 | ann | default | 0.7955 | 0.8891 | 0.8315 | 0.7273 | 413 |
 | Caption_based_aggregation | H-Optimus-1 | lin | default | 0.7928 | 0.9250 | 0.9157 | 0.8144 | 413 |
-| Caption_based_aggregation_15_classes | Virchow2 | ann | default | 0.7902 | 0.8691 | 0.7881 | 0.6905 | 413 |
-| Caption_based_aggregation | UNI2 | ann | default | 0.7839 | 0.8861 | 0.8358 | 0.7248 | 413 |
-| Averaging | UNI2 | ann | default | 0.7818 | 0.8618 | 0.8234 | 0.7135 | 413 |
-| Averaging | H-Optimus-1 | ann | default | 0.7768 | 0.8781 | 0.8164 | 0.7077 | 413 |
-| Caption_based_aggregation | Virchow2 | ann | default | 0.7755 | 0.8598 | 0.8311 | 0.7191 | 413 |
-| Tissue_Type_Clustering | H-Optimus-1 | ann | default | 0.7721 | 0.8833 | 0.8297 | 0.7135 | 413 |
-| Tissue_Type_Clustering | ConchV1 | ann | default | 0.7578 | 0.7948 | 0.7987 | 0.6873 | 413 |
-| Averaging | Virchow2 | ann | default | 0.7553 | 0.8352 | 0.8256 | 0.7054 | 413 |
+| Tissue_Type_Clustering | H-Optimus-1 | ann | default | 0.7916 | 0.9045 | 0.8326 | 0.7273 | 413 |
+| Caption_based_aggregation_15_classes | Virchow2 | ann | default | 0.7895 | 0.8696 | 0.8010 | 0.7008 | 413 |
+| Averaging | UNI2 | ann | default | 0.7889 | 0.8640 | 0.8338 | 0.7257 | 413 |
+| Caption_based_aggregation_15_classes | UNI2 | ann | default | 0.7861 | 0.8786 | 0.8466 | 0.7386 | 413 |
+| Tissue_Type_Clustering | UNI2 | ann | default | 0.7837 | 0.8807 | 0.8519 | 0.7416 | 413 |
+| Caption_based_aggregation | UNI2 | ann | default | 0.7818 | 0.8864 | 0.8475 | 0.7338 | 413 |
+| Caption_based_aggregation | Virchow2 | ann | default | 0.7670 | 0.8550 | 0.8234 | 0.7088 | 413 |
+| Averaging | Virchow2 | ann | default | 0.7626 | 0.8285 | 0.8383 | 0.7189 | 413 |
+| Tissue_Type_Clustering | ConchV1 | ann | default | 0.7605 | 0.8106 | 0.7914 | 0.6831 | 413 |
 | Caption_based_aggregation | H-Optimus-1 | proto | default | 0.7552 | 0.8323 | 0.8223 | 0.7027 | 413 |
 | Caption_based_aggregation_15_classes | H-Optimus-1 | proto | default | 0.7507 | 0.8367 | 0.8145 | 0.6973 | 413 |
 | Tissue_Type_Clustering | H-Optimus-1 | proto | default | 0.7503 | 0.8221 | 0.8066 | 0.6924 | 413 |
@@ -77,7 +77,7 @@ Sorted by balanced accuracy, with AUROC as the tie-break. AUROC is the primary m
 | Tissue_Type_Clustering | UNI2 | lin | default | 0.7356 | 0.8943 | 0.9152 | 0.7792 | 413 |
 | Caption_based_aggregation_15_classes | UNI2 | lin | default | 0.7340 | 0.8813 | 0.8989 | 0.7619 | 413 |
 | Caption_based_aggregation_15_classes | Virchow2 | lin | default | 0.7320 | 0.8808 | 0.8953 | 0.7636 | 413 |
-| Caption_based_aggregation_15_classes | Conch1_5 | ann | default | 0.7318 | 0.8059 | 0.7422 | 0.6374 | 413 |
+| Tissue_Type_Clustering | Conch1_5 | ann | default | 0.7284 | 0.8394 | 0.7873 | 0.6648 | 413 |
 
 _Showing the top 25 of 100 rows; the full table is in `slide_classification/best_of_all_exps_metric.xlsx`._
 
@@ -86,8 +86,8 @@ TITAN and PRISM are **slide-level encoders with no patch aggregation step**. The
 
 | Method | Model | Classifier | Variant | BalAcc | AUROC | Acc | MacroF1 | N_test |
 |---|---|---|---|---|---|---|---|---|
-| PRISM | PRISM | ann | default | 0.8009 | 0.8613 | 0.8357 | 0.7323 | 413 |
-| TITAN | Conch1_5 | ann | default | 0.7700 | 0.8546 | 0.8020 | 0.6922 | 413 |
+| TITAN | Conch1_5 | ann | default | 0.8029 | 0.8645 | 0.8292 | 0.7275 | 413 |
+| PRISM | PRISM | ann | default | 0.7933 | 0.8685 | 0.8405 | 0.7314 | 413 |
 | TITAN | Conch1_5 | rf | default | 0.7626 | 0.8770 | 0.8941 | 0.7677 | 413 |
 | PRISM | PRISM | lin | default | 0.7176 | 0.8441 | 0.8651 | 0.7170 | 413 |
 | TITAN | Conch1_5 | proto | default | 0.7166 | 0.7855 | 0.8126 | 0.6763 | 413 |
@@ -156,8 +156,8 @@ TITAN and PRISM are **slide-level encoders with no patch aggregation step**. The
 |---|---|---|---|---|---|---|---|---|---|
 | TITAN | Conch1_5 | lin | 0.9375 | [0.8636, 1.0000] | 0.9464 | [0.8533, 1.0000] | 0.9032 | 0.8784 | 31 |
 | PRISM | PRISM | lin | 0.7946 | [0.5809, 0.9643] | 0.8393 | [0.6207, 0.9947] | 0.8387 | 0.7801 | 31 |
+| PRISM | PRISM | ann | 0.7946 | [0.5773, 0.9658] | 0.7679 | [0.4522, 1.0000] | 0.8387 | 0.7801 | 31 |
 | PRISM | PRISM | rf | 0.7738 | [0.5595, 0.9583] | 0.8274 | [0.6071, 1.0000] | 0.8065 | 0.7473 | 31 |
-| PRISM | PRISM | ann | 0.7738 | [0.5509, 0.9565] | 0.7619 | [0.4524, 1.0000] | 0.8065 | 0.7473 | 31 |
 | TITAN | Conch1_5 | rf | 0.7619 | [0.5700, 0.9001] | 0.8750 | [0.6799, 1.0000] | 0.7097 | 0.6760 | 31 |
 | PRISM | PRISM | proto | 0.7530 | [0.5324, 0.9349] | 0.7917 | [0.5132, 1.0000] | 0.7742 | 0.7163 | 31 |
 | TITAN | Conch1_5 | knn | 0.7232 | [0.5038, 0.9231] | 0.8244 | [0.6606, 0.9593] | 0.8065 | 0.7232 | 31 |
@@ -189,31 +189,31 @@ Sorted by balanced accuracy, with AUROC as the tie-break. AUROC is the primary m
 
 | Method | Model | Classifier | Variant | BalAcc | AUROC | Acc | MacroF1 | N_test |
 |---|---|---|---|---|---|---|---|---|
-| Caption_based_aggregation_15_classes | H-Optimus-1 | ann | fold_ensemble | 0.8761 | 0.8813 | 0.9041 | 0.8685 | 73 |
-| Caption_based_aggregation | UNI2 | ann | fold_ensemble | 0.8671 | 0.8750 | 0.8904 | 0.8525 | 73 |
+| Caption_based_aggregation | UNI2 | ann | fold_ensemble | 0.8850 | 0.8981 | 0.9178 | 0.8850 | 73 |
+| Caption_based_aggregation_15_classes | UNI2 | ann | fold_ensemble | 0.8761 | 0.8960 | 0.9041 | 0.8685 | 73 |
+| Caption_based_aggregation_15_classes | H-Optimus-1 | ann | fold_ensemble | 0.8761 | 0.8918 | 0.9041 | 0.8685 | 73 |
 | Averaging | H-Optimus-1 | proto | tcga_full | 0.8671 | 0.8634 | 0.8904 | 0.8525 | 73 |
-| Caption_based_aggregation | H-Optimus-1 | ann | tcga_full | 0.8546 | 0.8992 | 0.8712 | 0.8314 | 73 |
-| Caption_based_aggregation_15_classes | UNI2 | ann | fold_ensemble | 0.8493 | 0.8908 | 0.8630 | 0.8221 | 73 |
+| Caption_based_aggregation | H-Optimus-1 | ann | fold_ensemble | 0.8671 | 0.8519 | 0.8904 | 0.8525 | 73 |
+| Caption_based_aggregation | H-Optimus-1 | ann | tcga_full | 0.8505 | 0.8880 | 0.8712 | 0.8305 | 73 |
 | Caption_based_aggregation_15_classes | H-Optimus-1 | proto | fold_ensemble | 0.8493 | 0.8676 | 0.8630 | 0.8221 | 73 |
-| Caption_based_aggregation | H-Optimus-1 | ann | fold_ensemble | 0.8493 | 0.8613 | 0.8630 | 0.8221 | 73 |
-| Tissue_Type_Clustering | H-Optimus-1 | ann | tcga_full | 0.8479 | 0.8813 | 0.8986 | 0.8550 | 73 |
-| Caption_based_aggregation_15_classes | H-Optimus-1 | ann | tcga_full | 0.8477 | 0.8805 | 0.8795 | 0.8378 | 73 |
+| Averaging | H-Optimus-1 | ann | fold_ensemble | 0.8493 | 0.8571 | 0.8630 | 0.8221 | 73 |
+| Caption_based_aggregation_15_classes | H-Optimus-1 | ann | tcga_full | 0.8475 | 0.8958 | 0.8603 | 0.8204 | 73 |
 | Averaging | H-Optimus-1 | proto | fold_ensemble | 0.8466 | 0.8634 | 0.8904 | 0.8466 | 73 |
+| Tissue_Type_Clustering | H-Optimus-1 | ann | tcga_full | 0.8452 | 0.8813 | 0.8630 | 0.8208 | 73 |
+| Caption_based_aggregation_15_classes | H-Optimus-1 | ann | fold_average | 0.8444 | 0.8873 | 0.8870 | 0.8422 | 73 |
 | Caption_based_aggregation_15_classes | Virchow2 | lin | tcga_full | 0.8430 | 0.8992 | 0.8219 | 0.7857 | 73 |
-| Caption_based_aggregation | H-Optimus-1 | ann | fold_average | 0.8426 | 0.8690 | 0.8527 | 0.8133 | 73 |
 | Caption_based_aggregation | Virchow2 | lin | fold_average | 0.8410 | 0.8782 | 0.8425 | 0.8050 | 73 |
 | Caption_based_aggregation_15_classes | Virchow2 | lin | fold_average | 0.8403 | 0.8879 | 0.8493 | 0.8111 | 73 |
+| Caption_based_aggregation_15_classes | Conch1_5 | ann | fold_ensemble | 0.8403 | 0.8718 | 0.8493 | 0.8076 | 73 |
 | Caption_based_aggregation_15_classes | H-Optimus-1 | proto | tcga_full | 0.8403 | 0.8666 | 0.8493 | 0.8076 | 73 |
-| Caption_based_aggregation_15_classes | H-Optimus-1 | ann | fold_average | 0.8355 | 0.8774 | 0.8733 | 0.8269 | 73 |
+| Caption_based_aggregation | UNI2 | ann | tcga_full | 0.8355 | 0.9025 | 0.8356 | 0.7966 | 73 |
 | Caption_based_aggregation_15_classes | Virchow2 | proto | fold_ensemble | 0.8351 | 0.8592 | 0.9041 | 0.8567 | 73 |
+| Tissue_Type_Clustering | H-Optimus-1 | ann | fold_ensemble | 0.8340 | 0.8624 | 0.8082 | 0.7723 | 73 |
 | Caption_based_aggregation | H-Optimus-1 | proto | fold_ensemble | 0.8314 | 0.8697 | 0.8356 | 0.7934 | 73 |
-| Caption_based_aggregation_15_classes | ConchV1 | ann | fold_ensemble | 0.8288 | 0.8477 | 0.8630 | 0.8157 | 73 |
+| Caption_based_aggregation | Conch1_5 | ann | fold_ensemble | 0.8288 | 0.8592 | 0.8630 | 0.8157 | 73 |
 | Caption_based_aggregation_15_classes | UNI2 | ann | tcga_full | 0.8286 | 0.8929 | 0.8438 | 0.8024 | 73 |
-| Tissue_Type_Clustering | H-Optimus-1 | ann | fold_ensemble | 0.8262 | 0.8550 | 0.8904 | 0.8399 | 73 |
+| Caption_based_aggregation | H-Optimus-1 | ann | fold_average | 0.8259 | 0.8621 | 0.8664 | 0.8190 | 73 |
 | Caption_based_aggregation_15_classes | Virchow2 | lin | fold_ensemble | 0.8251 | 0.8960 | 0.7945 | 0.7591 | 73 |
-| Caption_based_aggregation_15_classes | UNI2 | ann | fold_average | 0.8250 | 0.8831 | 0.8493 | 0.8035 | 73 |
-| Tissue_Type_Clustering | H-Optimus-1 | proto | fold_ensemble | 0.8225 | 0.8561 | 0.8219 | 0.7796 | 73 |
-| Caption_based_aggregation_15_classes | ConchV1 | lin | tcga_full | 0.8225 | 0.8466 | 0.8219 | 0.7796 | 73 |
 
 _Showing the top 25 of 300 rows; the full table is in `slide_classification/best_of_all_exps_metric.xlsx`._
 
@@ -222,21 +222,21 @@ TITAN and PRISM are **slide-level encoders with no patch aggregation step**. The
 
 | Method | Model | Classifier | Variant | BalAcc | AUROC | Acc | MacroF1 | N_test |
 |---|---|---|---|---|---|---|---|---|
-| PRISM | PRISM | ann | fold_ensemble | 0.8314 | 0.8382 | 0.8356 | 0.7934 | 73 |
-| PRISM | PRISM | ann | fold_average | 0.8221 | 0.8332 | 0.8527 | 0.8054 | 73 |
-| PRISM | PRISM | ann | tcga_full | 0.7976 | 0.8426 | 0.8466 | 0.7896 | 73 |
-| TITAN | Conch1_5 | ann | tcga_full | 0.7925 | 0.8445 | 0.8137 | 0.7619 | 73 |
-| TITAN | Conch1_5 | ann | fold_ensemble | 0.7904 | 0.8109 | 0.8356 | 0.7788 | 73 |
+| PRISM | PRISM | ann | fold_ensemble | 0.8314 | 0.8298 | 0.8356 | 0.7934 | 73 |
+| PRISM | PRISM | ann | fold_average | 0.8071 | 0.8301 | 0.8219 | 0.7768 | 73 |
 | PRISM | PRISM | rf | fold_ensemble | 0.7904 | 0.7994 | 0.8356 | 0.7788 | 73 |
 | PRISM | PRISM | rf | fold_average | 0.7876 | 0.7967 | 0.8390 | 0.7801 | 73 |
 | PRISM | PRISM | lin | tcga_full | 0.7868 | 0.8340 | 0.7671 | 0.7270 | 73 |
 | PRISM | PRISM | lin | fold_average | 0.7845 | 0.8398 | 0.7637 | 0.7241 | 73 |
+| PRISM | PRISM | ann | tcga_full | 0.7821 | 0.8368 | 0.7726 | 0.7332 | 73 |
 | TITAN | Conch1_5 | rf | fold_ensemble | 0.7815 | 0.8424 | 0.8219 | 0.7647 | 73 |
 | PRISM | PRISM | lin | fold_ensemble | 0.7805 | 0.8519 | 0.7260 | 0.6958 | 73 |
+| TITAN | Conch1_5 | ann | fold_ensemble | 0.7778 | 0.8487 | 0.7534 | 0.7143 | 73 |
 | TITAN | Conch1_5 | rf | tcga_full | 0.7738 | 0.8368 | 0.8164 | 0.7574 | 73 |
 | TITAN | Conch1_5 | rf | fold_average | 0.7646 | 0.8369 | 0.8116 | 0.7501 | 73 |
 | PRISM | PRISM | proto | fold_average | 0.7637 | 0.7970 | 0.7945 | 0.7372 | 73 |
 | PRISM | PRISM | proto | tcga_full | 0.7637 | 0.8004 | 0.7945 | 0.7376 | 73 |
+| TITAN | Conch1_5 | proto | tcga_full | 0.7600 | 0.8288 | 0.7260 | 0.6896 | 73 |
 
 ---
 
@@ -259,9 +259,9 @@ Sorted by balanced accuracy, with AUROC as the tie-break. AUROC is the primary m
 
 | Method | Model | Classifier | Variant | BalAcc | AUROC | Acc | MacroF1 | N_test |
 |---|---|---|---|---|---|---|---|---|
-| Caption_based_aggregation | Conch1_5 | ann | default | 0.6533 | 0.6848 | 0.7357 | 0.5614 | 622 |
+| Caption_based_aggregation | Conch1_5 | ann | default | 0.6722 | 0.6959 | 0.7439 | 0.5740 | 622 |
 | Caption_based_aggregation | Virchow2 | ann | default | 0.6523 | 0.7017 | 0.7763 | 0.5835 | 622 |
-| Tissue_Type_Clustering | Virchow2 | ann | default | 0.6286 | 0.7028 | 0.7496 | 0.5590 | 622 |
+| Tissue_Type_Clustering | Virchow2 | ann | default | 0.6277 | 0.6959 | 0.7481 | 0.5580 | 622 |
 | Tissue_Type_Clustering | Virchow2 | lin | default | 0.6262 | 0.7532 | 0.8968 | 0.6382 | 622 |
 | Tissue_Type_Clustering | Conch1_5 | ann | default | 0.6238 | 0.6484 | 0.7237 | 0.5442 | 622 |
 | Caption_based_aggregation | Virchow2 | proto | default | 0.6215 | 0.6644 | 0.6791 | 0.5229 | 622 |
@@ -272,10 +272,10 @@ Sorted by balanced accuracy, with AUROC as the tie-break. AUROC is the primary m
 | Caption_based_aggregation | Conch1_5 | proto | default | 0.5994 | 0.6712 | 0.6535 | 0.5029 | 622 |
 | Tissue_Type_Clustering | Conch1_5 | lin | default | 0.5950 | 0.7216 | 0.8720 | 0.5997 | 622 |
 | Caption_based_aggregation | Conch1_5 | lin | default | 0.5940 | 0.7258 | 0.8859 | 0.6041 | 622 |
+| Averaging | Virchow2 | ann | default | 0.5914 | 0.6356 | 0.7700 | 0.5497 | 622 |
 | Tissue_Type_Clustering | Conch1_5 | proto | default | 0.5849 | 0.6569 | 0.6408 | 0.4922 | 622 |
-| Averaging | Virchow2 | ann | default | 0.5819 | 0.6270 | 0.7672 | 0.5450 | 622 |
 | Averaging | Conch1_5 | proto | default | 0.5763 | 0.6574 | 0.6262 | 0.4828 | 622 |
-| Averaging | Conch1_5 | ann | default | 0.5746 | 0.6317 | 0.7518 | 0.5302 | 622 |
+| Averaging | Conch1_5 | ann | default | 0.5721 | 0.6468 | 0.7340 | 0.5238 | 622 |
 | Averaging | Conch1_5 | lin | default | 0.5694 | 0.6850 | 0.8829 | 0.5760 | 622 |
 | Averaging | Conch1_5 | knn | default | 0.5293 | 0.5892 | 0.8919 | 0.5347 | 622 |
 | Tissue_Type_Clustering | Virchow2 | knn | default | 0.5264 | 0.6079 | 0.8972 | 0.5287 | 622 |
@@ -309,30 +309,30 @@ Sorted by balanced accuracy, with AUROC as the tie-break. AUROC is the primary m
 | Method | Model | Classifier | Variant | BalAcc | AUROC | Acc | MacroF1 | N_test |
 |---|---|---|---|---|---|---|---|---|
 | Caption_based_aggregation | Virchow2 | lin | fold_ensemble | 0.7341 | 0.7806 | 0.7347 | 0.5907 | 622 |
+| Caption_based_aggregation | Virchow2 | ann | tcga_full | 0.6993 | 0.7668 | 0.7068 | 0.5627 | 622 |
+| Caption_based_aggregation | Virchow2 | ann | fold_ensemble | 0.6839 | 0.7746 | 0.5498 | 0.4711 | 622 |
 | Tissue_Type_Clustering | Virchow2 | lin | fold_ensemble | 0.6776 | 0.7524 | 0.6865 | 0.5448 | 622 |
 | Tissue_Type_Clustering | Virchow2 | lin | fold_average | 0.6590 | 0.7292 | 0.7504 | 0.5710 | 622 |
 | Caption_based_aggregation | Virchow2 | lin | fold_average | 0.6585 | 0.7574 | 0.7998 | 0.5960 | 622 |
 | Caption_based_aggregation | Virchow2 | lin | tcga_full | 0.6494 | 0.7613 | 0.8103 | 0.6019 | 622 |
-| Caption_based_aggregation | Virchow2 | ann | tcga_full | 0.6414 | 0.7668 | 0.4273 | 0.3851 | 622 |
-| Tissue_Type_Clustering | Virchow2 | ann | tcga_full | 0.6295 | 0.7308 | 0.4328 | 0.3855 | 622 |
+| Caption_based_aggregation | Conch1_5 | ann | fold_ensemble | 0.6271 | 0.6892 | 0.5145 | 0.4391 | 622 |
 | Tissue_Type_Clustering | Virchow2 | lin | tcga_full | 0.6241 | 0.7195 | 0.8183 | 0.5926 | 622 |
 | Averaging | Virchow2 | lin | fold_ensemble | 0.6159 | 0.6838 | 0.5884 | 0.4761 | 622 |
 | Averaging | Virchow2 | lin | tcga_full | 0.6062 | 0.6515 | 0.6785 | 0.5165 | 622 |
-| Caption_based_aggregation | Conch1_5 | ann | tcga_full | 0.6038 | 0.6646 | 0.6633 | 0.5054 | 622 |
+| Caption_based_aggregation | Conch1_5 | ann | tcga_full | 0.5977 | 0.6638 | 0.4990 | 0.4128 | 622 |
 | Caption_based_aggregation | Conch1_5 | lin | fold_ensemble | 0.5958 | 0.6661 | 0.7942 | 0.5639 | 622 |
 | Averaging | Virchow2 | lin | fold_average | 0.5932 | 0.6671 | 0.6953 | 0.5110 | 622 |
 | Caption_based_aggregation | Virchow2 | rf | fold_average | 0.5926 | 0.6846 | 0.8388 | 0.5617 | 622 |
-| Caption_based_aggregation | Conch1_5 | ann | fold_ensemble | 0.5912 | 0.6695 | 0.7186 | 0.5285 | 622 |
-| Caption_based_aggregation | Conch1_5 | ann | fold_average | 0.5908 | 0.6268 | 0.6439 | 0.4846 | 622 |
+| Caption_based_aggregation | Virchow2 | ann | fold_average | 0.5922 | 0.7367 | 0.4514 | 0.3630 | 622 |
 | Tissue_Type_Clustering | Virchow2 | rf | fold_ensemble | 0.5893 | 0.7466 | 0.9035 | 0.6170 | 622 |
 | Caption_based_aggregation | Conch1_5 | knn | tcga_full | 0.5853 | 0.6448 | 0.8424 | 0.5791 | 622 |
+| Averaging | Conch1_5 | ann | fold_ensemble | 0.5851 | 0.6292 | 0.4116 | 0.3699 | 622 |
+| Tissue_Type_Clustering | Virchow2 | ann | tcga_full | 0.5844 | 0.7281 | 0.3190 | 0.2867 | 622 |
 | Averaging | Virchow2 | proto | fold_average | 0.5837 | 0.6667 | 0.7958 | 0.5208 | 622 |
 | Tissue_Type_Clustering | Virchow2 | knn | fold_ensemble | 0.5801 | 0.6210 | 0.6447 | 0.4920 | 622 |
 | Tissue_Type_Clustering | Conch1_5 | rf | tcga_full | 0.5782 | 0.6099 | 0.6090 | 0.4733 | 622 |
 | Caption_based_aggregation | Conch1_5 | knn | fold_average | 0.5775 | 0.6229 | 0.8553 | 0.5790 | 622 |
 | Tissue_Type_Clustering | Virchow2 | rf | fold_average | 0.5744 | 0.6812 | 0.8666 | 0.5758 | 622 |
-| Tissue_Type_Clustering | Virchow2 | rf | tcga_full | 0.5741 | 0.6840 | 0.8868 | 0.5900 | 622 |
-| Caption_based_aggregation | Virchow2 | rf | fold_ensemble | 0.5727 | 0.7326 | 0.9003 | 0.5953 | 622 |
 
 _Showing the top 25 of 90 rows; the full table is in `slide_classification/best_of_all_exps_metric.xlsx`._
 

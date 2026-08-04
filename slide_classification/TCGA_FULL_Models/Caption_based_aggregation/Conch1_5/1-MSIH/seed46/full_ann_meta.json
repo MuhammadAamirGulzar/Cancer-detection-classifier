@@ -1,7 +1,7 @@
 {
   "classifier": "ann",
   "hparams": {
-    "hidden_dim1": 256,
+    "hidden_dim1": 512,
     "hidden_dim2": 64,
     "max_iter": 500
   },
@@ -14,6 +14,6 @@
   "reused_from_seed": null,
   "determinism": null,
   "machine": "local",
-  "timestamp": "2026-08-04T16:52:04+00:00",
-  "git_commit": "6ccfba1"
+  "timestamp": "2026-08-04T17:43:19+00:00",
+  "git_commit": "e3abf90"
 }

@@ -2,7 +2,7 @@ WSI_ID,target,prob_pos,pred
 validation_data_01_nonMSIH,0,0.114,0
 validation_data_02_MSIH,1,0.5175983112396775,1
 validation_data_03_nonMSIH,0,0.01781818181818182,0
-validation_data_04_MSIH,1,0.5598962681846932,1
+validation_data_04_MSIH,1,0.5598962681846933,1
 validation_data_05_nonMSIH,0,0.096,0
 validation_data_06_nonMSIH,0,0.5171958041958041,1
 validation_data_07_nonMSIH,0,0.038,0
@@ -25,7 +25,7 @@ validation_data_23_nonMSIH,0,0.064,0
 validation_data_24_nonMSIH,0,0.012,0
 validation_data_25_nonMSIH,0,0.09157184750733137,0
 validation_data_26_nonMSIH,0,0.042,0
-validation_data_27_MSIH,1,0.7274532248891908,1
+validation_data_27_MSIH,1,0.727453224889191,1
 validation_data_28_MSIH,1,0.3815971479500891,1
 validation_data_29_MSIH,1,0.055636363636363644,0
 validation_data_30_nonMSIH,0,0.03981818181818182,0

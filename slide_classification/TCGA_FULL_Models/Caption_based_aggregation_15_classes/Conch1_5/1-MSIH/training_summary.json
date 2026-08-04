@@ -19,8 +19,8 @@
         "n_train": 351,
         "n_early_stop": 62,
         "hparams": {
-          "hidden_dim1": 128,
-          "hidden_dim2": 128,
+          "hidden_dim1": 512,
+          "hidden_dim2": 64,
           "max_iter": 500
         },
         "reused_from_seed": null
@@ -70,8 +70,8 @@
         "n_train": 351,
         "n_early_stop": 62,
         "hparams": {
-          "hidden_dim1": 128,
-          "hidden_dim2": 128,
+          "hidden_dim1": 512,
+          "hidden_dim2": 64,
           "max_iter": 500
         },
         "reused_from_seed": null
@@ -121,8 +121,8 @@
         "n_train": 351,
         "n_early_stop": 62,
         "hparams": {
-          "hidden_dim1": 128,
-          "hidden_dim2": 128,
+          "hidden_dim1": 512,
+          "hidden_dim2": 64,
           "max_iter": 500
         },
         "reused_from_seed": null
@@ -172,8 +172,8 @@
         "n_train": 351,
         "n_early_stop": 62,
         "hparams": {
-          "hidden_dim1": 128,
-          "hidden_dim2": 128,
+          "hidden_dim1": 512,
+          "hidden_dim2": 64,
           "max_iter": 500
         },
         "reused_from_seed": null
@@ -223,8 +223,8 @@
         "n_train": 351,
         "n_early_stop": 62,
         "hparams": {
-          "hidden_dim1": 128,
-          "hidden_dim2": 128,
+          "hidden_dim1": 512,
+          "hidden_dim2": 64,
           "max_iter": 500
         },
         "reused_from_seed": null

@@ -1,0 +1,8 @@
+cohort,method,model,task,wsi_id,reason
+tcga,Caption_based_aggregation,UNI2,MSIH,TCGA-AD-6895_MSIH,labelled_but_no_features
+tcga,Caption_based_aggregation,UNI2,MSIH,TCGA-AD-6899_nonMSIH,labelled_but_no_features
+tcga,Caption_based_aggregation,UNI2,MSIH,TCGA-CM-6680_nonMSIH,labelled_but_no_features
+tcga,Caption_based_aggregation,UNI2,MSIH,TCGA-D5-7000_nonMSIH,features_but_no_label
+tcga,Caption_based_aggregation,UNI2,MSIH,TCGA-EI-6917_nonMSIH,features_but_no_label
+tcga,Caption_based_aggregation,UNI2,MSIH,TCGA-F5-6814_nonMSIH,features_but_no_label
+tcga,Caption_based_aggregation,UNI2,MSIH,TCGA-T9-A92H_nonMSIH,features_but_no_label

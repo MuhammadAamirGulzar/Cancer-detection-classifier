@@ -1,8 +1,8 @@
 {
   "stamp": {
     "machine": "local",
-    "timestamp": "2026-08-04T16:45:25+00:00",
-    "git_commit": "6ccfba1",
+    "timestamp": "2026-08-04T18:10:37+00:00",
+    "git_commit": "5167683",
     "experiment": "PAIP-IV",
     "cohort": "paip",
     "method": "Tissue_Type_Clustering",
@@ -111,8 +111,36 @@
           },
           {
             "hidden_dim1": 128,
+            "hidden_dim2": 64,
+            "max_iter": 1000,
+            "val_macro_f1": 0.8545454545454545,
+            "test_macro_f1": 0.6198439241917503
+          },
+          {
+            "hidden_dim1": 128,
             "hidden_dim2": 128,
             "max_iter": 500,
+            "val_macro_f1": 0.8545454545454545,
+            "test_macro_f1": 0.6759581881533101
+          },
+          {
+            "hidden_dim1": 128,
+            "hidden_dim2": 128,
+            "max_iter": 1000,
+            "val_macro_f1": 0.8545454545454545,
+            "test_macro_f1": 0.6759581881533101
+          },
+          {
+            "hidden_dim1": 128,
+            "hidden_dim2": 256,
+            "max_iter": 500,
+            "val_macro_f1": 0.8545454545454545,
+            "test_macro_f1": 0.6759581881533101
+          },
+          {
+            "hidden_dim1": 128,
+            "hidden_dim2": 256,
+            "max_iter": 1000,
             "val_macro_f1": 0.8545454545454545,
             "test_macro_f1": 0.6759581881533101
           },
@@ -125,10 +153,80 @@
           },
           {
             "hidden_dim1": 256,
+            "hidden_dim2": 64,
+            "max_iter": 1000,
+            "val_macro_f1": 0.8545454545454545,
+            "test_macro_f1": 0.5643243243243243
+          },
+          {
+            "hidden_dim1": 256,
             "hidden_dim2": 128,
             "max_iter": 500,
             "val_macro_f1": 0.8545454545454545,
             "test_macro_f1": 0.5921052631578947
+          },
+          {
+            "hidden_dim1": 256,
+            "hidden_dim2": 128,
+            "max_iter": 1000,
+            "val_macro_f1": 0.8545454545454545,
+            "test_macro_f1": 0.5921052631578947
+          },
+          {
+            "hidden_dim1": 256,
+            "hidden_dim2": 256,
+            "max_iter": 500,
+            "val_macro_f1": 0.8545454545454545,
+            "test_macro_f1": 0.6477272727272727
+          },
+          {
+            "hidden_dim1": 256,
+            "hidden_dim2": 256,
+            "max_iter": 1000,
+            "val_macro_f1": 0.8545454545454545,
+            "test_macro_f1": 0.6477272727272727
+          },
+          {
+            "hidden_dim1": 512,
+            "hidden_dim2": 64,
+            "max_iter": 500,
+            "val_macro_f1": 0.8545454545454545,
+            "test_macro_f1": 0.6198439241917503
+          },
+          {
+            "hidden_dim1": 512,
+            "hidden_dim2": 64,
+            "max_iter": 1000,
+            "val_macro_f1": 0.8545454545454545,
+            "test_macro_f1": 0.6198439241917503
+          },
+          {
+            "hidden_dim1": 512,
+            "hidden_dim2": 128,
+            "max_iter": 500,
+            "val_macro_f1": 0.8545454545454545,
+            "test_macro_f1": 0.5363247863247864
+          },
+          {
+            "hidden_dim1": 512,
+            "hidden_dim2": 128,
+            "max_iter": 1000,
+            "val_macro_f1": 0.8545454545454545,
+            "test_macro_f1": 0.5363247863247864
+          },
+          {
+            "hidden_dim1": 512,
+            "hidden_dim2": 256,
+            "max_iter": 500,
+            "val_macro_f1": 0.8545454545454545,
+            "test_macro_f1": 0.6198439241917503
+          },
+          {
+            "hidden_dim1": 512,
+            "hidden_dim2": 256,
+            "max_iter": 1000,
+            "val_macro_f1": 0.8545454545454545,
+            "test_macro_f1": 0.6198439241917503
           }
         ]
       }

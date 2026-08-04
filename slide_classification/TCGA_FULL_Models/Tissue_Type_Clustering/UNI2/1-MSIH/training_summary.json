@@ -20,7 +20,7 @@
         "n_early_stop": 62,
         "hparams": {
           "hidden_dim1": 128,
-          "hidden_dim2": 128,
+          "hidden_dim2": 256,
           "max_iter": 500
         },
         "reused_from_seed": null
@@ -71,7 +71,7 @@
         "n_early_stop": 62,
         "hparams": {
           "hidden_dim1": 128,
-          "hidden_dim2": 128,
+          "hidden_dim2": 256,
           "max_iter": 500
         },
         "reused_from_seed": null
@@ -122,7 +122,7 @@
         "n_early_stop": 62,
         "hparams": {
           "hidden_dim1": 128,
-          "hidden_dim2": 128,
+          "hidden_dim2": 256,
           "max_iter": 500
         },
         "reused_from_seed": null
@@ -173,7 +173,7 @@
         "n_early_stop": 62,
         "hparams": {
           "hidden_dim1": 128,
-          "hidden_dim2": 128,
+          "hidden_dim2": 256,
           "max_iter": 500
         },
         "reused_from_seed": null
@@ -224,7 +224,7 @@
         "n_early_stop": 62,
         "hparams": {
           "hidden_dim1": 128,
-          "hidden_dim2": 128,
+          "hidden_dim2": 256,
           "max_iter": 500
         },
         "reused_from_seed": null
