@@ -183,9 +183,28 @@ def load_hparams(method: str, model: str, classifier: str, task: str = "MSIH",
     store = json.loads(p.read_text(encoding="utf-8"))
     key = f"{method}|{model}|{task}"
     try:
-        return {k: v for k, v in store[key][classifier].items() if not k.startswith("_")}
+        hp = {k: v for k, v in store[key][classifier].items() if not k.startswith("_")}
     except KeyError as exc:
         raise KeyError(f"No hyperparameters for {key} / {classifier}") from exc
+    return _restore_json_types(hp)
+
+
+def _restore_json_types(hp: Dict[str, Any]) -> Dict[str, Any]:
+    """Undo JSON's coercion of dict keys to strings.
+
+    JSON object keys are always strings, so ``class_weight={0: 1, 1: 10}`` comes
+    back as ``{"0": 1, "1": 10}`` and scikit-learn rejects it with
+    ``ValueError: The classes, [0, 1], are not in class_weight`` - the class
+    labels are integers and no longer match. Integer-like keys are restored here.
+    """
+    out = dict(hp)
+    cw = out.get("class_weight")
+    if isinstance(cw, dict):
+        out["class_weight"] = {
+            (int(k) if isinstance(k, str) and k.lstrip("-").isdigit() else k): v
+            for k, v in cw.items()
+        }
+    return out
 
 
 if __name__ == "__main__":  # pragma: no cover
