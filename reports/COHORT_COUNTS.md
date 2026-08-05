@@ -78,14 +78,17 @@ Two are MSI-H, which is why PAIP's positive count is 17 rather than 19.
 
 ### They were never patched — this is not an aggregation failure
 
-Traced through every stage of the PAIP tree:
+Traced through every per-slide stage of the PAIP tree. **Every stage holds exactly 73**, including the earliest one:
 
-| Stage | Contents | Any of the 5 present? |
+| Stage | Entries | Any of the 5 present? |
 |---|---|---|
-| `paip_data/patches_metadata/` | **73 entries** | **none** |
-| `paip_data/Features/` | 7 model dirs | none |
-| `paip_data/slide_h5_files/` | — | none |
-| `paip_data/Flat_directory/` | — | none |
+| `patch_data/` — earliest per-slide artifact | **73** | **none** |
+| `patches_metadata/` | **73** | **none** |
+| `Features/H_Optimus_1_fivecrop_Updated/` | **73** | **none** |
+| `Features/Virchow2_fivecrop_Updated/` | **73** | **none** |
+| `slide_aggregation/Averaging/H-Optimus-1/` | **73** | **none** |
+
+The count never drops from 78 to 73 anywhere in the pipeline — it **starts** at 73. That rules out loss during patching, feature extraction or aggregation: these 5 slides were never processed at all.
 
 They *are* declared in `paip_78slides.csv` and `TrainTest_paip.csv`, and two of them (`training_data_30`, `training_data_42`) appear in `paip_reviewed_slides.csv`. So they were expected, and dropped out at or before **patching** — the source WSIs were either never obtained or failed patch extraction. Nothing downstream could have recovered them.
 
