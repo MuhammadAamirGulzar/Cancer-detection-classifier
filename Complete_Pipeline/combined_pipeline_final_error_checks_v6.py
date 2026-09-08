@@ -5,8 +5,10 @@ Downloads WSIs in batches, runs the full pipeline (Step A-1 → A-2 → Step C)
 for each selected model, deletes the CZI files, then rsyncs features to a
 remote machine over SSH via Tailscale.
 
-The WSI catalogue is built dynamically from surgen_labels.csv — any slide with
-label_desc == -1 is excluded automatically. No hardcoded filename lists needed.
+The WSI catalogue is built dynamically from surgen_slide_labels.csv — any slide
+whose `include` column is not TRUE is excluded automatically. That CSV is the
+single source of truth for SurGen labels; no MMR/MSI rule is re-derived in code.
+No hardcoded filename lists needed.
 
 Usage:
     python surgen_batch_pipeline.py
@@ -239,6 +241,14 @@ ACTIVE_MODELS = [  # "uni2-h", "h-optimus-1", "conch1-5", "conch-v1", "virchow2"
     "virchow2"
 ]
 
+# Run one encoder at a time without editing this file:
+#   PowerShell:  $env:SURGEN_ACTIVE_MODELS = "virchow2"
+#   then launch the pipeline / supervisor as usual.
+# Comma-separated for more than one. Unset to use the list above.
+_env_models = os.environ.get("SURGEN_ACTIVE_MODELS", "").strip()
+if _env_models:
+    ACTIVE_MODELS = [s.strip() for s in _env_models.split(",") if s.strip()]
+
 # ── Download / storage settings ───────────────────────────────────────────────
 BATCH_SIZE    = 2      # WSIs per batch
 MIN_FREE_GB   = 20      # halt if D: drive has less than this free after a batch
@@ -250,8 +260,19 @@ OUTPUT_BASE = r"D:\Aamir Gulzar\KSA_project2\surgen_data"
 FEATURES_BASE = r"D:\Aamir Gulzar\KSA_project2\surgen_data\surgen_processed"
 
 # ── Labels CSV ────────────────────────────────────────────────────────────────
-# Columns: WSI_Id (slide stem), label_desc (0=nonmsih, 1=msih, -1=exclude)
-SURGEN_LABELS_CSV = r"D:\Aamir Gulzar\KSA_project2\surgen_data\surgen_labels.csv"
+# surgen_slide_labels.csv is the SINGLE SOURCE OF TRUTH for SurGen labels. It
+# lives in the repo (next to this script) so both machines run the byte-identical
+# file and their patch sets stay in lock-step. Columns:
+#   slide_filename, sub_cohort, case_id, section,
+#   label        (1 = MSI-H, 0 = non-MSI-H, blank when excluded),
+#   class_name, label_source, evidence, patient_group,
+#   include      (TRUE = use this slide, FALSE = drop it),
+#   exclude_reason
+# The MMR/MSI resolution that produced `label` is NOT reimplemented here — this
+# pipeline only ever looks the value up.
+SURGEN_LABELS_CSV = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), "surgen_slide_labels.csv"
+)
 
 # ── Model weights / checkpoints ───────────────────────────────────────────────
 SVM_MODEL_PATH      = r"D:\Aamir Gulzar\KSA_project2\Cancer-detection-classifier\Complete_Pipeline\svm_model.pkl"
@@ -293,6 +314,24 @@ PATCH_METADATA_DIR    = os.path.join(OUTPUT_BASE, "patch_metadata")
 MERGED_METADATA_CSV   = os.path.join(OUTPUT_BASE, "patch_metadata_merged.csv")
 NONWHITE_METADATA_CSV = os.path.join(OUTPUT_BASE, "patch_metadata_nonwhite.csv")
 
+# ── Incremental Step A-1/A-2 ─────────────────────────────────────────────────
+# Ledger of every slide that has completed A-1/A-2 screening, whether or not it
+# ended up with any tissue patches. This is DISTINCT from "appears in the
+# nonwhite CSV": a screened slide with zero tissue is legitimately absent from
+# that file, so non-membership alone cannot mean "no tissue" once the cohort
+# grows. Seeded from the nonwhite CSV's slide list the first time it is needed.
+SCREENED_SLIDES_LEDGER = os.path.join(OUTPUT_BASE, "patch_metadata_screened_slides.txt")
+
+# When the nonwhite CSV already exists, screen only slides NOT in the ledger and
+# APPEND their tissue rows to it — the millions of rows already there are never
+# rewritten. Set SURGEN_INCREMENTAL_A1A2=0 to force the legacy full rebuild.
+INCREMENTAL_A1A2 = os.environ.get("SURGEN_INCREMENTAL_A1A2", "1").strip() != "0"
+
+# Skip the per-model Step C feature-extraction loop entirely. Download, A-1,
+# A-2-append and CZI deletion still run. Lets the new patch rows be committed
+# without spending GPU-days on feature extraction in the same pass.
+SKIP_STEP_C = os.environ.get("SURGEN_SKIP_STEP_C", "0").strip() == "1"
+
 MODEL_OUTPUT_ROOTS = {
     "h-optimus-1": _HOPT_ROOT,
     "conch1-5"   : os.path.join(FEATURES_BASE, "conch1-5"),
@@ -311,19 +350,24 @@ _BASE_URL = "https://ftp.ebi.ac.uk/biostudies/fire/S-BIAD/285/S-BIAD1285/Files"
 
 def build_wsi_list(labels_csv: str) -> list:
     """
-    Read surgen_labels.csv and return (filename, url) pairs for every slide
-    whose label_desc != -1. The EBI subfolder is inferred from the slide
-    name prefix (SR1482 → SR1482_WSIs, SR386 → SR386_WSIs).
+    Read surgen_slide_labels.csv and return (filename, url) pairs for every
+    slide whose `include` column is TRUE. The EBI subfolder is inferred from
+    the slide name prefix (SR1482 → SR1482_WSIs, SR386 → SR386_WSIs).
+
+    The label CSV is authoritative — this just filters on `include`, it does
+    not re-derive anything from the MMR/MSI evidence columns.
     """
     df = pd.read_csv(labels_csv)
 
-    if "WSI_Id" not in df.columns or "label_desc" not in df.columns:
+    required = {"slide_filename", "label", "include"}
+    if not required.issubset(df.columns):
         raise ValueError(
-            f"Expected columns 'WSI_Id' and 'label_desc' in {labels_csv}. "
+            f"Expected columns {sorted(required)} in {labels_csv}. "
             f"Found: {df.columns.tolist()}"
         )
 
-    valid_stems = df.loc[df["label_desc"] != -1, "WSI_Id"].tolist()
+    included    = df["include"].astype(str).str.strip().str.upper() == "TRUE"
+    valid_stems = [Path(str(f)).stem for f in df.loc[included, "slide_filename"]]
 
     wsis    = []
     skipped = 0
@@ -343,7 +387,7 @@ def build_wsi_list(labels_csv: str) -> list:
 
     print(
         f"[CATALOGUE] {len(wsis)} valid WSI(s) loaded from {labels_csv} "
-        f"({len(df) - len(valid_stems)} excluded with label=-1"
+        f"({len(df) - len(valid_stems)} excluded (include != TRUE)"
         + (f", {skipped} skipped due to unknown prefix" if skipped else "")
         + ")",
         flush=True,
@@ -513,22 +557,74 @@ def _get_nonwhite_slide_names() -> set:
     return _NONWHITE_SLIDE_NAMES_CACHE
 
 
+_SCREENED_SLIDES_CACHE = None
+_SCREENED_SLIDES_MTIME = None
+
+
+def _seed_screened_ledger_if_missing() -> None:
+    """Create the ledger from the existing nonwhite CSV the first time we run
+    incrementally. Every slide already in that CSV has, by definition, been
+    screened. Slides screened historically that had zero tissue are not
+    recoverable from here — they get re-screened once (one extra download +
+    A-1 pass), then land in the ledger."""
+    if os.path.exists(SCREENED_SLIDES_LEDGER):
+        return
+    seed = sorted(_get_nonwhite_slide_names())
+    with open(SCREENED_SLIDES_LEDGER, "w", encoding="utf-8") as fh:
+        fh.write("\n".join(seed) + ("\n" if seed else ""))
+    log(f"  [LEDGER] Seeded {SCREENED_SLIDES_LEDGER} with {len(seed)} "
+        f"already-screened slide(s) from the nonwhite CSV.")
+
+
+def _get_screened_slides() -> set:
+    """Cached set of slide stems that have completed A-1/A-2 screening."""
+    global _SCREENED_SLIDES_CACHE, _SCREENED_SLIDES_MTIME
+    if not os.path.exists(SCREENED_SLIDES_LEDGER):
+        return set()
+    mtime = os.path.getmtime(SCREENED_SLIDES_LEDGER)
+    if _SCREENED_SLIDES_CACHE is None or mtime != _SCREENED_SLIDES_MTIME:
+        with open(SCREENED_SLIDES_LEDGER, encoding="utf-8") as fh:
+            _SCREENED_SLIDES_CACHE = {ln.strip() for ln in fh if ln.strip()}
+        _SCREENED_SLIDES_MTIME = mtime
+    return _SCREENED_SLIDES_CACHE
+
+
+def _mark_slides_screened(stems) -> None:
+    existing = _get_screened_slides()
+    new = sorted({s for s in stems if s} - existing)
+    if not new:
+        return
+    with open(SCREENED_SLIDES_LEDGER, "a", encoding="utf-8") as fh:
+        fh.write("\n".join(new) + "\n")
+    global _SCREENED_SLIDES_CACHE, _SCREENED_SLIDES_MTIME
+    _SCREENED_SLIDES_CACHE = None
+    _SCREENED_SLIDES_MTIME = None
+    log(f"  [LEDGER] +{len(new)} slide(s) marked screened "
+        f"({len(existing) + len(new)} total).")
+
+
 def _slide_confirmed_zero_tissue(stem: str) -> bool:
     """
-    True if this slide has zero rows in the nonwhite CSV.
+    True only if this slide has been through A-1/A-2 screening AND has zero
+    rows in the nonwhite CSV.
 
-    NONWHITE_METADATA_CSV is a complete, precomputed guide covering every
-    slide in the dataset (built once upfront via full-dataset screening,
-    not incrementally per batch) — so simple non-membership is a reliable
-    signal that the slide has no tissue patches worth processing, even
-    before it's ever been downloaded.
-
-    If the CSV doesn't exist at all yet, we can't confirm anything — return
-    False so nothing gets incorrectly skipped.
+    The screening check matters once the cohort grows past the set the
+    nonwhite CSV was first built from: an un-screened slide that is simply
+    missing from the CSV has *unknown* tissue content and must still be
+    downloaded and run through A-1/A-2 — it must not be mistaken for a slide
+    that screening already proved empty.
     """
     if not os.path.exists(NONWHITE_METADATA_CSV):
         return False
+    if INCREMENTAL_A1A2 and stem not in _get_screened_slides():
+        return False
     return stem not in _get_nonwhite_slide_names()
+
+
+def _slide_preprocessing_only_done(stem: str) -> bool:
+    """Completion criterion while SKIP_STEP_C is set: the slide has been
+    through A-1/A-2. Feature extraction is deliberately not required."""
+    return stem in _get_screened_slides()
 
 
 def _slide_features_complete(slide_stem: str) -> bool:
@@ -562,7 +658,8 @@ def _batch_fully_complete(batch: list, verbose: bool = False) -> bool:
     all_complete = True
     for filename, _ in batch:
         stem = Path(filename).stem
-        slide_complete = _slide_features_complete(stem)
+        slide_complete = (_slide_preprocessing_only_done(stem) if SKIP_STEP_C
+                          else _slide_features_complete(stem))
         if verbose:
             log(f"    [RESUME SCAN]   {filename} — "
                 f"{'complete' if slide_complete else 'INCOMPLETE'}")
@@ -586,6 +683,12 @@ def filter_batch_for_download(batch: list) -> list:
     to_download = []
     for filename, url in batch:
         stem = Path(filename).stem
+        if SKIP_STEP_C:
+            if _slide_preprocessing_only_done(stem):
+                log(f"  [SKIP DOWNLOAD] {filename} — already screened (Step C deferred)")
+            else:
+                to_download.append((filename, url))
+            continue
         if _slide_confirmed_zero_tissue(stem):
             log(f"  [SKIP DOWNLOAD] {filename} — confirmed zero tissue patches, nothing to process")
         elif _slide_features_complete(stem):
@@ -741,22 +844,37 @@ _surgen_labels_df = None
 
 
 def _load_label_df():
-    """Load and cache the unified labels CSV, indexed by WSI_Id."""
+    """Load and cache surgen_slide_labels.csv, indexed by slide stem.
+
+    This only reads the CSV. It never re-derives a label from the MMR / MSI
+    evidence columns — the resolved `label` value in the file is authoritative,
+    and both machines must run the identical file so their patch sets match.
+    """
     global _surgen_labels_df
     if _surgen_labels_df is None:
         df = pd.read_csv(SURGEN_LABELS_CSV)
-        _surgen_labels_df = df.set_index("WSI_Id")
-        log(f"  Loaded labels: {len(_surgen_labels_df)} rows from {SURGEN_LABELS_CSV}")
+        df["_stem"] = df["slide_filename"].astype(str).map(lambda s: Path(s).stem)
+        if df["_stem"].duplicated().any():
+            dups = sorted(df.loc[df["_stem"].duplicated(keep=False), "_stem"].unique())
+            raise ValueError(f"Duplicate slide stems in {SURGEN_LABELS_CSV}: {dups}")
+        _surgen_labels_df = df.set_index("_stem")
+        n_inc = int((_surgen_labels_df["include"].astype(str).str.strip().str.upper()
+                     == "TRUE").sum())
+        log(f"  Loaded labels: {len(_surgen_labels_df)} rows "
+            f"({n_inc} include=TRUE) from {SURGEN_LABELS_CSV}")
 
 
 def get_slide_label(czi_filename: str):
     """
-    Return 'msih', 'nonmsih', or None (skip) for the given CZI filename.
+    Return 'msih', 'nonmsih', or None (skip) for the given CZI filename, by
+    looking the slide stem up in surgen_slide_labels.csv.
 
-      label_desc == 1  → 'msih'
-      label_desc == 0  → 'nonmsih'
-      label_desc == -1 → None  (excluded)
-      not in CSV       → None  (unknown)
+      include == TRUE, label == 1  → 'msih'
+      include == TRUE, label == 0  → 'nonmsih'
+      include == FALSE             → None  (excluded — do not process)
+      stem not in CSV              → None  (unknown — do not process)
+
+    No MMR/MSI rule is applied here; the CSV already carries the resolved label.
     """
     _load_label_df()
     stem = Path(czi_filename).stem
@@ -765,15 +883,19 @@ def get_slide_label(czi_filename: str):
         log(f"  [SKIP] {stem}: not found in labels CSV")
         return None
 
-    val = int(_surgen_labels_df.at[stem, "label_desc"])
+    row = _surgen_labels_df.loc[stem]
+    if str(row["include"]).strip().upper() != "TRUE":
+        reason = str(row.get("exclude_reason", "") or "").strip()
+        log(f"  [SKIP] {stem}: include=FALSE" + (f" ({reason})" if reason else ""))
+        return None
 
+    val = int(row["label"])
     if val == 1:
         return "msih"
-    elif val == 0:
+    if val == 0:
         return "nonmsih"
-    else:
-        log(f"  [SKIP] {stem}: label_desc={val} — excluded")
-        return None
+    log(f"  [SKIP] {stem}: unexpected label={val!r} with include=TRUE")
+    return None
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -975,6 +1097,10 @@ def run_step_A1(czi_root, output_metadata_dir, patch_size, target_mag, row_batch
         if label is None:
             continue
 
+        if stem in _get_screened_slides():
+            log(f"  [SKIP] {stem}: already screened (in ledger)")
+            continue
+
         final_csv = os.path.join(output_metadata_dir, f"{stem}.csv")
         tmp_csv   = os.path.join(output_metadata_dir, f"{stem}.tmp")
 
@@ -1084,11 +1210,110 @@ def apply_svm_whiteness(svm_input_df: pd.DataFrame) -> pd.DataFrame:
     return result_df
 
 
+def _count_data_rows(path: str) -> int:
+    """Number of data rows (lines minus the header) in a CSV. Streamed so a
+    multi-GB file costs no meaningful memory."""
+    if not os.path.exists(path):
+        return 0
+    n = 0
+    with open(path, "rb") as fh:
+        for buf in iter(lambda: fh.read(1 << 20), b""):
+            n += buf.count(b"\n")
+    return max(0, n - 1)
+
+
+def _classify_patch_frame(merged_df, qc_filtered_dir):
+    """pixel-rule pre-filter + SVM → merged_df with an int `white_label`
+    column (0 = tissue, 1 = white) and no `reject_reason`. Shared by both the
+    full-rebuild and the incremental-append paths so the filtering is
+    byte-identical between them."""
+    merged_df, _ = tag_bad_patches(merged_df, qc_filtered_dir)
+    svm_input_df = merged_df[merged_df["white_label"].isna()].drop(
+        columns=["white_label", "reject_reason"]
+    )
+    log(f"\n  Stage 2 — SVM on {len(svm_input_df):,} patches ...")
+    if len(svm_input_df):
+        svm_result_df = apply_svm_whiteness(svm_input_df)
+        merged_df.loc[merged_df["white_label"].isna(), "white_label"] = \
+            svm_result_df["white_label"].values
+    merged_df["white_label"] = merged_df["white_label"].astype(int)
+    return merged_df.drop(columns=["reject_reason"])
+
+
 def run_step_A2(patch_metadata_dir, merged_csv_path, nonwhite_csv_path, qc_filtered_dir):
     """
-    Merge per-slide CSVs, apply pixel filter + SVM, write merged and nonwhite CSVs.
-    Always re-runs to incorporate new slides from the current batch.
+    Merge per-slide CSVs, apply the pixel filter + SVM, and update the nonwhite CSV.
+
+    Two modes:
+      • INCREMENTAL (nonwhite CSV exists and SURGEN_INCREMENTAL_A1A2 != 0):
+        screen only the per-slide CSVs whose stem is NOT in the screened-slides
+        ledger and APPEND their tissue rows to the existing nonwhite CSV. The
+        rows already in that file are never touched. Reports before/after counts.
+      • FULL REBUILD (legacy): merge every per-slide CSV and overwrite both the
+        merged and nonwhite CSVs from scratch.
     """
+    incremental = INCREMENTAL_A1A2 and os.path.exists(nonwhite_csv_path)
+    if incremental:
+        return _run_step_A2_append(patch_metadata_dir, nonwhite_csv_path, qc_filtered_dir)
+    return _run_step_A2_full_rebuild(
+        patch_metadata_dir, merged_csv_path, nonwhite_csv_path, qc_filtered_dir
+    )
+
+
+def _run_step_A2_append(patch_metadata_dir, nonwhite_csv_path, qc_filtered_dir):
+    screened = _get_screened_slides()
+    new_csvs = [p for p in sorted(glob.glob(os.path.join(patch_metadata_dir, "*.csv")))
+                if Path(p).stem not in screened]
+    if not new_csvs:
+        log("  [A-2] No un-screened per-slide CSVs present — nothing to append.")
+        return None
+
+    before = _count_data_rows(nonwhite_csv_path)
+    log(f"  [A-2 APPEND] nonwhite CSV rows before : {before:,}")
+    log(f"  [A-2 APPEND] screening {len(new_csvs)} new slide(s) ...")
+
+    dfs = []
+    for p in new_csvs:
+        try:
+            dfs.append(pd.read_csv(p))
+        except Exception as e:
+            log(f"  [WARN] Could not read {p}: {e} — skipping")
+    if not dfs:
+        raise RuntimeError("[A-2] every new per-slide CSV failed to load.")
+
+    merged_df = pd.concat(dfs, ignore_index=True)
+    log(f"  [A-2 APPEND] {len(merged_df):,} patch rows from {len(dfs)} slide(s)")
+
+    save_df   = _classify_patch_frame(merged_df, qc_filtered_dir)
+    tissue_df = save_df[save_df["white_label"] == 0].reset_index(drop=True)
+
+    # Append in the existing file's exact column order — never assume the
+    # in-memory frame's order matches what is already on disk.
+    header = list(pd.read_csv(nonwhite_csv_path, nrows=0).columns)
+    missing = [c for c in header if c not in tissue_df.columns]
+    if missing:
+        raise RuntimeError(f"[A-2] new rows are missing columns {missing} "
+                           f"— schema drift, refusing to append.")
+    tissue_df = tissue_df[header]
+    tissue_df.to_csv(nonwhite_csv_path, mode="a", header=False, index=False)
+
+    _mark_slides_screened(save_df["slide_name"].unique().tolist())
+
+    after = _count_data_rows(nonwhite_csv_path)
+    for stem, grp in save_df.groupby("slide_name"):
+        t = int((grp["white_label"] == 0).sum())
+        log(f"      {stem}: {len(grp):,} patches → {t:,} tissue / {len(grp) - t:,} white")
+    log(f"\n[A-2 APPEND] complete.")
+    log(f"  slides screened this pass : {save_df['slide_name'].nunique()}")
+    log(f"  tissue rows appended      : {len(tissue_df):,}")
+    log(f"  nonwhite CSV rows         : {before:,} → {after:,}")
+    if after - before != len(tissue_df):
+        log(f"  [WARN] row-count delta {after - before:,} != appended {len(tissue_df):,}")
+    return tissue_df
+
+
+def _run_step_A2_full_rebuild(patch_metadata_dir, merged_csv_path,
+                              nonwhite_csv_path, qc_filtered_dir):
     csv_files = sorted(glob.glob(os.path.join(patch_metadata_dir, "*.csv")))
     if not csv_files:
         raise FileNotFoundError(
@@ -1110,24 +1335,14 @@ def run_step_A2(patch_metadata_dir, merged_csv_path, nonwhite_csv_path, qc_filte
     merged_df = pd.concat(dfs, ignore_index=True)
     log(f"  → {len(merged_df):,} total patches from {len(dfs)} slide(s)")
 
-    merged_df, bad_mask = tag_bad_patches(merged_df, qc_filtered_dir)
-
-    svm_input_df = merged_df[merged_df["white_label"].isna()].drop(
-        columns=["white_label", "reject_reason"]
-    )
-    log(f"\n  Stage 2 — SVM on {len(svm_input_df):,} patches ...")
-    svm_result_df = apply_svm_whiteness(svm_input_df)
-
-    merged_df.loc[merged_df["white_label"].isna(), "white_label"] = \
-        svm_result_df["white_label"].values
-    merged_df["white_label"] = merged_df["white_label"].astype(int)
-
-    save_df = merged_df.drop(columns=["reject_reason"])
+    save_df = _classify_patch_frame(merged_df, qc_filtered_dir)
     save_df.to_csv(merged_csv_path, index=False)
 
     nonwhite_class = save_df["white_label"].min()
     nonwhite_df    = save_df[save_df["white_label"] == nonwhite_class].reset_index(drop=True)
     nonwhite_df.to_csv(nonwhite_csv_path, index=False)
+
+    _mark_slides_screened(save_df["slide_name"].unique().tolist())
 
     total    = len(save_df)
     n_tissue = len(nonwhite_df)
@@ -1917,14 +2132,29 @@ def main():
             log(f"  [SKIP DOWNLOAD] All slides in this batch already processed — skipping download.")
 
         # ── 2 & 3. Step A-1 + A-2 ────────────────────────────────────────────
-        # Skipped entirely if the nonwhite CSV already exists — it contains
-        # all slides and does not need to be rebuilt per batch.
-        if os.path.exists(NONWHITE_METADATA_CSV):
-            log(f"\n[STEP A-1 & A-2 SKIPPED] Nonwhite CSV already present:")
+        # Legacy behaviour: build the nonwhite CSV once, then skip forever.
+        # Incremental behaviour (SURGEN_INCREMENTAL_A1A2 != 0): whenever this
+        # batch contains slides that have not been through screening, run A-1
+        # over them and APPEND their tissue rows to the existing nonwhite CSV.
+        nonwhite_exists = os.path.exists(NONWHITE_METADATA_CSV)
+        if nonwhite_exists and INCREMENTAL_A1A2:
+            _seed_screened_ledger_if_missing()
+        batch_unscreened = [Path(fn).stem for fn, _ in batch
+                            if Path(fn).stem not in _get_screened_slides()]
+
+        if nonwhite_exists and not INCREMENTAL_A1A2:
+            log(f"\n[STEP A-1 & A-2 SKIPPED] Nonwhite CSV present and "
+                f"SURGEN_INCREMENTAL_A1A2=0:")
             log(f"  {NONWHITE_METADATA_CSV}")
-            log(f"  Delete that file to force re-extraction and re-filtering.")
+        elif nonwhite_exists and not batch_unscreened:
+            log(f"\n[STEP A-1 & A-2] Every slide in this batch is already "
+                f"screened — nothing to add.")
         else:
-            log(f"\n[STEP A-1] Generating per-slide patch metadata ...")
+            if nonwhite_exists:
+                log(f"\n[STEP A-1] {len(batch_unscreened)} un-screened slide(s) "
+                    f"in this batch: {', '.join(batch_unscreened)}")
+            else:
+                log(f"\n[STEP A-1] Generating per-slide patch metadata ...")
             write_checkpoint("step_a1_start", batch_idx=batch_idx)
             run_step_A1(CZI_DIR, PATCH_METADATA_DIR, PATCH_SIZE, TARGET_MAG, ROW_BATCH)
             write_checkpoint("step_a1_complete", batch_idx=batch_idx)
@@ -1942,7 +2172,12 @@ def main():
             write_checkpoint("step_a2_complete", batch_idx=batch_idx)
 
         # ── 4. Feature extraction per active model ────────────────────────────
-        for model_name in ACTIVE_MODELS:
+        if SKIP_STEP_C:
+            log(f"\n[STEP C SKIPPED] SURGEN_SKIP_STEP_C=1 — feature extraction "
+                f"deferred. Patch rows for this batch are committed to the "
+                f"nonwhite CSV; run again without the flag, or launch the "
+                f"per-encoder scripts, to extract features.")
+        for model_name in ([] if SKIP_STEP_C else ACTIVE_MODELS):
             log(f"\n{'─'*70}")
             log(f"[MODEL: {model_name.upper()}]  Loading and extracting features ...")
             log(f"{'─'*70}")
