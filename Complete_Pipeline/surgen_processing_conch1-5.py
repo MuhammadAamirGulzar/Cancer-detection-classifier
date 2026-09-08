@@ -1,28 +1,24 @@
 """
-SurGen Step-C Runner — Virchow2
+SurGen Step-C Runner — CONCH 1.5
 ======================================
 Standalone, single-encoder clone of combined_pipeline_final_error_checks_v6.py,
-pinned to the Virchow2 tile encoder (hf-hub:paige-ai/Virchow2, 2560-d). It does
-NOT import v6 — it is an independent copy, so the two can be run and edited
-without touching each other. Keep the shared preprocessing logic (Step A-1 /
-A-2, the screened-slides ledger, the nonwhite CSV schema) in sync with v6 by
-hand if either is changed.
-
-  ⚠ This REPLACES the earlier surgen_processing_virchow2.py, which targeted the
-    Linux server (paths under /media/dp-psau/…). That version is preserved in
-    git history (`git show main:Complete_Pipeline/surgen_processing_virchow2.py`).
+pinned to the CONCH 1.5 image encoder (MahmoodLab/TITAN.return_conch(), 768-d).
+It does NOT import v6 — it is an independent copy, so the two can be run and
+edited without touching each other. Keep the shared preprocessing logic
+(Step A-1 / A-2, the screened-slides ledger, the nonwhite CSV schema) in sync
+with v6 by hand if either is changed.
 
 Downloads WSIs in batches, runs the full pipeline (Step A-1 → A-2 → Step C)
-for Virchow2, deletes the CZI files, then (optionally) rsyncs features to a
+for CONCH 1.5, deletes the CZI files, then (optionally) rsyncs features to a
 remote machine over SSH via Tailscale.
 
 Per-patch features land in
-  F:\\surgen_processed\\virchow2\\features\\<slide>\\
-one .pt per patch, shape (5, 2560) fp16 (FiveCrop crops kept), matching the
-622 slides already present there.
+  D:\\Aamir Gulzar\\KSA_project2\\surgen_data\\surgen_processed\\conch1-5\\features\\<slide>\\
+one .pt per patch, shape (5, 768) (FiveCrop crops kept), matching the 622
+slides already present there.
 
 Run it through the supervisor, exactly like v6:
-  python run_pipeline_supervisor.py surgen_processing_virchow2.py
+  python run_pipeline_supervisor.py surgen_processing_conch1-5.py
 
 The WSI catalogue is built dynamically from surgen_slide_labels.csv — any slide
 whose `include` column is not TRUE is excluded automatically. That CSV is the
@@ -256,10 +252,10 @@ print(f"[DIAG] breadcrumb timeline → {_BREADCRUMBS_PATH}", flush=True)
 # ══════════════════════════════════════════════════════════════════════════════
 
 # ── Model selection ───────────────────────────────────────────────────────────
-# This is the single-encoder Virchow2 runner — the model is pinned and the
+# This is the single-encoder CONCH 1.5 runner — the model is pinned and the
 # SURGEN_ACTIVE_MODELS override is deliberately not honoured here (use v6 for
 # multi-model runs).
-ACTIVE_MODELS = ["virchow2"]
+ACTIVE_MODELS = ["conch1-5"]
 
 # ── Download / storage settings ───────────────────────────────────────────────
 BATCH_SIZE    = 2      # WSIs per batch

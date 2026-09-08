@@ -76,8 +76,14 @@ done:
 ──────────────────────────────────────────────────────────────────────────────
 """
 import os
-from dotenv import load_dotenv
-load_dotenv()
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ModuleNotFoundError:
+    # python-dotenv is only needed to pull HF_TOKEN out of a .env file; Step C
+    # still works if HF_TOKEN is already in the environment, and Steps A-1/A-2
+    # don't need it at all. Don't make the whole pipeline unimportable over it.
+    pass
 # DO NOT RUN THIS SCRIPT DIRECTLY, USE run_pipeline_supervisor.py instead to catch errors
 
 # ══════════════════════════════════════════════════════════════════════════════
