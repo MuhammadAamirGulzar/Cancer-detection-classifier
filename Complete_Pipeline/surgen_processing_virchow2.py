@@ -99,7 +99,19 @@ try:
     from dotenv import load_dotenv
     load_dotenv()
 except ModuleNotFoundError:
-    pass
+    # SurGen conda env has no python-dotenv — read .env by hand (repo root or
+    # next to this script), without overriding anything already in os.environ.
+    for _root in (os.path.dirname(os.path.abspath(__file__)),
+                  os.path.dirname(os.path.dirname(os.path.abspath(__file__)))):
+        _envf = os.path.join(_root, ".env")
+        if os.path.isfile(_envf):
+            with open(_envf, encoding="utf-8") as _fh:
+                for _ln in _fh:
+                    _ln = _ln.strip()
+                    if _ln and not _ln.startswith("#") and "=" in _ln:
+                        _k, _v = _ln.split("=", 1)
+                        os.environ.setdefault(_k.strip(), _v.strip().strip('"').strip("'"))
+            break
 # DO NOT RUN THIS SCRIPT DIRECTLY, USE run_pipeline_supervisor.py instead to catch errors
 
 # ══════════════════════════════════════════════════════════════════════════════

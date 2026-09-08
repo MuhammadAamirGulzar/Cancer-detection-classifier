@@ -80,10 +80,21 @@ try:
     from dotenv import load_dotenv
     load_dotenv()
 except ModuleNotFoundError:
-    # python-dotenv is only needed to pull HF_TOKEN out of a .env file; Step C
-    # still works if HF_TOKEN is already in the environment, and Steps A-1/A-2
-    # don't need it at all. Don't make the whole pipeline unimportable over it.
-    pass
+    # The SurGen conda env has no python-dotenv. Do the one thing load_dotenv
+    # was here for by hand: read KEY=VALUE lines from a .env at the repo root
+    # (or next to this script) into os.environ, without overriding anything
+    # already set. Steps A-1/A-2 don't need HF_TOKEN at all; Step C does.
+    for _root in (os.path.dirname(os.path.abspath(__file__)),
+                  os.path.dirname(os.path.dirname(os.path.abspath(__file__)))):
+        _envf = os.path.join(_root, ".env")
+        if os.path.isfile(_envf):
+            with open(_envf, encoding="utf-8") as _fh:
+                for _ln in _fh:
+                    _ln = _ln.strip()
+                    if _ln and not _ln.startswith("#") and "=" in _ln:
+                        _k, _v = _ln.split("=", 1)
+                        os.environ.setdefault(_k.strip(), _v.strip().strip('"').strip("'"))
+            break
 # DO NOT RUN THIS SCRIPT DIRECTLY, USE run_pipeline_supervisor.py instead to catch errors
 
 # ══════════════════════════════════════════════════════════════════════════════
