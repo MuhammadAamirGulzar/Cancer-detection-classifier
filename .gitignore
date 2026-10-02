@@ -69,4 +69,4 @@ slide_classification/*_ARCHIVED_*/
 *.out
 *.csv.bak-*
 slide_aggregation/caption_generation/Results/*.csv.gz
-"Results_Tables_Clean (1).docx"
+Results_Tables_Clean (1).docx
