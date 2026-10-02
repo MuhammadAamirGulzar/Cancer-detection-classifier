@@ -1,0 +1,16 @@
+{
+  "input_dim": 23040,
+  "hidden_dim1": 512,
+  "hidden_dim2": 256,
+  "n_hidden_layers": 2,
+  "dropout": 0.3,
+  "patience": 20,
+  "lr": 0.0001,
+  "weight_decay": 0.0001,
+  "max_iter": 500,
+  "checkpoint": "fold2_ann_23040_512_256.pth",
+  "selection_metric": "val_ann_macro_f1",
+  "selection_value": 0.6764410340732621,
+  "softmax_in_graph": false,
+  "saved_at": "2026-09-03T06:21:01+00:00"
+}

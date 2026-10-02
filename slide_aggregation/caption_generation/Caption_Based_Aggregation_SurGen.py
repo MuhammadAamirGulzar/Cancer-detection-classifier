@@ -30,13 +30,16 @@ from collections import defaultdict
 from tqdm import tqdm
 
 # ─── CONFIG ───────────────────────────────────────────────────────────────────
+USE_15_CLASSES = True
+
 ACTIVE_MODELS = [
+    # "Conch1_5",
     "Virchow2"
 ]
 
 # Pick the CSV path matching the machine you're running on.
 CSV_FILE_LINUX   = "/home/mle/Aamir/Azfaar/surgen_processing/classification_results_surgen.csv"
-CSV_FILE_WINDOWS = r"D:\Aamir Gulzar\KSA_project2\Cancer-detection-classifier\slide_aggregation\caption_generation\Results\classification_results_surgen.csv"
+CSV_FILE_WINDOWS = r"D:\Aamir Gulzar\KSA_project2\Cancer-detection-classifier\slide_aggregation\caption_generation\Results\classification_results_surgen_15_classes.csv.gz"
 CSV_FILE = CSV_FILE_WINDOWS if os.name == "nt" else CSV_FILE_LINUX
 
 MODEL_CONFIG = {
@@ -53,14 +56,12 @@ MODEL_CONFIG = {
         "expected_shape": torch.Size([5, 768]),
     },
     "H-Optimus-1": {
-        # ASSUMPTION: matches the Linux path pattern from your Averaging/TTC h-optimus-1 scripts.
         "features_dir"  : "/media/dp-psau/Datum/Aamir/Azfaar/surgen_processed/h-optimus-1/features",
         "output_dir"    : "/media/dp-psau/Datum/Aamir/Azfaar/surgen_processed/h-optimus-1/features/slide_aggregation/Caption_based_aggregation/h-optimus-1",
         "feature_dim"   : 1536,
         "expected_shape": torch.Size([5, 1536]),
     },
     "UNI2": {
-        # ASSUMPTION: inferred by analogy to h-optimus-1's Linux path — confirm/edit.
         "features_dir"  : "/media/dp-psau/Datum/Aamir/Azfaar/surgen_processed/uni2-h/features",
         "output_dir"    : "/media/dp-psau/Datum/Aamir/Azfaar/surgen_processed/uni2-h/features/slide_aggregation/Caption_based_aggregation/uni2-h",
         "feature_dim"   : 1536,
@@ -74,11 +75,20 @@ MODEL_CONFIG = {
     },
 }
 
-# 14-class default (see NOTE above) — swap for the 15-class list if needed:
-# ALL_GROUPS = ['ADI', 'DEB', 'TIL', 'PLC', 'LYA', 'LYM', 'MUS', 'MUC',
-#               'NORM', 'ADE', 'STR', 'CAR', 'PDC', 'SIG', 'BACK']
-ALL_GROUPS = ['ADI', 'DEB', 'LYM', 'PLC', 'LYA', 'MUC', 'MUS', 'NORM',
-              'ADE', 'STR', 'MES', 'CAR', 'PDC', 'SIG']
+
+if USE_15_CLASSES:
+    for model in MODEL_CONFIG:
+        MODEL_CONFIG[model]["output_dir"] = MODEL_CONFIG[model]["output_dir"].replace(
+            "Caption_based_aggregation", "Caption_based_aggregation_15_classes"
+        )
+
+# 15-class list — swap for the 15-class list if needed:
+ALL_GROUPS = ['ADI', 'DEB', 'TIL', 'PLC', 'LYA', 'LYM', 'MUS', 'MUC',
+              'NORM', 'ADE', 'STR', 'CAR', 'PDC', 'SIG', 'BACK']
+
+# 14 class list
+# ALL_GROUPS = ['ADI', 'DEB', 'LYM', 'PLC', 'LYA', 'MUC', 'MUS', 'NORM',
+#               'ADE', 'STR', 'MES', 'CAR', 'PDC', 'SIG']
 
 MAX_WORKERS = 12
 

@@ -1,0 +1,17 @@
+{
+  "timestamp": "2026-09-08T17:08:31.500",
+  "pid": 31688,
+  "stage": "process_start",
+  "open_fds": -1,
+  "gpu_mem": {
+    "allocated_mb": 0.0,
+    "reserved_mb": 0.0,
+    "max_allocated_mb": 0.0
+  },
+  "details": {
+    "python": "3.12.13 | packaged by Anaconda, Inc. | (main, Mar 19 2026, 20:16:45) [MSC v.1942 64 bit (AMD64)]",
+    "argv": [
+      "-c"
+    ]
+  }
+}

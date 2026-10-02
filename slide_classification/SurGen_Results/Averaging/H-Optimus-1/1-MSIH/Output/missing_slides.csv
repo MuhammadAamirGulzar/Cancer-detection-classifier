@@ -1,0 +1,3 @@
+cohort,method,model,task,wsi_id,reason
+surgen,Averaging,H-Optimus-1,MSIH,SR386_40X_HE_T086_01,labelled_but_no_features
+surgen,Averaging,H-Optimus-1,MSIH,SR386_40X_HE_T339_01,labelled_but_no_features

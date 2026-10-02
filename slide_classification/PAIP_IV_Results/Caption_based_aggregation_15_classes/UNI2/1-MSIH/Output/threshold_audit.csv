@@ -1,0 +1,11 @@
+experiment,method,model,classifier,threshold_label,threshold,bacc,auroc,conf_matrix
+PAIP-IV,Caption_based_aggregation_15_classes,UNI2,lin,0.5,0.5,0.7321428571428572,0.8809523809523809,"[[18, 6], [2, 5]]"
+PAIP-IV,Caption_based_aggregation_15_classes,UNI2,lin,tau_TCGA,0.03680022656218405,0.7827380952380952,0.8809523809523809,"[[17, 7], [1, 6]]"
+PAIP-IV,Caption_based_aggregation_15_classes,UNI2,ann,0.5,0.5,0.7827380952380952,0.8809523809523809,"[[17, 7], [1, 6]]"
+PAIP-IV,Caption_based_aggregation_15_classes,UNI2,ann,tau_TCGA,0.43724706768989563,0.7410714285714286,0.8809523809523809,"[[15, 9], [1, 6]]"
+PAIP-IV,Caption_based_aggregation_15_classes,UNI2,knn,0.5,0.5,0.8244047619047619,0.9017857142857143,"[[19, 5], [1, 6]]"
+PAIP-IV,Caption_based_aggregation_15_classes,UNI2,knn,tau_TCGA,0.14285714285714285,0.7291666666666666,0.9017857142857143,"[[11, 13], [0, 7]]"
+PAIP-IV,Caption_based_aggregation_15_classes,UNI2,proto,0.5,0.5,0.8035714285714286,0.875,"[[18, 6], [1, 6]]"
+PAIP-IV,Caption_based_aggregation_15_classes,UNI2,proto,tau_TCGA,0.5032253265380859,0.8035714285714286,0.875,"[[18, 6], [1, 6]]"
+PAIP-IV,Caption_based_aggregation_15_classes,UNI2,rf,0.5,0.5,0.8571428571428572,0.8690476190476191,"[[24, 0], [2, 5]]"
+PAIP-IV,Caption_based_aggregation_15_classes,UNI2,rf,tau_TCGA,0.14564976958525347,0.6160714285714286,0.8690476190476191,"[[9, 15], [1, 6]]"

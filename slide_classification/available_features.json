@@ -1,8 +1,8 @@
 {
   "machine": "local",
-  "scanned_at": "2026-08-04T13:30:46+00:00",
+  "scanned_at": "2026-08-27T07:52:15+00:00",
   "base_root": "D:\\Aamir Gulzar\\KSA_project2",
-  "n_combinations": 50,
+  "n_combinations": 65,
   "combinations": {
     "tcga|Averaging|H-Optimus-1": {
       "cohort": "tcga",
@@ -185,7 +185,7 @@
       "method": "Averaging",
       "model": "H-Optimus-1",
       "path": "D:\\Aamir Gulzar\\KSA_project2\\paip_data\\slide_aggregation\\Averaging\\H-Optimus-1",
-      "n_files": 73,
+      "n_files": 78,
       "expected_dim": 1536
     },
     "paip|Averaging|Conch1_5": {
@@ -193,7 +193,7 @@
       "method": "Averaging",
       "model": "Conch1_5",
       "path": "D:\\Aamir Gulzar\\KSA_project2\\paip_data\\slide_aggregation\\Averaging\\Conch1_5",
-      "n_files": 73,
+      "n_files": 78,
       "expected_dim": 768
     },
     "paip|Averaging|UNI2": {
@@ -201,7 +201,7 @@
       "method": "Averaging",
       "model": "UNI2",
       "path": "D:\\Aamir Gulzar\\KSA_project2\\paip_data\\slide_aggregation\\Averaging\\UNI2",
-      "n_files": 73,
+      "n_files": 78,
       "expected_dim": 1536
     },
     "paip|Averaging|Virchow2": {
@@ -209,7 +209,7 @@
       "method": "Averaging",
       "model": "Virchow2",
       "path": "D:\\Aamir Gulzar\\KSA_project2\\paip_data\\slide_aggregation\\Averaging\\Virchow2",
-      "n_files": 73,
+      "n_files": 78,
       "expected_dim": 2560
     },
     "paip|Averaging|ConchV1": {
@@ -217,7 +217,7 @@
       "method": "Averaging",
       "model": "ConchV1",
       "path": "D:\\Aamir Gulzar\\KSA_project2\\paip_data\\slide_aggregation\\Averaging\\ConchV1",
-      "n_files": 73,
+      "n_files": 78,
       "expected_dim": 512
     },
     "paip|Caption_based_aggregation|H-Optimus-1": {
@@ -225,7 +225,7 @@
       "method": "Caption_based_aggregation",
       "model": "H-Optimus-1",
       "path": "D:\\Aamir Gulzar\\KSA_project2\\paip_data\\slide_aggregation\\Caption_based_aggregation\\H-Optimus-1",
-      "n_files": 73,
+      "n_files": 78,
       "expected_dim": 21504
     },
     "paip|Caption_based_aggregation|Conch1_5": {
@@ -233,7 +233,7 @@
       "method": "Caption_based_aggregation",
       "model": "Conch1_5",
       "path": "D:\\Aamir Gulzar\\KSA_project2\\paip_data\\slide_aggregation\\Caption_based_aggregation\\Conch1_5",
-      "n_files": 73,
+      "n_files": 78,
       "expected_dim": 10752
     },
     "paip|Caption_based_aggregation|UNI2": {
@@ -241,7 +241,7 @@
       "method": "Caption_based_aggregation",
       "model": "UNI2",
       "path": "D:\\Aamir Gulzar\\KSA_project2\\paip_data\\slide_aggregation\\Caption_based_aggregation\\UNI2",
-      "n_files": 73,
+      "n_files": 78,
       "expected_dim": 21504
     },
     "paip|Caption_based_aggregation|Virchow2": {
@@ -249,7 +249,7 @@
       "method": "Caption_based_aggregation",
       "model": "Virchow2",
       "path": "D:\\Aamir Gulzar\\KSA_project2\\paip_data\\slide_aggregation\\Caption_based_aggregation\\Virchow2",
-      "n_files": 73,
+      "n_files": 78,
       "expected_dim": 35840
     },
     "paip|Caption_based_aggregation|ConchV1": {
@@ -257,7 +257,7 @@
       "method": "Caption_based_aggregation",
       "model": "ConchV1",
       "path": "D:\\Aamir Gulzar\\KSA_project2\\paip_data\\slide_aggregation\\Caption_based_aggregation\\ConchV1",
-      "n_files": 73,
+      "n_files": 78,
       "expected_dim": 7168
     },
     "paip|Caption_based_aggregation_15_classes|H-Optimus-1": {
@@ -265,7 +265,7 @@
       "method": "Caption_based_aggregation_15_classes",
       "model": "H-Optimus-1",
       "path": "D:\\Aamir Gulzar\\KSA_project2\\paip_data\\slide_aggregation\\Caption_based_aggregation_15_classes\\H-Optimus-1",
-      "n_files": 73,
+      "n_files": 78,
       "expected_dim": 23040
     },
     "paip|Caption_based_aggregation_15_classes|Conch1_5": {
@@ -273,7 +273,7 @@
       "method": "Caption_based_aggregation_15_classes",
       "model": "Conch1_5",
       "path": "D:\\Aamir Gulzar\\KSA_project2\\paip_data\\slide_aggregation\\Caption_based_aggregation_15_classes\\Conch1_5",
-      "n_files": 73,
+      "n_files": 78,
       "expected_dim": 11520
     },
     "paip|Caption_based_aggregation_15_classes|UNI2": {
@@ -281,7 +281,7 @@
       "method": "Caption_based_aggregation_15_classes",
       "model": "UNI2",
       "path": "D:\\Aamir Gulzar\\KSA_project2\\paip_data\\slide_aggregation\\Caption_based_aggregation_15_classes\\UNI2",
-      "n_files": 73,
+      "n_files": 78,
       "expected_dim": 23040
     },
     "paip|Caption_based_aggregation_15_classes|Virchow2": {
@@ -289,7 +289,7 @@
       "method": "Caption_based_aggregation_15_classes",
       "model": "Virchow2",
       "path": "D:\\Aamir Gulzar\\KSA_project2\\paip_data\\slide_aggregation\\Caption_based_aggregation_15_classes\\Virchow2",
-      "n_files": 73,
+      "n_files": 78,
       "expected_dim": 38400
     },
     "paip|Caption_based_aggregation_15_classes|ConchV1": {
@@ -297,7 +297,7 @@
       "method": "Caption_based_aggregation_15_classes",
       "model": "ConchV1",
       "path": "D:\\Aamir Gulzar\\KSA_project2\\paip_data\\slide_aggregation\\Caption_based_aggregation_15_classes\\ConchV1",
-      "n_files": 73,
+      "n_files": 78,
       "expected_dim": 7680
     },
     "paip|Tissue_Type_Clustering|H-Optimus-1": {
@@ -305,7 +305,7 @@
       "method": "Tissue_Type_Clustering",
       "model": "H-Optimus-1",
       "path": "D:\\Aamir Gulzar\\KSA_project2\\paip_data\\slide_aggregation\\Tissue_Type_Clustering\\H-Optimus-1",
-      "n_files": 73,
+      "n_files": 78,
       "expected_dim": 13824
     },
     "paip|Tissue_Type_Clustering|Conch1_5": {
@@ -313,7 +313,7 @@
       "method": "Tissue_Type_Clustering",
       "model": "Conch1_5",
       "path": "D:\\Aamir Gulzar\\KSA_project2\\paip_data\\slide_aggregation\\Tissue_Type_Clustering\\Conch1_5",
-      "n_files": 73,
+      "n_files": 78,
       "expected_dim": 6912
     },
     "paip|Tissue_Type_Clustering|UNI2": {
@@ -321,7 +321,7 @@
       "method": "Tissue_Type_Clustering",
       "model": "UNI2",
       "path": "D:\\Aamir Gulzar\\KSA_project2\\paip_data\\slide_aggregation\\Tissue_Type_Clustering\\UNI2",
-      "n_files": 73,
+      "n_files": 78,
       "expected_dim": 13824
     },
     "paip|Tissue_Type_Clustering|Virchow2": {
@@ -329,7 +329,7 @@
       "method": "Tissue_Type_Clustering",
       "model": "Virchow2",
       "path": "D:\\Aamir Gulzar\\KSA_project2\\paip_data\\slide_aggregation\\Tissue_Type_Clustering\\Virchow2",
-      "n_files": 73,
+      "n_files": 78,
       "expected_dim": 23040
     },
     "paip|Tissue_Type_Clustering|ConchV1": {
@@ -337,7 +337,7 @@
       "method": "Tissue_Type_Clustering",
       "model": "ConchV1",
       "path": "D:\\Aamir Gulzar\\KSA_project2\\paip_data\\slide_aggregation\\Tissue_Type_Clustering\\ConchV1",
-      "n_files": 73,
+      "n_files": 78,
       "expected_dim": 4608
     },
     "paip|TITAN|Conch1_5": {
@@ -345,7 +345,7 @@
       "method": "TITAN",
       "model": "Conch1_5",
       "path": "D:\\Aamir Gulzar\\KSA_project2\\paip_data\\slide_aggregation\\TITAN\\Conch1_5",
-      "n_files": 73,
+      "n_files": 78,
       "expected_dim": 768
     },
     "paip|PRISM|PRISM": {
@@ -353,8 +353,16 @@
       "method": "PRISM",
       "model": "PRISM",
       "path": "D:\\Aamir Gulzar\\KSA_project2\\paip_data\\slide_aggregation\\PRISM",
-      "n_files": 73,
+      "n_files": 78,
       "expected_dim": 1280
+    },
+    "surgen|Averaging|H-Optimus-1": {
+      "cohort": "surgen",
+      "method": "Averaging",
+      "model": "H-Optimus-1",
+      "path": "D:\\Aamir Gulzar\\KSA_project2\\surgen_data\\surgen_processed\\h-optimus-1\\features\\slide_aggregation\\Averaging\\h-optimus-1",
+      "n_files": 613,
+      "expected_dim": 1536
     },
     "surgen|Averaging|Conch1_5": {
       "cohort": "surgen",
@@ -364,6 +372,14 @@
       "n_files": 622,
       "expected_dim": 768
     },
+    "surgen|Averaging|UNI2": {
+      "cohort": "surgen",
+      "method": "Averaging",
+      "model": "UNI2",
+      "path": "D:\\Aamir Gulzar\\KSA_project2\\surgen_data\\surgen_processed\\uni2-h\\features\\slide_aggregation\\Averaging\\uni2-h",
+      "n_files": 622,
+      "expected_dim": 1536
+    },
     "surgen|Averaging|Virchow2": {
       "cohort": "surgen",
       "method": "Averaging",
@@ -371,6 +387,22 @@
       "path": "D:\\Aamir Gulzar\\KSA_project2\\surgen_data\\surgen_processed\\virchow2\\features\\slide_aggregation\\Averaging\\virchow2",
       "n_files": 622,
       "expected_dim": 2560
+    },
+    "surgen|Averaging|ConchV1": {
+      "cohort": "surgen",
+      "method": "Averaging",
+      "model": "ConchV1",
+      "path": "D:\\Aamir Gulzar\\KSA_project2\\surgen_data\\surgen_processed\\conch-v1\\features\\slide_aggregation\\Averaging\\conch-v1",
+      "n_files": 622,
+      "expected_dim": 512
+    },
+    "surgen|Caption_based_aggregation|H-Optimus-1": {
+      "cohort": "surgen",
+      "method": "Caption_based_aggregation",
+      "model": "H-Optimus-1",
+      "path": "D:\\Aamir Gulzar\\KSA_project2\\surgen_data\\surgen_processed\\h-optimus-1\\features\\slide_aggregation\\Caption_based_aggregation\\h-optimus-1",
+      "n_files": 622,
+      "expected_dim": 21504
     },
     "surgen|Caption_based_aggregation|Conch1_5": {
       "cohort": "surgen",
@@ -380,6 +412,14 @@
       "n_files": 622,
       "expected_dim": 10752
     },
+    "surgen|Caption_based_aggregation|UNI2": {
+      "cohort": "surgen",
+      "method": "Caption_based_aggregation",
+      "model": "UNI2",
+      "path": "D:\\Aamir Gulzar\\KSA_project2\\surgen_data\\surgen_processed\\uni2-h\\features\\slide_aggregation\\Caption_based_aggregation\\uni2-h",
+      "n_files": 622,
+      "expected_dim": 21504
+    },
     "surgen|Caption_based_aggregation|Virchow2": {
       "cohort": "surgen",
       "method": "Caption_based_aggregation",
@@ -387,6 +427,62 @@
       "path": "D:\\Aamir Gulzar\\KSA_project2\\surgen_data\\surgen_processed\\virchow2\\features\\slide_aggregation\\Caption_based_aggregation\\virchow2",
       "n_files": 622,
       "expected_dim": 35840
+    },
+    "surgen|Caption_based_aggregation|ConchV1": {
+      "cohort": "surgen",
+      "method": "Caption_based_aggregation",
+      "model": "ConchV1",
+      "path": "D:\\Aamir Gulzar\\KSA_project2\\surgen_data\\surgen_processed\\conch-v1\\features\\slide_aggregation\\Caption_based_aggregation\\conch-v1",
+      "n_files": 622,
+      "expected_dim": 7168
+    },
+    "surgen|Caption_based_aggregation_15_classes|H-Optimus-1": {
+      "cohort": "surgen",
+      "method": "Caption_based_aggregation_15_classes",
+      "model": "H-Optimus-1",
+      "path": "D:\\Aamir Gulzar\\KSA_project2\\surgen_data\\surgen_processed\\h-optimus-1\\features\\slide_aggregation\\Caption_based_aggregation_15_classes\\h-optimus-1",
+      "n_files": 622,
+      "expected_dim": 23040
+    },
+    "surgen|Caption_based_aggregation_15_classes|Conch1_5": {
+      "cohort": "surgen",
+      "method": "Caption_based_aggregation_15_classes",
+      "model": "Conch1_5",
+      "path": "D:\\Aamir Gulzar\\KSA_project2\\surgen_data\\surgen_processed\\conch1-5\\features\\slide_aggregation\\Caption_based_aggregation_15_classes\\conch1-5",
+      "n_files": 622,
+      "expected_dim": 11520
+    },
+    "surgen|Caption_based_aggregation_15_classes|UNI2": {
+      "cohort": "surgen",
+      "method": "Caption_based_aggregation_15_classes",
+      "model": "UNI2",
+      "path": "D:\\Aamir Gulzar\\KSA_project2\\surgen_data\\surgen_processed\\uni2-h\\features\\slide_aggregation\\Caption_based_aggregation_15_classes\\uni2-h",
+      "n_files": 622,
+      "expected_dim": 23040
+    },
+    "surgen|Caption_based_aggregation_15_classes|Virchow2": {
+      "cohort": "surgen",
+      "method": "Caption_based_aggregation_15_classes",
+      "model": "Virchow2",
+      "path": "D:\\Aamir Gulzar\\KSA_project2\\surgen_data\\surgen_processed\\virchow2\\features\\slide_aggregation\\Caption_based_aggregation_15_classes\\virchow2",
+      "n_files": 622,
+      "expected_dim": 38400
+    },
+    "surgen|Caption_based_aggregation_15_classes|ConchV1": {
+      "cohort": "surgen",
+      "method": "Caption_based_aggregation_15_classes",
+      "model": "ConchV1",
+      "path": "D:\\Aamir Gulzar\\KSA_project2\\surgen_data\\surgen_processed\\conch-v1\\features\\slide_aggregation\\Caption_based_aggregation_15_classes\\conch-v1",
+      "n_files": 622,
+      "expected_dim": 7680
+    },
+    "surgen|Tissue_Type_Clustering|H-Optimus-1": {
+      "cohort": "surgen",
+      "method": "Tissue_Type_Clustering",
+      "model": "H-Optimus-1",
+      "path": "D:\\Aamir Gulzar\\KSA_project2\\surgen_data\\surgen_processed\\h-optimus-1\\features\\slide_aggregation\\Tissue_Type_Clustering\\h-optimus-1",
+      "n_files": 613,
+      "expected_dim": 13824
     },
     "surgen|Tissue_Type_Clustering|Conch1_5": {
       "cohort": "surgen",
@@ -396,6 +492,14 @@
       "n_files": 622,
       "expected_dim": 6912
     },
+    "surgen|Tissue_Type_Clustering|UNI2": {
+      "cohort": "surgen",
+      "method": "Tissue_Type_Clustering",
+      "model": "UNI2",
+      "path": "D:\\Aamir Gulzar\\KSA_project2\\surgen_data\\surgen_processed\\uni2-h\\features\\slide_aggregation\\Tissue_Type_Clustering\\uni2-h",
+      "n_files": 622,
+      "expected_dim": 13824
+    },
     "surgen|Tissue_Type_Clustering|Virchow2": {
       "cohort": "surgen",
       "method": "Tissue_Type_Clustering",
@@ -403,6 +507,22 @@
       "path": "D:\\Aamir Gulzar\\KSA_project2\\surgen_data\\surgen_processed\\virchow2\\features\\slide_aggregation\\Tissue_Type_Clustering\\virchow2",
       "n_files": 622,
       "expected_dim": 23040
+    },
+    "surgen|Tissue_Type_Clustering|ConchV1": {
+      "cohort": "surgen",
+      "method": "Tissue_Type_Clustering",
+      "model": "ConchV1",
+      "path": "D:\\Aamir Gulzar\\KSA_project2\\surgen_data\\surgen_processed\\conch-v1\\features\\slide_aggregation\\Tissue_Type_Clustering\\conch-v1",
+      "n_files": 622,
+      "expected_dim": 4608
+    },
+    "surgen|PRISM|PRISM": {
+      "cohort": "surgen",
+      "method": "PRISM",
+      "model": "PRISM",
+      "path": "D:\\Aamir Gulzar\\KSA_project2\\surgen_data\\surgen_processed\\prism\\features\\slide_aggregation\\PRISM\\prism",
+      "n_files": 152,
+      "expected_dim": 1280
     }
   }
 }

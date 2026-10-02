@@ -1,26 +1,37 @@
 {
   "stamp": {
     "machine": "local",
-    "timestamp": "2026-08-04T18:11:08+00:00",
-    "git_commit": "5167683",
+    "timestamp": "2026-08-31T11:03:08+00:00",
+    "git_commit": "e8cbb89",
     "experiment": "PAIP-IV",
     "cohort": "paip",
     "method": "Tissue_Type_Clustering",
     "model": "Virchow2",
     "task": "MSIH",
     "n_test": 31,
-    "n_train": 42,
+    "n_train": 47,
     "n_train_declared": 47,
     "n_test_declared": 31,
     "protocol": "single provider-defined split, no averaging",
     "threshold_policy": "0.5 (internal experiment, section 1b rule 2)",
-    "bootstrap": "1000 resamples, 95% CI"
+    "bootstrap": "1000 resamples, 95% CI",
+    "ann_protocol": "legacy",
+    "ann_preset": null,
+    "ann_hparam_source": "searched on the PAIP early-stop carve-out",
+    "ann_trained_on": "38 of 47 training slides",
+    "ann_held_back_for_tuning": 9,
+    "ann_arch": "deep",
+    "ann_n_hidden_layers": 2,
+    "ann_dropout": null,
+    "ann_hidden_dim1": null,
+    "ann_max_iter": null,
+    "ann_max_iter_overridden": false
   },
   "results": {
     "lin": {
       "classifier": "lin",
       "bacc": 0.7738095238095238,
-      "auroc": 0.8511904761904763,
+      "auroc": 0.8095238095238095,
       "acc": 0.8064516129032258,
       "macro_f1": 0.7472826086956521,
       "weighted_f1": 0.8143408134642356,
@@ -35,9 +46,11 @@
         ]
       ],
       "threshold": 0.5,
-      "n_train": 42,
-      "n_ann_early_stop": 8,
+      "n_train": 47,
+      "n_ann_early_stop": 9,
       "n_test": 31,
+      "n_train_effective": 47,
+      "ann_protocol": null,
       "bootstrap": {
         "n_resamples": 1000,
         "n_usable": 1000,
@@ -48,50 +61,57 @@
           0.96
         ],
         "auroc_ci": [
-          0.6538333333333334,
-          1.0
+          0.595959595959596,
+          0.9815134099616858
         ],
         "bacc_boot_mean": 0.7764298925244714,
-        "auroc_boot_mean": 0.8528226408540841
+        "auroc_boot_mean": 0.8117498549647935
       },
-      "selection": null
+      "selection": null,
+      "tau_train": null,
+      "tau_train_fit": {
+        "fitted": false,
+        "reason": "not requested"
+      }
     },
     "ann": {
       "classifier": "ann",
-      "bacc": 0.6994047619047619,
-      "auroc": 0.8333333333333333,
-      "acc": 0.6129032258064516,
-      "macro_f1": 0.5921052631578947,
-      "weighted_f1": 0.6426146010186757,
+      "bacc": 0.6071428571428572,
+      "auroc": 0.8273809523809523,
+      "acc": 0.5483870967741935,
+      "macro_f1": 0.5241228070175439,
+      "weighted_f1": 0.5830503678551217,
       "conf_matrix": [
         [
-          13,
-          11
+          12,
+          12
         ],
         [
-          1,
-          6
+          2,
+          5
         ]
       ],
       "threshold": 0.5,
-      "n_train": 42,
-      "n_ann_early_stop": 8,
+      "n_train": 47,
+      "n_ann_early_stop": 9,
       "n_test": 31,
+      "n_train_effective": 38,
+      "ann_protocol": "legacy",
       "bootstrap": {
         "n_resamples": 1000,
         "n_usable": 1000,
         "n_degenerate_single_class": 0,
         "level": 95,
         "bacc_ci": [
-          0.502735119047619,
-          0.85
+          0.3986607142857143,
+          0.804682932955791
         ],
         "auroc_ci": [
-          0.5952380952380952,
+          0.5998989898989899,
           1.0
         ],
-        "bacc_boot_mean": 0.7001098493598407,
-        "auroc_boot_mean": 0.8351181425724218
+        "bacc_boot_mean": 0.608907738276296,
+        "auroc_boot_mean": 0.8288271802673515
       },
       "selection": {
         "selected": {
@@ -100,141 +120,153 @@
           "max_iter": 500
         },
         "selection_metric": "val_ann_macro_f1",
-        "selection_value": 0.8545454545454545,
+        "selection_value": 0.75,
         "grid_trace": [
           {
             "hidden_dim1": 128,
             "hidden_dim2": 64,
             "max_iter": 500,
-            "val_macro_f1": 0.8545454545454545,
-            "test_macro_f1": 0.5921052631578947
+            "val_macro_f1": 0.75,
+            "test_macro_f1": 0.5241228070175439
           },
           {
             "hidden_dim1": 128,
             "hidden_dim2": 64,
             "max_iter": 1000,
-            "val_macro_f1": 0.8545454545454545,
-            "test_macro_f1": 0.5921052631578947
+            "val_macro_f1": 0.75,
+            "test_macro_f1": 0.5241228070175439
           },
           {
             "hidden_dim1": 128,
             "hidden_dim2": 128,
             "max_iter": 500,
-            "val_macro_f1": 0.8545454545454545,
-            "test_macro_f1": 0.5079365079365079
+            "val_macro_f1": 0.6493506493506493,
+            "test_macro_f1": 0.5363247863247864
           },
           {
             "hidden_dim1": 128,
             "hidden_dim2": 128,
             "max_iter": 1000,
-            "val_macro_f1": 0.8545454545454545,
-            "test_macro_f1": 0.5079365079365079
+            "val_macro_f1": 0.6493506493506493,
+            "test_macro_f1": 0.5363247863247864
           },
           {
             "hidden_dim1": 128,
             "hidden_dim2": 256,
             "max_iter": 500,
-            "val_macro_f1": 0.8545454545454545,
-            "test_macro_f1": 0.6039488966318234
+            "val_macro_f1": 0.6493506493506493,
+            "test_macro_f1": 0.5241228070175439
           },
           {
             "hidden_dim1": 128,
             "hidden_dim2": 256,
             "max_iter": 1000,
-            "val_macro_f1": 0.8545454545454545,
-            "test_macro_f1": 0.6039488966318234
+            "val_macro_f1": 0.6493506493506493,
+            "test_macro_f1": 0.5241228070175439
           },
           {
             "hidden_dim1": 256,
             "hidden_dim2": 64,
             "max_iter": 500,
-            "val_macro_f1": 0.8545454545454545,
-            "test_macro_f1": 0.6309523809523809
+            "val_macro_f1": 0.6493506493506493,
+            "test_macro_f1": 0.5241228070175439
           },
           {
             "hidden_dim1": 256,
             "hidden_dim2": 64,
             "max_iter": 1000,
-            "val_macro_f1": 0.8545454545454545,
-            "test_macro_f1": 0.6309523809523809
+            "val_macro_f1": 0.6493506493506493,
+            "test_macro_f1": 0.5241228070175439
           },
           {
             "hidden_dim1": 256,
             "hidden_dim2": 128,
             "max_iter": 500,
-            "val_macro_f1": 0.8545454545454545,
-            "test_macro_f1": 0.6309523809523809
+            "val_macro_f1": 0.75,
+            "test_macro_f1": 0.5241228070175439
           },
           {
             "hidden_dim1": 256,
             "hidden_dim2": 128,
             "max_iter": 1000,
-            "val_macro_f1": 0.8545454545454545,
-            "test_macro_f1": 0.6309523809523809
+            "val_macro_f1": 0.75,
+            "test_macro_f1": 0.5241228070175439
           },
           {
             "hidden_dim1": 256,
             "hidden_dim2": 256,
             "max_iter": 500,
-            "val_macro_f1": 0.8545454545454545,
-            "test_macro_f1": 0.5772727272727273
+            "val_macro_f1": 0.75,
+            "test_macro_f1": 0.5507246376811594
           },
           {
             "hidden_dim1": 256,
             "hidden_dim2": 256,
             "max_iter": 1000,
-            "val_macro_f1": 0.8545454545454545,
-            "test_macro_f1": 0.5772727272727273
+            "val_macro_f1": 0.75,
+            "test_macro_f1": 0.5507246376811594
           },
           {
             "hidden_dim1": 512,
             "hidden_dim2": 64,
             "max_iter": 500,
-            "val_macro_f1": 0.8545454545454545,
-            "test_macro_f1": 0.4972972972972973
+            "val_macro_f1": 0.6493506493506493,
+            "test_macro_f1": 0.5363247863247864
           },
           {
             "hidden_dim1": 512,
             "hidden_dim2": 64,
             "max_iter": 1000,
-            "val_macro_f1": 0.8545454545454545,
-            "test_macro_f1": 0.4972972972972973
+            "val_macro_f1": 0.6493506493506493,
+            "test_macro_f1": 0.5363247863247864
           },
           {
             "hidden_dim1": 512,
             "hidden_dim2": 128,
             "max_iter": 500,
-            "val_macro_f1": 0.8545454545454545,
-            "test_macro_f1": 0.6585067319461444
+            "val_macro_f1": 0.5846153846153846,
+            "test_macro_f1": 0.5241228070175439
           },
           {
             "hidden_dim1": 512,
             "hidden_dim2": 128,
             "max_iter": 1000,
-            "val_macro_f1": 0.8545454545454545,
-            "test_macro_f1": 0.6585067319461444
+            "val_macro_f1": 0.5846153846153846,
+            "test_macro_f1": 0.5241228070175439
           },
           {
             "hidden_dim1": 512,
             "hidden_dim2": 256,
             "max_iter": 500,
-            "val_macro_f1": 0.8545454545454545,
-            "test_macro_f1": 0.6585067319461444
+            "val_macro_f1": 0.75,
+            "test_macro_f1": 0.5241228070175439
           },
           {
             "hidden_dim1": 512,
             "hidden_dim2": 256,
             "max_iter": 1000,
-            "val_macro_f1": 0.8545454545454545,
-            "test_macro_f1": 0.6585067319461444
+            "val_macro_f1": 0.75,
+            "test_macro_f1": 0.5241228070175439
           }
-        ]
+        ],
+        "n_grid_points": 18,
+        "hparam_source": "searched 18 points on val_ann_macro_f1",
+        "refit_on_trainval": false,
+        "selection_fit_skipped": false,
+        "arch": "deep",
+        "n_hidden_layers": 2,
+        "dropout": null
+      },
+      "tau_train": null,
+      "tau_train_fit": {
+        "fitted": false,
+        "reason": "not requested"
       }
     },
     "knn": {
       "classifier": "knn",
       "bacc": 0.7738095238095238,
-      "auroc": 0.8065476190476191,
+      "auroc": 0.8422619047619048,
       "acc": 0.8064516129032258,
       "macro_f1": 0.7472826086956521,
       "weighted_f1": 0.8143408134642356,
@@ -249,70 +281,38 @@
         ]
       ],
       "threshold": 0.5,
-      "n_train": 42,
-      "n_ann_early_stop": 8,
+      "n_train": 47,
+      "n_ann_early_stop": 9,
       "n_test": 31,
+      "n_train_effective": 47,
+      "ann_protocol": null,
       "bootstrap": {
         "n_resamples": 1000,
         "n_usable": 1000,
         "n_degenerate_single_class": 0,
         "level": 95,
         "bacc_ci": [
-          0.5773809523809523,
-          0.9546401515151515
+          0.5666346153846153,
+          0.94739110707804
         ],
         "auroc_ci": [
-          0.5462937801932367,
-          0.9885185185185185
+          0.6499537037037038,
+          0.9818262987012987
         ],
-        "bacc_boot_mean": 0.7762096176545503,
-        "auroc_boot_mean": 0.8095285647292843
+        "bacc_boot_mean": 0.7755087719269513,
+        "auroc_boot_mean": 0.8443492305089515
       },
-      "selection": null
+      "selection": null,
+      "tau_train": null,
+      "tau_train_fit": {
+        "fitted": false,
+        "reason": "not requested"
+      }
     },
     "proto": {
       "classifier": "proto",
-      "bacc": 0.7529761904761905,
-      "auroc": 0.8273809523809523,
-      "acc": 0.7741935483870968,
-      "macro_f1": 0.7163398692810458,
-      "weighted_f1": 0.7865907653383933,
-      "conf_matrix": [
-        [
-          19,
-          5
-        ],
-        [
-          2,
-          5
-        ]
-      ],
-      "threshold": 0.5,
-      "n_train": 42,
-      "n_ann_early_stop": 8,
-      "n_test": 31,
-      "bootstrap": {
-        "n_resamples": 1000,
-        "n_usable": 1000,
-        "n_degenerate_single_class": 0,
-        "level": 95,
-        "bacc_ci": [
-          0.5570652173913043,
-          0.9423611111111111
-        ],
-        "auroc_ci": [
-          0.5977613871635611,
-          1.0
-        ],
-        "bacc_boot_mean": 0.7570674420130844,
-        "auroc_boot_mean": 0.8297114849698239
-      },
-      "selection": null
-    },
-    "rf": {
-      "classifier": "rf",
       "bacc": 0.7321428571428572,
-      "auroc": 0.8392857142857143,
+      "auroc": 0.7857142857142858,
       "acc": 0.7419354838709677,
       "macro_f1": 0.6868686868686869,
       "weighted_f1": 0.7588791137178235,
@@ -327,26 +327,79 @@
         ]
       ],
       "threshold": 0.5,
-      "n_train": 42,
-      "n_ann_early_stop": 8,
+      "n_train": 47,
+      "n_ann_early_stop": 9,
       "n_test": 31,
+      "n_train_effective": 47,
+      "ann_protocol": null,
       "bootstrap": {
         "n_resamples": 1000,
         "n_usable": 1000,
         "n_degenerate_single_class": 0,
         "level": 95,
         "bacc_ci": [
-          0.5267827380952381,
-          0.9230769230769231
+          0.5299166666666667,
+          0.91675
         ],
         "auroc_ci": [
-          0.6203611111111111,
+          0.5296845238095238,
+          0.9933511904761905
+        ],
+        "bacc_boot_mean": 0.7355582440345488,
+        "auroc_boot_mean": 0.7897671226621084
+      },
+      "selection": null,
+      "tau_train": null,
+      "tau_train_fit": {
+        "fitted": false,
+        "reason": "not requested"
+      }
+    },
+    "rf": {
+      "classifier": "rf",
+      "bacc": 0.6904761904761905,
+      "auroc": 0.8273809523809523,
+      "acc": 0.6774193548387096,
+      "macro_f1": 0.6309523809523809,
+      "weighted_f1": 0.7027649769585254,
+      "conf_matrix": [
+        [
+          16,
+          8
+        ],
+        [
+          2,
+          5
+        ]
+      ],
+      "threshold": 0.5,
+      "n_train": 47,
+      "n_ann_early_stop": 9,
+      "n_test": 31,
+      "n_train_effective": 47,
+      "ann_protocol": null,
+      "bootstrap": {
+        "n_resamples": 1000,
+        "n_usable": 1000,
+        "n_degenerate_single_class": 0,
+        "level": 95,
+        "bacc_ci": [
+          0.4760912698412698,
+          0.875
+        ],
+        "auroc_ci": [
+          0.5925875603864734,
           1.0
         ],
-        "bacc_boot_mean": 0.7366547192007841,
-        "auroc_boot_mean": 0.8417892130134937
+        "bacc_boot_mean": 0.6944167269112048,
+        "auroc_boot_mean": 0.8296528377249562
       },
-      "selection": null
+      "selection": null,
+      "tau_train": null,
+      "tau_train_fit": {
+        "fitted": false,
+        "reason": "not requested"
+      }
     }
   }
 }

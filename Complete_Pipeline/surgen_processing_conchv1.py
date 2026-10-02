@@ -9,14 +9,27 @@ Pipeline order:
   4. Step QC        — visual patch inspection (VISUALIZE_PATCHES flag controls this)
   5. Step B         — patch extraction helper (used inline during Step C)
   6. Step C         — CONCH V1 feature extraction → .pt files per patch
+
+Performance notes (see inline comments at each site for details):
+  - Step A-1 and Step C each use a single dedicated CZI-reader thread that
+    stays one unit of work ahead of the main thread via a small bounded
+    queue. This overlaps slow CZI I/O with CPU/GPU compute instead of
+    running read -> compute -> read -> compute fully serially, and it keeps
+    all CZI reads on ONE thread (pylibCZIrw is not safe for concurrent reads
+    against the same czidoc from multiple threads).
+  - Step C additionally writes finished .pt files from a small async writer
+    pool so disk I/O doesn't block the next GPU batch, and preprocesses
+    (FiveCrop) each batch's images across a CPU thread pool instead of a
+    single-threaded Python loop.
+  - Step C uses autocast (fp16) for the GPU forward pass.
 """
-import os
-from dotenv import load_dotenv
-load_dotenv()
+
 # ══════════════════════════════════════════════════════════════════════════════
 # Cell 1 — Configuration (edit everything here)
 # ══════════════════════════════════════════════════════════════════════════════
 import os
+import threading
+import queue
 
 # ── Input paths ───────────────────────────────────────────────────────────────
 CZI_ROOT          = "/media/dp-psau/dp-psau-wsi/SurGen/S-BIAD1285/Files"
@@ -41,7 +54,7 @@ PATCH_SIZE = 512   # pixels at target magnification
 TARGET_MAG = 20    # desired magnification (x)
 
 # ── Feature extraction ────────────────────────────────────────────────────────
-HF_TOKEN = os.environ.get("HF_TOKEN", "")
+HF_TOKEN = "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"
 DEVICE   = "cuda"   # "cuda" or "cpu"
 
 # ── Pixel filter thresholds (Stage 1 of Step A-2) ────────────────────────────
@@ -61,8 +74,10 @@ VISUALIZE_PATCHES = 0
 ROW_BATCH = 16
 
 # Number of patches per GPU forward pass in Step C.
-# Increase if GPU has spare VRAM; decrease if you get OOM errors.
-FEATURE_BATCH_SIZE = 8
+# Increased from 8 -> 16: with autocast (fp16) enabled below, a larger batch
+# keeps the GPU busier per kernel launch. Lower this back down if you see
+# CUDA OOM errors on your GPU.
+FEATURE_BATCH_SIZE = 16
 
 # ── Derived output paths (do not edit) ───────────────────────────────────────
 PATCH_METADATA_DIR    = "/media/dp-psau/Datum/Aamir/Azfaar/surgen_processed/h-optimus-1/patch_metadata"
@@ -216,7 +231,7 @@ def open_czi_at_target_mag(czi_path: str, target_mag: int = 20, patch_size: int 
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# Step A-1 — Generate per-slide RGB stats CSV (row-strip batching)
+# Step A-1 — Generate per-slide RGB stats CSV (row-strip batching, double-buffered I/O)
 # ══════════════════════════════════════════════════════════════════════════════
 import time
 from tqdm import tqdm
@@ -263,6 +278,83 @@ def log(msg):
     sys.stdout.flush()
 
 
+def _read_one_strip(czidoc, strip_idx, total_strips, strip_start_row, strip_end_row,
+                     n_rows_in_strip, n_patch_cols, patch_size,
+                     x_start, y_start, downsample, zoom):
+    """
+    I/O ONLY for a single strip (full-strip read, or per-row fallback on
+    failure). Called exclusively from the dedicated reader thread — never
+    from the main thread — because pylibCZIrw is only safe with a single
+    thread touching a given `czidoc`. All numpy processing happens back on
+    the main thread after this returns, so the two overlap across strips.
+    """
+    y_native_strip = y_start + (strip_start_row * patch_size * downsample)
+    height_native  = n_rows_in_strip * patch_size * downsample
+    width_native   = n_patch_cols * patch_size * downsample
+    x_native_strip = x_start
+
+    log(f"  [DEBUG] ── Strip {strip_idx+1}/{total_strips} "
+        f"(rows {strip_start_row}–{strip_end_row-1}) starting ──")
+    log(f"  [DEBUG] Strip {strip_idx+1}: attempting full strip read ...")
+    t0 = time.time()
+    try:
+        strip = czidoc.read(
+            roi=(x_native_strip, y_native_strip, width_native, height_native),
+            zoom=zoom,
+            plane={'C': 0, 'Z': 0, 'T': 0},
+        )[:, :, :3]
+        log(f"  [DEBUG] Strip {strip_idx+1}: full read OK in {time.time()-t0:.1f}s")
+        return {
+            'mode': 'full', 'strip': strip, 'strip_idx': strip_idx,
+            'strip_start_row': strip_start_row, 'n_rows_in_strip': n_rows_in_strip,
+        }
+
+    except Exception as strip_err:
+        log(f"  [WARN] Strip {strip_idx+1} rows {strip_start_row}–{strip_end_row-1} "
+            f"failed after {time.time()-t0:.1f}s ({strip_err}), retrying row-by-row ...")
+
+        rows_out = []
+        for single_row in range(strip_start_row, strip_end_row):
+            log(f"    [DEBUG] Row {single_row}: starting read attempt ...")
+            t1 = time.time()
+            y_native_row  = y_start + (single_row * patch_size * downsample)
+            height_single = patch_size * downsample
+            try:
+                log(f"    [DEBUG] Row {single_row}: calling czidoc.read() ...")
+                row_strip = czidoc.read(
+                    roi=(x_native_strip, y_native_row, width_native, height_single),
+                    zoom=zoom,
+                    plane={'C': 0, 'Z': 0, 'T': 0},
+                )[:, :, :3]
+                log(f"    [DEBUG] Row {single_row}: read returned in {time.time()-t1:.1f}s")
+                rows_out.append((single_row, row_strip))
+            except Exception as row_err:
+                log(f"    [DEBUG] Row {single_row}: exception after {time.time()-t1:.1f}s: {row_err}")
+                log(f"      [SKIP] Row {single_row} failed, skipping entire row ...")
+                rows_out.append((single_row, None))
+
+        log(f"  [DEBUG] Strip {strip_idx+1}: row-by-row fallback done")
+        return {'mode': 'rowfallback', 'strip_idx': strip_idx, 'rows': rows_out}
+
+
+def _strip_reader_thread(czidoc, n_patch_rows, n_patch_cols, patch_size, row_batch,
+                          x_start, y_start, downsample, zoom, out_queue):
+    """Runs on its own thread: sequentially reads every strip for the slide
+    and pushes results into `out_queue` (maxsize=1 -> one-strip lookahead)."""
+    strip_starts  = list(range(0, n_patch_rows, row_batch))
+    total_strips  = len(strip_starts)
+    for strip_idx, strip_start_row in enumerate(strip_starts):
+        strip_end_row   = min(strip_start_row + row_batch, n_patch_rows)
+        n_rows_in_strip = strip_end_row - strip_start_row
+        result = _read_one_strip(
+            czidoc, strip_idx, total_strips, strip_start_row, strip_end_row,
+            n_rows_in_strip, n_patch_cols, patch_size,
+            x_start, y_start, downsample, zoom,
+        )
+        out_queue.put(result)
+    out_queue.put(None)   # sentinel: no more strips
+
+
 def compute_patch_rgb_stats_rowbatch(slide_info: dict, patch_size: int,
                                       row_batch: int = 16,
                                       row_timeout: int = 30) -> pd.DataFrame:
@@ -288,37 +380,39 @@ def compute_patch_rgb_stats_rowbatch(slide_info: dict, patch_size: int,
     all_rows      = []
     patch_num     = 0
     skipped_rows  = 0
+    total_strips  = len(range(0, n_patch_rows, row_batch))
 
     log(f"  [DEBUG] opening CZI file ...")
     with pyczi.open_czi(czi_path) as czidoc:
         log(f"  [DEBUG] CZI opened OK")
-
-        total_strips = len(range(0, n_patch_rows, row_batch))
         log(f"  [DEBUG] total strips to process: {total_strips}")
 
-        for strip_idx, strip_start_row in enumerate(range(0, n_patch_rows, row_batch)):
-            strip_end_row   = min(strip_start_row + row_batch, n_patch_rows)
-            n_rows_in_strip = strip_end_row - strip_start_row
-            N_strip         = n_rows_in_strip * n_patch_cols
+        # Double-buffered I/O: one dedicated reader thread stays a single
+        # strip ahead (queue maxsize=1) while this (main) thread runs the
+        # numpy stats computation for the previous strip. This overlaps
+        # CZI I/O latency with CPU compute instead of doing them serially.
+        # Only the reader thread ever calls czidoc.read().
+        strip_queue = queue.Queue(maxsize=1)
+        reader_thread = threading.Thread(
+            target=_strip_reader_thread,
+            args=(czidoc, n_patch_rows, n_patch_cols, patch_size, row_batch,
+                  x_start, y_start, downsample, zoom, strip_queue),
+            daemon=True,
+        )
+        reader_thread.start()
 
-            log(f"  [DEBUG] ── Strip {strip_idx+1}/{total_strips} "
-                f"(rows {strip_start_row}–{strip_end_row-1}) starting ──")
+        while True:
+            result = strip_queue.get()
+            if result is None:
+                break
 
-            y_native_strip = y_start + (strip_start_row * patch_size * downsample)
-            height_native  = n_rows_in_strip * patch_size * downsample
-            width_native   = n_patch_cols * patch_size * downsample
-            x_native_strip = x_start
+            strip_idx = result['strip_idx']
 
-            # ── Attempt 1: read the whole strip ───────────────────────────
-            log(f"  [DEBUG] Strip {strip_idx+1}: attempting full strip read ...")
-            t0 = time.time()
-            try:
-                strip = czidoc.read(
-                    roi=(x_native_strip, y_native_strip, width_native, height_native),
-                    zoom=zoom,
-                    plane={'C': 0, 'Z': 0, 'T': 0},
-                )[:, :, :3]
-                log(f"  [DEBUG] Strip {strip_idx+1}: full read OK in {time.time()-t0:.1f}s")
+            if result['mode'] == 'full':
+                strip_start_row = result['strip_start_row']
+                n_rows_in_strip = result['n_rows_in_strip']
+                N_strip         = n_rows_in_strip * n_patch_cols
+                strip           = result['strip']
 
                 strip_H = n_rows_in_strip * patch_size
                 strip_W = n_patch_cols    * patch_size
@@ -341,58 +435,37 @@ def compute_patch_rgb_stats_rowbatch(slide_info: dict, patch_size: int,
                 del strip, strip_f32, grid, patches
                 log(f"  [DEBUG] Strip {strip_idx+1}: done, patch_num now={patch_num}")
 
-            # ── Attempt 2: strip failed — retry row by row ────────────────
-            except Exception as strip_err:
-                log(f"  [WARN] Strip {strip_idx+1} rows {strip_start_row}–{strip_end_row-1} "
-                    f"failed after {time.time()-t0:.1f}s ({strip_err}), retrying row-by-row ...")
-
-                for single_row in range(strip_start_row, strip_end_row):
-                    log(f"    [DEBUG] Row {single_row}: starting read attempt ...")
-                    t1 = time.time()
-
-                    y_native_row  = y_start + (single_row * patch_size * downsample)
-                    height_single = patch_size * downsample
-
-                    try:
-                        log(f"    [DEBUG] Row {single_row}: calling czidoc.read() ...")
-                        row_strip = czidoc.read(
-                            roi=(x_native_strip, y_native_row,
-                                 width_native,   height_single),
-                            zoom=zoom,
-                            plane={'C': 0, 'Z': 0, 'T': 0},
-                        )[:, :, :3]
-                        log(f"    [DEBUG] Row {single_row}: read returned in {time.time()-t1:.1f}s")
-
-                        row_strip = row_strip[:patch_size, :n_patch_cols * patch_size, :]
-                        row_f32   = row_strip.astype(np.float32)
-                        grid      = row_f32.reshape(1, patch_size,
-                                                     n_patch_cols, patch_size, 3)
-                        grid      = grid.transpose(0, 2, 1, 3, 4)
-                        patches   = grid.reshape(n_patch_cols, patch_size, patch_size, 3)
-
-                        avg, std, bpr, wpr = _compute_patch_stats(patches, patch_size)
-
-                        col_idx = np.arange(n_patch_cols)
-                        _append_patch_rows(all_rows, patch_num,
-                                           avg, std, bpr, wpr,
-                                           np.full(n_patch_cols, single_row), col_idx,
-                                           patch_size)
-                        patch_num += n_patch_cols
-                        del row_strip, row_f32, grid, patches
-                        log(f"    [DEBUG] Row {single_row}: done OK, patch_num={patch_num}")
-
-                    except Exception as row_err:
-                        log(f"    [DEBUG] Row {single_row}: exception after {time.time()-t1:.1f}s: {row_err}")
-                        log(f"      [SKIP] Row {single_row} failed, skipping entire row ...")
+            else:  # 'rowfallback'
+                for single_row, row_strip in result['rows']:
+                    if row_strip is None:
                         patch_num    += n_patch_cols
                         skipped_rows += 1
                         log(f"    [DEBUG] Row {single_row}: skipped, patch_num={patch_num}, "
-                            f"moving to row {single_row+1}")
+                            f"moving to next row")
+                        continue
 
-                log(f"  [DEBUG] Strip {strip_idx+1}: row-by-row fallback done")
+                    row_strip = row_strip[:patch_size, :n_patch_cols * patch_size, :]
+                    row_f32   = row_strip.astype(np.float32)
+                    grid      = row_f32.reshape(1, patch_size,
+                                                 n_patch_cols, patch_size, 3)
+                    grid      = grid.transpose(0, 2, 1, 3, 4)
+                    patches   = grid.reshape(n_patch_cols, patch_size, patch_size, 3)
+
+                    avg, std, bpr, wpr = _compute_patch_stats(patches, patch_size)
+
+                    col_idx = np.arange(n_patch_cols)
+                    _append_patch_rows(all_rows, patch_num,
+                                       avg, std, bpr, wpr,
+                                       np.full(n_patch_cols, single_row), col_idx,
+                                       patch_size)
+                    patch_num += n_patch_cols
+                    del row_strip, row_f32, grid, patches
+                    log(f"    [DEBUG] Row {single_row}: done OK, patch_num={patch_num}")
 
             log(f"  [DEBUG] Strip {strip_idx+1}/{total_strips} complete. "
                 f"Rows collected so far: {len(all_rows)}, skipped_rows={skipped_rows}")
+
+        reader_thread.join()
 
     log(f"  [DEBUG] All strips done. Total rows in df: {len(all_rows)}, "
         f"skipped_rows={skipped_rows}")
@@ -781,7 +854,7 @@ print("Step B helper loaded.  Patches will be extracted in-memory during Step C.
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# Step C — Feature extraction with CONCH V1 (batched GPU inference)
+# Step C — Feature extraction with CONCH V1 (batched GPU inference, pipelined I/O)
 # ══════════════════════════════════════════════════════════════════════════════
 import torch
 from torchvision import transforms
@@ -802,7 +875,7 @@ class ConchV1Extractor:
     """
 
     def __init__(self, device: str = 'cuda', hf_token: str = None,
-                 checkpoint: str = None):
+                 checkpoint: str = None, prep_workers: int = None):
         if hf_token:
             login(token=hf_token)
 
@@ -844,7 +917,15 @@ class ConchV1Extractor:
             )
         ])
 
-        print("  CONCH V1 ready.  Feature dim: 512")
+        # Persistent CPU thread pool for FiveCrop preprocessing. Each call to
+        # extract_batch() farms the per-image crop/normalize work out across
+        # these threads instead of a single-threaded Python loop, so CPU
+        # preprocessing for a batch doesn't serialize on one core while the
+        # GPU (and other cores) sit idle.
+        self._prep_workers = prep_workers or min(8, (os.cpu_count() or 4))
+        self._prep_pool = ThreadPoolExecutor(max_workers=self._prep_workers)
+
+        print(f"  CONCH V1 ready.  Feature dim: 512  |  CPU preprocess workers: {self._prep_workers}")
 
     def extract(self, image: Image.Image) -> torch.Tensor:
         """Single-patch extract — returns (5, 512)."""
@@ -863,26 +944,76 @@ class ConchV1Extractor:
         Each patch's 5 crops are stacked into a single (B*5, 3, 224, 224) tensor
         so the model sees one large batch instead of B tiny ones.
         """
-        batch = torch.cat(
-            [self._fivecrop(img.convert("RGB")) for img in images], dim=0
-        ).to(self.device)   # (B*5, 3, 224, 224)
-
-        with torch.inference_mode():
-            features = self.model.encode_image(
-                batch, proj_contrast=False, normalize=False
-            )   # (B*5, 512)
-
         B = len(images)
+
+        # Parallelize the CPU-side FiveCrop + normalize step across threads
+        # instead of a serial list comprehension.
+        crop_tensors = list(self._prep_pool.map(
+            lambda img: self._fivecrop(img.convert("RGB")), images
+        ))
+        batch = torch.cat(crop_tensors, dim=0).to(self.device)   # (B*5, 3, 224, 224)
+
+        autocast_enabled = (self.device.type == 'cuda')
+        with torch.inference_mode():
+            with torch.autocast(device_type=self.device.type, dtype=torch.float16,
+                                 enabled=autocast_enabled):
+                features = self.model.encode_image(
+                    batch, proj_contrast=False, normalize=False
+                )   # (B*5, 512)
+
         return features.cpu().reshape(B, 5, 512)   # (B, 5, 512)
 
 
 def _read_patch_worker(czidoc, x_native, y_native, size_native, zoom):
-    """Read one patch from an open czidoc — called from a background thread."""
+    """Read one patch from an open czidoc — called from the single dedicated
+    reader thread only (see _slide_patch_reader)."""
     raw = czidoc.read(
         roi=(x_native, y_native, size_native, size_native),
         zoom=zoom, plane={'C': 0, 'Z': 0, 'T': 0},
     )
     return Image.fromarray(raw[:, :, :3].astype('uint8')).convert('RGB')
+
+
+def _slide_patch_reader(czidoc, rows, x_start, y_start, downsample, size_native, zoom,
+                         slide_stem, out_queue):
+    """
+    Runs on ONE dedicated thread for the whole slide. pylibCZIrw is not safe
+    for concurrent reads against the same czidoc from multiple threads, so
+    all patch reads for this slide happen serially here, while the main
+    thread overlaps GPU inference and async disk writes for previously-read
+    batches. Pushes (patch_id, image, error) tuples; error is None on
+    success. Pushes a final `None` sentinel when done.
+    """
+    for row in rows:
+        x_native = x_start + (int(row['patch_x']) * downsample)
+        y_native = y_start + (int(row['patch_y']) * downsample)
+        patch_id = f"{slide_stem}_{int(row['patch_number'])}"
+        try:
+            img = _read_patch_worker(czidoc, x_native, y_native, size_native, zoom)
+            out_queue.put((patch_id, img, None))
+        except Exception as e:
+            out_queue.put((patch_id, None, e))
+    out_queue.put(None)
+
+
+def _save_feature_atomic(feat_dir: str, patch_id: str, feat: "torch.Tensor") -> str:
+    """
+    Atomic save used by the async writer pool.
+
+    `feat` is a (5, 512) slice taken by iterating over a (B, 5, 512) batch
+    tensor, i.e. it is a VIEW into the larger batch tensor's storage, not an
+    independent tensor. `.clone()` is essential here: without it, torch.save
+    would serialize the entire underlying storage of the batch tensor (not
+    just this patch's 5x512 slice), bloating every .pt file to the size of
+    the whole batch. This is the same view-bloat bug already fixed elsewhere
+    in this pipeline. `.clone()` forces a fresh, exactly-sized, contiguous
+    tensor before saving.
+    """
+    final_path = os.path.join(feat_dir, patch_id + '.pt')
+    tmp_path   = final_path + '.tmp'
+    torch.save(feat.to(torch.float16).clone(), tmp_path)
+    os.replace(tmp_path, final_path)   # atomic on Linux
+    return patch_id
 
 
 def _validate_and_clean_pt_files(feat_dir: str) -> set:
@@ -917,7 +1048,7 @@ def _validate_and_clean_pt_files(feat_dir: str) -> set:
 def run_step_C(czi_root, nonwhite_csv, features_root,
                extractor, patch_size, target_mag, batch_size: int = 8, excluded_list=None):
     """
-    Batched + prefetched feature extraction — safe to interrupt and resume.
+    Pipelined + prefetched feature extraction — safe to interrupt and resume.
 
     Crash-safety guarantees
     ───────────────────────
@@ -936,6 +1067,17 @@ def run_step_C(czi_root, nonwhite_csv, features_root,
                        corrupt are reprocessed.
     4. Stale .tmp    : any leftover .tmp files from a prior crash are deleted
                        at slide startup before the corrupt scan runs.
+
+    Performance
+    ───────────
+    A single dedicated reader thread streams patches for the slide into a
+    bounded queue (respecting the pylibCZIrw single-thread-per-czidoc
+    constraint). The main thread assembles GPU batches from that queue,
+    runs inference (CPU preprocessing inside extract_batch is itself
+    thread-parallel, and the GPU forward pass uses autocast), and hands
+    finished features off to a small async writer pool so disk I/O never
+    blocks the next GPU batch. All three stages — I/O, GPU compute, and
+    disk writes — overlap across batches instead of running serially.
     """
     if not os.path.exists(nonwhite_csv):
         raise FileNotFoundError(
@@ -1006,62 +1148,75 @@ def run_step_C(czi_root, nonwhite_csv, features_root,
                    f"{len(patches_to_process)} patch(es) remaining "
                    f"({len(existing)} already done)")
 
-        rows      = patches_to_process.to_dict('records')
-        n_total   = len(rows)
-        n_done    = 0
-        n_batches = (n_total + batch_size - 1) // batch_size
+        rows    = patches_to_process.to_dict('records')
+        n_total = len(rows)
+        n_done  = 0
+
+        # Bounded queue: reader thread stays a few batches ahead of GPU/writer
+        # so CZI I/O overlaps with GPU inference + disk writes instead of the
+        # three stages running fully serially, as in the previous version.
+        read_queue = queue.Queue(maxsize=batch_size * 4)
 
         with pyczi.open_czi(czi_path) as czidoc, \
-             ThreadPoolExecutor(max_workers=batch_size) as pool:
+             ThreadPoolExecutor(max_workers=2) as writer_pool:
 
-            for b_idx in tqdm(range(n_batches),
-                               desc=f"  Patches: {slide_stem}",
-                               unit="batch", leave=False):
+            reader_thread = threading.Thread(
+                target=_slide_patch_reader,
+                args=(czidoc, rows, x_start, y_start, downsample, size_native, zoom,
+                      slide_stem, read_queue),
+                daemon=True,
+            )
+            reader_thread.start()
 
-                batch_rows = rows[b_idx * batch_size : (b_idx + 1) * batch_size]
-                patch_ids, futures = [], []
+            write_futures = []
+            batch_ids, batch_imgs = [], []
+            pbar = tqdm(total=n_total, desc=f"  Patches: {slide_stem}",
+                        unit="patch", leave=False)
 
-                for row in batch_rows:
-                    x_native = x_start + (int(row['patch_x']) * downsample)
-                    y_native = y_start + (int(row['patch_y']) * downsample)
-                    patch_id = f"{slide_stem}_{int(row['patch_number'])}"
-                    patch_ids.append(patch_id)
-                    futures.append(
-                        pool.submit(_read_patch_worker,
-                                    czidoc, x_native, y_native, size_native, zoom)
-                    )
-
-                images, valid_ids = [], []
-                for patch_id, fut in zip(patch_ids, futures):
-                    try:
-                        images.append(fut.result())
-                        valid_ids.append(patch_id)
-                    except Exception as e:
-                        tqdm.write(f"    [ERROR] patch {patch_id}: {e}")
-
-                if not images:
-                    continue
-
-                # ── GPU batch inference ──────────────────────────────────────
+            def flush_batch():
+                nonlocal batch_ids, batch_imgs
+                if not batch_imgs:
+                    return
                 try:
-                    batch_features = extractor.extract_batch(images)   # (B, 5, 512)
+                    batch_features = extractor.extract_batch(batch_imgs)   # (B, 5, 512)
                 except Exception as e:
-                    tqdm.write(f"    [ERROR] batch inference at idx {b_idx}: {e}")
-                    continue
+                    tqdm.write(f"    [ERROR] batch inference at "
+                               f"{len(batch_imgs)} patches: {e}")
+                    batch_ids, batch_imgs = [], []
+                    return
 
-                # ── Atomic save: write .tmp then rename to .pt ───────────────
-                for patch_id, feat in zip(valid_ids, batch_features):
-                    final_path = os.path.join(feat_dir, patch_id + '.pt')
-                    tmp_path   = final_path + '.tmp'
-                    try:
-                        torch.save(feat.to(torch.float16).clone(), tmp_path)
-                        os.replace(tmp_path, final_path)   # atomic on Linux
-                        n_done += 1
-                    except Exception as e:
-                        tqdm.write(f"    [ERROR] saving patch {patch_id}: {e}")
-                        # Clean up partial .tmp so it won't be mistaken for anything
-                        if os.path.exists(tmp_path):
-                            os.remove(tmp_path)
+                for pid, feat in zip(batch_ids, batch_features):
+                    write_futures.append(
+                        writer_pool.submit(_save_feature_atomic, feat_dir, pid, feat)
+                    )
+                pbar.update(len(batch_ids))
+                batch_ids, batch_imgs = [], []
+
+            while True:
+                item = read_queue.get()
+                if item is None:
+                    break
+                patch_id, img, err = item
+                if err is not None:
+                    tqdm.write(f"    [ERROR] patch {patch_id}: {err}")
+                    continue
+                batch_ids.append(patch_id)
+                batch_imgs.append(img)
+                if len(batch_imgs) >= batch_size:
+                    flush_batch()
+
+            flush_batch()   # final partial batch
+            reader_thread.join()
+            pbar.close()
+
+            # Writer pool submissions are async relative to GPU batches above;
+            # drain them here to count successes and surface any save errors.
+            for fut in write_futures:
+                try:
+                    fut.result()
+                    n_done += 1
+                except Exception as e:
+                    tqdm.write(f"    [ERROR] saving a patch for {slide_stem}: {e}")
 
         tqdm.write(
             f"  ✓ {slide_stem}: saved {n_done}/{n_total} feature files → {feat_dir}"

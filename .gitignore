@@ -59,3 +59,14 @@ data_cleaning/iframe_figures/*.html
 
 # Kept intentionally (do not add rules for these): *.xlsx, *.csv, *.md, *.docx,
 # *.json, *.ipynb, *.py — these are the tracked record of what was run.
+
+# Superseded result snapshots - regenerable/historical, and their generated
+# filenames run ~220 chars (breaks Windows MAX_PATH once checked out).
+slide_classification/archives/
+slide_classification/*_ARCHIVED_*/
+
+# Stdout captures from pipeline launches, and one-off backups/oversize dumps
+*.out
+*.csv.bak-*
+slide_aggregation/caption_generation/Results/*.csv.gz
+"Results_Tables_Clean (1).docx"

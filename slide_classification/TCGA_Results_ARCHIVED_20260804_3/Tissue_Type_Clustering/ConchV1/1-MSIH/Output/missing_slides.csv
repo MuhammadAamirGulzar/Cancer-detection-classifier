@@ -1,8 +1,0 @@
-cohort,method,model,task,wsi_id,reason
-tcga,Tissue_Type_Clustering,ConchV1,MSIH,TCGA-AD-6895_MSIH,labelled_but_no_features
-tcga,Tissue_Type_Clustering,ConchV1,MSIH,TCGA-AD-6899_nonMSIH,labelled_but_no_features
-tcga,Tissue_Type_Clustering,ConchV1,MSIH,TCGA-CM-6680_nonMSIH,labelled_but_no_features
-tcga,Tissue_Type_Clustering,ConchV1,MSIH,TCGA-D5-7000_nonMSIH,features_but_no_label
-tcga,Tissue_Type_Clustering,ConchV1,MSIH,TCGA-EI-6917_nonMSIH,features_but_no_label
-tcga,Tissue_Type_Clustering,ConchV1,MSIH,TCGA-F5-6814_nonMSIH,features_but_no_label
-tcga,Tissue_Type_Clustering,ConchV1,MSIH,TCGA-T9-A92H_nonMSIH,features_but_no_label

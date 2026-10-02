@@ -49,7 +49,17 @@ CANONICAL_EXPERIMENTS = ["TCGA-CV", "PAIP-IV", "PAIP-EV", "SurGen-CV", "SurGen-E
 SLIDE_LEVEL_ENCODERS = {"TITAN", "PRISM"}
 
 SUMMARY_COLUMNS = ["Method", "Model", "Classifier", "Variant",
-                   "BalAcc", "AUROC", "Acc", "MacroF1", "N_test"]
+                   "BalAcc", "AUROC", "Acc", "MacroF1", "N_test",
+                   # Which threshold scheme produced this row. PAIP-EV now mixes
+                   # two of them (KNN k=35 + refit tau, RF rate-matched, the rest
+                   # frozen tau_TCGA), so a bare metric is no longer
+                   # self-describing. Sits beside the metrics, not at the far
+                   # right, because it qualifies them.
+                   "Threshold_scheme",
+                   # Corrected-mode columns. Every sheet filters this list with
+                   # `if c in agg.columns`, so on a frozen run they are absent
+                   # and the workbook is identical to before.
+                   "BalAcc_corrected", "AUROC_corrected", "Status_corrected"]
 
 
 def discover(root: Path = SLIDE_CLS) -> List[dict]:
@@ -99,15 +109,16 @@ def _rows_from(record: dict) -> List[dict]:
     for clf, val in results.items():
         if not isinstance(val, dict):
             continue
-        # EV-style: nested by variant.
-        if any(isinstance(v, dict) and "bacc" in v for v in val.values()):
-            for variant, m in val.items():
-                if not (isinstance(m, dict) and "bacc" in m):
-                    continue
-                rows.append({**base, "Classifier": clf, "Variant": variant,
-                             **_metric_cols(m)})
-        # IV-style: flat per classifier.
-        elif "bacc" in val:
+        # A record may be flat (IV-style), nested by variant (EV-style), or -
+        # as PAIP-IV is - flat *and* carrying an extra operating point under
+        # ``at_tau_train``. Handle the two parts independently: treating the
+        # third case as purely nested drops the flat row, and with it AUROC,
+        # which a threshold-specific block does not restate.
+        nested = {k: v for k, v in val.items()
+                  if isinstance(v, dict) and "bacc" in v}
+        is_flat = "bacc" in val
+
+        if is_flat:
             row = {**base, "Classifier": clf, "Variant": "default", **_metric_cols(val)}
             boot = val.get("bootstrap") or {}
             if boot.get("bacc_ci"):
@@ -116,18 +127,89 @@ def _rows_from(record: dict) -> List[dict]:
                 row["AUROC_CI"] = f"[{boot['auroc_ci'][0]:.4f}, {boot['auroc_ci'][1]:.4f}]"
             row["N_train"] = val.get("n_train")
             rows.append(row)
+
+        for variant, m in nested.items():
+            cols = _metric_cols(m)
+            # AUROC is threshold-free, so an operating-point block stores it
+            # once on the parent rather than repeating it per threshold.
+            if is_flat:
+                for key, src in (("AUROC", "auroc"), ("AUROC_sd", "auroc_sd"),
+                                 ("WeightedF1", "weighted_f1")):
+                    if cols.get(key) is None:
+                        cols[key] = val.get(src)
+            rows.append({**base, "Classifier": clf, "Variant": variant, **cols})
     return rows
 
 
 def _metric_cols(m: dict) -> dict:
-    return {
+    """Frozen metrics, plus corrected ones only when the run produced them.
+
+    ``ev_runner --threshold-mode corrected`` writes ``bacc_corrected`` etc.
+    BESIDE the frozen keys; a frozen run writes none of them, so the extra
+    columns never materialise and the report is byte-for-byte what it was.
+    """
+    extra = {}
+    if m.get("promoted"):
+        # A promoted row's headline IS the corrected number, so repeating it in a
+        # *_corrected column would imply an alternative reading that no longer
+        # exists. What a reader needs instead is the scheme and what the figure
+        # displaced, so the change is legible from the workbook alone.
+        extra = {
+            "Threshold_scheme": m.get("threshold_scheme"),
+            "Status": m.get("status"),
+            "BalAcc_prev_frozen": m.get("bacc_frozen"),
+            "AUROC_prev_frozen": m.get("auroc_frozen"),
+            "Threshold_prev_frozen": m.get("threshold_frozen"),
+            "Status_prev_frozen": m.get("status_frozen"),
+            "N_pos_pred": m.get("n_pos_pred_corrected"),
+            "KNN_k": m.get("knn_k_corrected"),
+            "KNN_tau_source": m.get("knn_tau_source"),
+        }
+    elif "bacc_corrected" in m:
+        extra = {
+            "BalAcc_corrected": m.get("bacc_corrected"),
+            # only KNN changes its scores (k changes); others keep frozen AUROC
+            "AUROC_corrected": m.get("auroc_corrected", m.get("auroc")),
+            "Acc_corrected": m.get("acc_corrected"),
+            "MacroF1_corrected": m.get("macro_f1_corrected"),
+            "Threshold_corrected": m.get("threshold_corrected"),
+            "Status_frozen": m.get("status_frozen"),
+            "Status_corrected": m.get("status_corrected"),
+            "N_pos_pred_corrected": m.get("n_pos_pred_corrected"),
+            "Corrected_scheme": m.get("corrected_scheme"),
+            "ConfMatrix_corrected": (str(m.get("conf_matrix_corrected"))
+                                     if m.get("conf_matrix_corrected") else None),
+        }
+    return {**extra, **{
         "BalAcc": m.get("bacc"), "AUROC": m.get("auroc"), "Acc": m.get("acc"),
         "MacroF1": m.get("macro_f1"), "WeightedF1": m.get("weighted_f1"),
         "BalAcc_sd": m.get("bacc_sd"), "AUROC_sd": m.get("auroc_sd"),
         "Threshold": m.get("threshold"), "N_seeds": m.get("n_seeds"),
         "N_folds_used": m.get("n_folds_used"),
         "ConfMatrix": str(m.get("conf_matrix")) if m.get("conf_matrix") else None,
-    }
+    }}
+
+
+def fill_threshold_scheme(df: pd.DataFrame) -> pd.DataFrame:
+    """Give every row in a mixed-scheme experiment an explicit scheme label.
+
+    Only promoted rows carry ``Threshold_scheme``; a frozen row carries nothing,
+    because for four of the five experiments there is only one scheme and naming
+    it on every row would be noise. But inside an experiment that mixes schemes,
+    a blank cell is the ambiguous case - the reader cannot tell "frozen" from
+    "nobody recorded it". So the blanks are filled per experiment, and only where
+    at least one row was promoted; experiments with a single scheme never grow
+    the column and keep their previous shape exactly.
+
+    Modifies and returns ``df``. Safe to call on a frame that has no such column.
+    """
+    if "Threshold_scheme" not in df.columns or "Experiment" not in df.columns:
+        return df
+    mixed = [e for e, g in df.groupby("Experiment")
+             if g["Threshold_scheme"].notna().any()]
+    m = df["Experiment"].isin(mixed)
+    df.loc[m, "Threshold_scheme"] = df.loc[m, "Threshold_scheme"].fillna("frozen_tau_TCGA")
+    return df
 
 
 def sort_summary(df: pd.DataFrame) -> pd.DataFrame:
@@ -161,7 +243,7 @@ def build(out_path: Optional[Path] = None, root: Path = SLIDE_CLS) -> Dict[str, 
 
     with pd.ExcelWriter(out_path, engine="openpyxl", mode="w") as xw:
         for exp in order:
-            df = pd.DataFrame(per_exp[exp])
+            df = fill_threshold_scheme(pd.DataFrame(per_exp[exp]))
             agg = df[~df["Method"].isin(SLIDE_LEVEL_ENCODERS)]
             enc = df[df["Method"].isin(SLIDE_LEVEL_ENCODERS)]
 

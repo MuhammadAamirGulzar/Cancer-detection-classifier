@@ -1,0 +1,11 @@
+experiment,method,model,classifier,threshold_label,threshold,bacc,auroc,conf_matrix
+PAIP-IV,Caption_based_aggregation_15_classes,H-Optimus-1,lin,0.5,0.5,0.8363095238095238,0.8333333333333334,"[[23, 1], [2, 5]]"
+PAIP-IV,Caption_based_aggregation_15_classes,H-Optimus-1,lin,tau_TCGA,0.048111478869424476,0.7946428571428572,0.8333333333333334,"[[21, 3], [2, 5]]"
+PAIP-IV,Caption_based_aggregation_15_classes,H-Optimus-1,ann,0.5,0.5,0.7113095238095238,0.7976190476190477,"[[17, 7], [2, 5]]"
+PAIP-IV,Caption_based_aggregation_15_classes,H-Optimus-1,ann,tau_TCGA,0.32805055379867554,0.6279761904761905,0.7976190476190477,"[[13, 11], [2, 5]]"
+PAIP-IV,Caption_based_aggregation_15_classes,H-Optimus-1,knn,0.5,0.5,0.8363095238095238,0.8720238095238095,"[[23, 1], [2, 5]]"
+PAIP-IV,Caption_based_aggregation_15_classes,H-Optimus-1,knn,tau_TCGA,0.3333333333333333,0.7738095238095238,0.8720238095238095,"[[20, 4], [2, 5]]"
+PAIP-IV,Caption_based_aggregation_15_classes,H-Optimus-1,proto,0.5,0.5,0.7946428571428572,0.8273809523809524,"[[21, 3], [2, 5]]"
+PAIP-IV,Caption_based_aggregation_15_classes,H-Optimus-1,proto,tau_TCGA,0.4981093108654022,0.7946428571428572,0.8273809523809524,"[[21, 3], [2, 5]]"
+PAIP-IV,Caption_based_aggregation_15_classes,H-Optimus-1,rf,0.5,0.5,0.6428571428571428,0.7976190476190476,"[[24, 0], [5, 2]]"
+PAIP-IV,Caption_based_aggregation_15_classes,H-Optimus-1,rf,tau_TCGA,0.15701827607875998,0.6071428571428572,0.7976190476190476,"[[12, 12], [2, 5]]"

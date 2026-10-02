@@ -1,0 +1,8 @@
+{
+  "k": 35,
+  "metric": "manhattan",
+  "weights": "uniform",
+  "n_train": 413,
+  "n_pos": 60,
+  "rationale": "k=35: max TCGA OOF BalAcc (exp D2) + prevalence rule 35*0.145~5 expected positive neighbours; TCGA-only"
+}

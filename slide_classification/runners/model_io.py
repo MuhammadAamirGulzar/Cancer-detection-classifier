@@ -97,6 +97,21 @@ def fit_full(
         return clf
 
     if kind == "knn":
+        # [ADDED] Optional fixed neighbourhood size. ``knn_k=None`` (the
+        # default) keeps the GridSearchCV below untouched, so every published
+        # artifact reproduces exactly. Setting it - validated value 35 - pins k
+        # and uniform weights and searches the metric only, which is still a
+        # TCGA-only choice. See runners/threshold_modes.py for why 35.
+        knn_k = hparams.get("knn_k")
+        if knn_k:
+            gs = GridSearchCV(
+                KNeighborsClassifier(n_neighbors=int(knn_k), weights="uniform"),
+                {"metric": ["cosine", "euclidean", "manhattan"]},
+                n_jobs=-1, scoring="balanced_accuracy")
+            with joblib.parallel_backend("threading"):
+                gs.fit(X.numpy(), labels.numpy())
+            return gs.best_estimator_
+
         # Same nested GridSearchCV the fold runs use - cross-validated on the
         # training data, so no external information enters.
         # Threading backend for the same reason as eval_knn: loky workers crash

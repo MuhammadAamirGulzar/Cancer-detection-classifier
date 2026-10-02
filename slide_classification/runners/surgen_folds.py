@@ -165,7 +165,6 @@ def _print_fold_table(fold_map, slides_by_case, case_labels, labels, num_folds):
 # Legacy (buggy) fold construction - retained ONLY to quantify the correction
 # --------------------------------------------------------------------------
 
-
 def build_slide_level_folds_legacy(
     labels_csv: Optional[str] = None,
     num_folds: int = DEFAULT_NUM_FOLDS,

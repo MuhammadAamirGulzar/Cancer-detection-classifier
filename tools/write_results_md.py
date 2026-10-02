@@ -5,7 +5,7 @@ summary table and known caveats. Plus a top-level table stating **N for every
 experiment**, because those differ from the raw label-file counts and reviewers
 will check:
 
-    TCGA-CV 413 . PAIP-IV 42 train / 31 test . PAIP-EV 73 . SurGen-CV 624 . SurGen-EV 622
+    TCGA-CV 413 . PAIP-IV 47 train / 31 test . PAIP-EV 78 . SurGen-CV 624 . SurGen-EV 622
 
 Everything here is derived from the result files - nothing is typed by hand, so
 re-running after a re-run keeps the document honest (rule of engagement #1).
@@ -28,7 +28,8 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 SLIDE_CLS = REPO_ROOT / "slide_classification"
 sys.path.insert(0, str(REPO_ROOT / "tools"))
 
-from build_report import discover, _rows_from, SLIDE_LEVEL_ENCODERS, sort_summary  # noqa: E402
+from build_report import (discover, _rows_from, SLIDE_LEVEL_ENCODERS,  # noqa: E402
+                          sort_summary, fill_threshold_scheme)
 
 OUT = REPO_ROOT / "RESULTS.md"
 
@@ -41,14 +42,26 @@ DEFINITIONS = {
     "PAIP-IV": dict(
         cohort="PAIP (external cohort, internal split)",
         protocol="single fixed provider split, no averaging",
-        train="PAIP official train (42 of 47 have features)",
+        train="PAIP official train (all 47 have features, 12 MSI-H)",
         test="PAIP official test (31, all have features)",
         kind="IV",
-        note="Reported at threshold 0.5 with bootstrap 95% CIs over the 31 test slides."),
+        note="Reported at threshold 0.5 with bootstrap 95% CIs over the 31 test slides. "
+             "The ANN head is fitted on all 47 training slides with the TCGA-CV-derived "
+             "configuration, matching the other four heads; the 20% carve-out is used "
+             "for early stopping only."),
     "PAIP-EV": dict(
         cohort="PAIP (external)", protocol="external validation",
-        train="TCGA (see variant)", test="all 73 PAIP slides", kind="EV",
-        note="Reported at tau_TCGA, fixed on TCGA and applied unchanged."),
+        train="TCGA (see variant)", test="all 78 PAIP slides", kind="EV",
+        note="**Two threshold schemes in one table.** kNN is scored at k=35 "
+             "(uniform weights) and cut at a tau refitted on TCGA out-of-fold "
+             "probabilities at that k, so kNN is the only head whose AUROC moves. "
+             "RF keeps its scores and takes a rate-matched (quantile) threshold, so "
+             "its AUROC is unchanged and only the operating point moves. LR, ANN and "
+             "ProtoNet keep the frozen tau_TCGA and are unchanged. Both schemes come "
+             "from TCGA alone — the quantile reads PAIP scores but never PAIP labels. "
+             "Applies to the `tcga_full` variant; the two fold-based variants stay "
+             "entirely frozen, as does all of SurGen-EV, so kNN/RF are not comparable "
+             "across the two external cohorts."),
     "SurGen-CV": dict(
         cohort="SurGen (second external cohort, internal CV)",
         protocol="4-fold cross-validation, case-grouped",
@@ -78,7 +91,7 @@ def load() -> pd.DataFrame:
         rows.extend(_rows_from(rec))
     if not rows:
         raise SystemExit("no result files found")
-    return pd.DataFrame(rows)
+    return fill_threshold_scheme(pd.DataFrame(rows))
 
 
 def md_table(df: pd.DataFrame, cols: List[str], max_rows: int = None) -> str:
@@ -189,6 +202,10 @@ def main():
         if e == "PAIP-IV":
             cols = ["Method", "Model", "Classifier", "BalAcc", "BalAcc_CI",
                     "AUROC", "AUROC_CI", "Acc", "MacroF1", "N_test"]
+        # Where an experiment mixes threshold schemes, the metrics alone do not
+        # say what produced them - and these rows get quoted out of context.
+        if "Threshold_scheme" in sub.columns and sub["Threshold_scheme"].notna().any():
+            cols = cols + ["Threshold_scheme"]
         parts.append(md_table(sort_summary(agg), cols, max_rows=25))
         if len(agg) > 25:
             parts.append(f"\n_Showing the top 25 of {len(agg)} rows; the full table is "

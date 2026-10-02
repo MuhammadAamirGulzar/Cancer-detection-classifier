@@ -1,37 +1,48 @@
-"""Radar plots, one figure per (experiment x metric) (work order Task 4.4).
+"""Radar plots, one figure per (experiment x metric).
 
-Design decisions, and why
--------------------------
-**Faceted by foundation model, not overlaid.** Five foundation models drawn on one
-radar means five series visible simultaneously - the "all pairs" case. No
-5-colour subset of the palette clears the colourblind-separation floors in dark
-mode (checked exhaustively: 11 of 56 five-subsets pass in light, **none** of those
-11 passes in dark). So the models become small multiples and the *aggregation
-methods* - the actual experimental variable - become the series.
+Design source
+-------------
+This reproduces the radar layout the project already uses in
+``Analysis_and_Visualization/Analysis.ipynb`` (the "Below script will generate
+radar plots from the best of all exps metrics excel file" cell), rather than the
+faceted small-multiple design that previously lived here. Owner decision: the
+notebook figure is the one that goes in the paper, so the tool emits the same
+thing.
 
-**Four series, validated.** The aggregation methods use blue / yellow / magenta /
-green, which passes every check in both modes on the all-pairs list:
+The layout, unchanged from the notebook:
 
-    light  CVD dE 13.0 worst pair, normal-vision dE 19.6   -> ALL CHECKS PASS
-    dark   CVD dE  6.9 worst pair, normal-vision dE 19.3   -> ALL CHECKS PASS
+  * spokes  = aggregation method x classifier, grouped so each aggregation owns
+              a contiguous wedge of the circle;
+  * series  = the five foundation models, overlaid as coloured lines;
+  * wedges  = a pastel background per aggregation, matched to the spoke label
+              boxes so a reader can tell at a glance which block they are in;
+  * radius  = fixed 0.0-1.0 with numbers printed along every spoke, so figures
+              from different experiments stay directly comparable.
 
-Two obligations come with that result and are discharged here:
-  * the dark-mode CVD warning (green vs yellow, dE 6.9) sits in the 6-8 band,
-    which is legal *only* with secondary encoding - so every series also carries a
-    distinct line style and marker shape, never colour alone;
-  * the light-mode contrast warning on yellow and magenta triggers the relief
-    rule - a legend is always present and the same numbers exist as a table in
-    best_of_all_exps_metric.xlsx.
+What changed relative to the notebook
+-------------------------------------
+1. **Data source.** The notebook parsed the *old* workbook shape - a ``Metric``
+   column holding ``lin_auroc_Averaging`` strings and one ``<Model>_N`` column
+   per encoder. ``build_report.py`` now emits a tidy frame
+   (``Experiment, Method, Model, Classifier, Variant, AUROC, BalAcc, ...``), so
+   the extraction here reads that instead. Pointing the notebook cell at the
+   current workbook would silently plot zeros everywhere - every ``Metric``
+   lookup misses.
+2. **Four aggregations, not three.** ``Caption_based_aggregation_15_classes``
+   was commented out in the notebook; it has results now, so it is included by
+   default. ``--methods`` overrides.
+3. **Variant selection.** EV experiments carry three variants. Only the primary
+   (``tcga_full``) is plotted, otherwise every model is drawn three times.
+4. **N in the title.** Kept from the previous tool - reviewers check it, and the
+   SurGen H-Optimus-1 rows genuinely differ (613 vs 622).
 
-Spokes are the five classifiers. Every title carries the canonical experiment
-name and the test-set N, which is the Task 4.4 acceptance criterion.
-
-Run:  python tools/make_radar_plots.py [--metric AUROC|BalAcc] [--archive]
+Run:  python tools/make_radar_plots.py [--metrics AUROC,BalAcc] [--archive]
 """
 
 from __future__ import annotations
 
 import argparse
+import re
 import shutil
 import sys
 from datetime import date
@@ -40,8 +51,8 @@ from typing import Dict, List, Optional
 
 import matplotlib
 matplotlib.use("Agg")
+import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
-from matplotlib.lines import Line2D
 import numpy as np
 import pandas as pd
 
@@ -50,33 +61,73 @@ SLIDE_CLS = REPO_ROOT / "slide_classification"
 PLOTS_ROOT = REPO_ROOT / "Analysis_and_Visualization" / "Radar_Plots"
 sys.path.insert(0, str(REPO_ROOT / "tools"))
 
-from build_report import discover, _rows_from, SLIDE_LEVEL_ENCODERS  # noqa: E402
+from build_report import (discover, _rows_from, SLIDE_LEVEL_ENCODERS,  # noqa: E402
+                          fill_threshold_scheme)
+
+# ---------------------------------------------------------------- notebook config
+
+AGG_METHODS = ["Caption_based_aggregation",
+               "Caption_based_aggregation_15_classes",
+               "Averaging",
+               "Tissue_Type_Clustering"]
+
+AGG_ABBREV = {"Caption_based_aggregation": "CBA",
+              "Caption_based_aggregation_15_classes": "CBA15",
+              "Averaging": "AVG",
+              "Tissue_Type_Clustering": "TTC"}
+
+AGGREGATION_COLORS = {"Caption_based_aggregation": "#d0e0ff",
+                      "Caption_based_aggregation_15_classes": "#fff0b3",
+                      "Averaging": "#ffe0e0",
+                      "Tissue_Type_Clustering": "#c0ffc0"}
+
+FOUNDATION_MODELS = ["H-Optimus-1", "Conch1_5", "UNI2", "Virchow2", "ConchV1"]
+
+MODEL_DISPLAY_NAMES = {"H-Optimus-1": "H-Optimus-1", "Conch1_5": "CONCH1.5",
+                       "UNI2": "UNI2", "Virchow2": "Virchow2", "ConchV1": "CONCH"}
+
+MODEL_COLORS = ["#e6194b", "#3cb44b", "#4363d8", "#f58231", "#6b3f00"]
 
 CLASSIFIERS = ["lin", "ann", "knn", "proto", "rf"]
-CLASSIFIER_LABELS = {"lin": "Logistic", "ann": "ANN", "knn": "KNN",
-                     "proto": "ProtoNet", "rf": "RandomForest"}
-AGG_METHODS = ["Averaging", "Caption_based_aggregation",
-               "Caption_based_aggregation_15_classes", "Tissue_Type_Clustering"]
-AGG_LABELS = {"Averaging": "Averaging",
-              "Caption_based_aggregation": "Caption-based (14)",
-              "Caption_based_aggregation_15_classes": "Caption-based (15)",
-              "Tissue_Type_Clustering": "Tissue-type clustering"}
-MODELS = ["H-Optimus-1", "Conch1_5", "UNI2", "Virchow2", "ConchV1"]
+CLASSIFIER_LABEL_MAP = {"lin": "Linear", "ann": "ANN", "knn": "KNN",
+                        "proto": "Proto", "rf": "RF"}
 
-# Validated categorical slots (see module docstring for the validator output).
-SERIES_LIGHT = ["#2a78d6", "#eda100", "#e87ba4", "#008300"]
-SERIES_DARK = ["#3987e5", "#c98500", "#d55181", "#008300"]
-# Secondary encoding - required by the dark-mode CVD warning, and good practice
-# regardless: identity is never carried by colour alone.
-SERIES_STYLE = ["-", "--", "-.", ":"]
-SERIES_MARKER = ["o", "s", "^", "D"]
+# The notebook called AUROC "AUC"; accept both so existing habits keep working.
+METRIC_ALIASES = {"AUC": "AUROC", "AUROC": "AUROC", "BalAcc": "BalAcc",
+                  "Acc": "Acc", "MacroF1": "MacroF1", "WF1": "WeightedF1",
+                  "WeightedF1": "WeightedF1"}
 
-THEMES = {
-    "light": {"surface": "#fcfcfb", "text": "#0b0b0b", "muted": "#52514e",
-              "grid": "#d8d7d2", "series": SERIES_LIGHT},
-    "dark": {"surface": "#1a1a19", "text": "#ffffff", "muted": "#c3c2b7",
-             "grid": "#3a3a38", "series": SERIES_DARK},
-}
+# Primary variant per experiment - everything else is a robustness/legacy row.
+# thresholds.py rule 2: internal experiments report at 0.5, the flat "default"
+# row. PAIP-IV's `at_tau_train` is a supplementary operating point, and it
+# stores no AUROC of its own (AUROC is threshold-free).
+PRIMARY_VARIANT = {"TCGA-CV": "default", "SurGen-CV": "default",
+                   "PAIP-IV": "default", "PAIP-EV": "tcga_full",
+                   "SurGen-EV": "tcga_full"}
+
+EXPERIMENT_ORDER = ["TCGA-CV", "PAIP-IV", "PAIP-EV", "SurGen-CV", "SurGen-EV"]
+
+
+def close_circle(values: List[float]) -> List[float]:
+    return list(values) + [values[0]]
+
+
+def describe_n(sub: pd.DataFrame) -> str:
+    """Cohort size for the title, naming any combination that differs.
+
+    A bare "613/622" was read as "N is 613", which is wrong - it is one figure
+    covering many combinations. State the cohort size, then name the exceptions,
+    so nobody has to guess which reading is intended.
+    """
+    counts = (sub.groupby(["Method", "Model"])["N_test"].first().dropna().astype(int))
+    if counts.empty:
+        return "?"
+    main = int(counts.mode().iloc[0])
+    odd = counts[counts != main]
+    if odd.empty:
+        return str(main)
+    parts = [f"{AGG_ABBREV.get(m, m)}/{mo}: {n}" for (m, mo), n in odd.items()]
+    return f"{main}  (except {'; '.join(parts)})"
 
 
 def load_table() -> pd.DataFrame:
@@ -84,122 +135,175 @@ def load_table() -> pd.DataFrame:
     for rec in discover(SLIDE_CLS):
         rows.extend(_rows_from(rec))
     if not rows:
-        raise SystemExit("no result files found - run the Phase 3 experiments first")
-    df = pd.DataFrame(rows)
-    # For EV experiments keep the primary variant only; the other two are
-    # robustness/legacy rows and would triple-plot the same model.
-    if "Variant" in df.columns:
-        keep = df["Variant"].isin(["default", "tcga_full"])
-        # fall back to fold_average where tcga_full is not available yet
-        for (exp, me, mo, clf), grp in df.groupby(["Experiment", "Method", "Model", "Classifier"]):
-            if not keep[grp.index].any() and len(grp):
-                keep[grp.index[0]] = True
-        df = df[keep]
-    return df
+        raise SystemExit("no result files found - run the experiments first")
+    return fill_threshold_scheme(pd.DataFrame(rows))
 
 
-def _panel(ax, sub: pd.DataFrame, metric: str, theme: dict, model: str,
-           show_legend: bool) -> None:
-    angles = np.linspace(0, 2 * np.pi, len(CLASSIFIERS), endpoint=False).tolist()
-    angles += angles[:1]
+def extract_values(df: pd.DataFrame, methods: List[str], metric: str):
+    """Spoke labels, their aggregation group, and one series per model.
 
-    ax.set_facecolor(theme["surface"])
-    ax.set_theta_offset(np.pi / 2)
-    ax.set_theta_direction(-1)
-    ax.set_xticks(angles[:-1])
-    ax.set_xticklabels([CLASSIFIER_LABELS[c] for c in CLASSIFIERS],
-                       color=theme["text"], fontsize=8)
-    ax.set_ylim(0.4, 1.0)
-    ax.set_yticks([0.5, 0.6, 0.7, 0.8, 0.9, 1.0])
-    ax.set_yticklabels(["0.5", "", "0.7", "", "0.9", ""],
-                       color=theme["muted"], fontsize=6.5)
-    # Recessive grid.
-    ax.grid(color=theme["grid"], linewidth=0.6, alpha=0.9)
-    ax.spines["polar"].set_color(theme["grid"])
-    ax.spines["polar"].set_linewidth(0.6)
+    Missing cells become 0.0 - the notebook's convention, so a gap reads
+    visibly as a gap rather than as an interpolated line.
+    """
+    axis_labels: List[str] = []
+    agg_groups: List[str] = []
+    models_data: Dict[str, List[float]] = {m: [] for m in FOUNDATION_MODELS}
 
-    for i, method in enumerate(AGG_METHODS):
-        vals = []
+    for agg in methods:
+        short = AGG_ABBREV.get(agg, agg)
         for clf in CLASSIFIERS:
-            row = sub[(sub["Method"] == method) & (sub["Classifier"] == clf)]
-            vals.append(float(row[metric].iloc[0]) if len(row) and pd.notna(
-                row[metric].iloc[0]) else np.nan)
-        if all(np.isnan(v) for v in vals):
-            continue
-        vals += vals[:1]
-        ax.plot(angles, vals, color=theme["series"][i], linewidth=2.0,
-                linestyle=SERIES_STYLE[i], marker=SERIES_MARKER[i], markersize=4.5,
-                markeredgecolor=theme["surface"], markeredgewidth=0.8,
-                label=AGG_LABELS[method], zorder=3 - i * 0.1)
+            axis_labels.append(
+                f"{CLASSIFIER_LABEL_MAP.get(clf, clf)}-{metric}\n({short})")
+            agg_groups.append(agg)
+            for fm in FOUNDATION_MODELS:
+                sel = df[(df["Method"] == agg) & (df["Model"] == fm) &
+                         (df["Classifier"] == clf)]
+                val = 0.0
+                if not sel.empty and metric in sel.columns:
+                    v = sel[metric].iloc[0]
+                    val = round(float(v), 4) if pd.notna(v) else 0.0
+                models_data[fm].append(val)
+    return axis_labels, agg_groups, models_data
 
-    ax.set_title(model, color=theme["text"], fontsize=10, pad=18, fontweight="600")
+
+def describe_schemes(sub: pd.DataFrame) -> str:
+    """A caption line when one panel mixes threshold schemes, else ''.
+
+    A radar with KNN scored at k=35 next to LR at the frozen tau is not
+    comparing like with like, and the spoke that moved is the one a reader will
+    ask about first. Saying so on the figure costs one line; leaving it to the
+    surrounding prose means the image travels without it.
+    """
+    if "Threshold_scheme" not in sub.columns:
+        return ""
+    per_clf = sub.groupby("Classifier")["Threshold_scheme"].agg(set)
+    schemes = {s for v in per_clf for s in v}
+    if len(schemes) < 2:
+        return ""
+    def label(s):
+        m = re.fullmatch(r"refit_tau_k(\d+)", s)
+        return f"k={m.group(1)} + TCGA-refit tau" if m else s
+    named = {"quantile_rate_matched": "rate-matched tau"}
+    parts = [f"{clf.upper()} {named.get(s, label(s))}"
+             for clf, v in sorted(per_clf.items()) for s in v
+             if s != "frozen_tau_TCGA"]
+    frozen = sorted(c.upper() for c, v in per_clf.items()
+                    if v == {"frozen_tau_TCGA"})
+    return (f"Two threshold schemes: {', '.join(parts)}; "
+            f"{'/'.join(frozen)} at the frozen TCGA tau")
 
 
-def make_figure(df: pd.DataFrame, experiment: str, metric: str, theme_name: str,
-                out_dir: Path) -> Optional[Path]:
-    theme = THEMES[theme_name]
-    sub = df[(df["Experiment"] == experiment) &
-             (~df["Method"].isin(SLIDE_LEVEL_ENCODERS))]
+def make_figure(df: pd.DataFrame, experiment: str, metric: str,
+                methods: List[str], out_dir: Path,
+                value_set: str = "frozen") -> Optional[Path]:
+    sub = df[df["Experiment"] == experiment]
+    variant = PRIMARY_VARIANT.get(experiment)
+    if variant and variant in set(sub["Variant"]):
+        sub = sub[sub["Variant"] == variant]
+    # TITAN and PRISM are slide-level encoders and are their own aggregation
+    # "method" - they have no place on a foundation-model radar.
+    sub = sub[~sub["Method"].isin(SLIDE_LEVEL_ENCODERS)]
     if sub.empty:
         return None
 
-    models = [m for m in MODELS if m in set(sub["Model"])]
-    if not models:
+    # `corrected` reads the columns ev_runner writes under
+    # --threshold-mode=corrected. They are absent on a frozen run, so the
+    # figure is skipped rather than silently drawn from the frozen numbers.
+    col = metric if value_set == "frozen" else f"{metric}_corrected"
+    if col not in sub.columns or sub[col].notna().sum() == 0:
+        if value_set != "frozen":
+            print(f"  [skip] {experiment}/{metric}: no {col} "
+                  f"(run ev_runner --threshold-mode corrected first)")
+            return None
+        col = metric
+
+    axis_labels, agg_groups, models_data = extract_values(sub, methods, col)
+    if not axis_labels:
         return None
 
-    n = len(models)
-    ncols = min(3, n)
-    nrows = int(np.ceil(n / ncols))
-    fig, axes = plt.subplots(nrows, ncols, figsize=(4.3 * ncols, 4.4 * nrows),
-                             subplot_kw={"polar": True})
-    fig.patch.set_facecolor(theme["surface"])
-    axes = np.atleast_1d(axes).ravel()
+    n_txt = describe_n(sub)
+    scheme_note = describe_schemes(sub)
 
-    n_test = sub["N_test"].dropna()
-    n_test = int(n_test.iloc[0]) if len(n_test) else "?"
+    max_r, label_position = 1.0, 1.13
+    n_spokes = len(axis_labels)
+    angle_step = 2 * np.pi / n_spokes
+    angles = np.linspace(0, 2 * np.pi, n_spokes, endpoint=False) + angle_step / 2
+    angles_closed = np.concatenate((angles, [angles[0]]))
 
-    for j, model in enumerate(models):
-        _panel(axes[j], sub[sub["Model"] == model], metric, theme, model,
-               show_legend=False)
-    for j in range(len(models), len(axes)):
-        axes[j].set_visible(False)
+    fig = plt.figure(figsize=(24, 24))
+    ax = fig.add_subplot(111, polar=True)
+    ax.set_theta_offset(np.pi / 2)
+    ax.set_theta_direction(-1)
 
-    metric_label = {"AUROC": "AUROC", "BalAcc": "Balanced accuracy"}.get(metric, metric)
-    # Task 4.4 acceptance: canonical experiment name AND test-set N in every title.
-    fig.suptitle(f"{experiment} — {metric_label} by aggregation method  (N = {n_test})",
-                 color=theme["text"], fontsize=13, fontweight="600", y=0.99)
+    group_span = 2 * np.pi / len(methods)
+    for i, agg in enumerate(methods):
+        t0, t1 = i * group_span, (i + 1) * group_span
+        arc = np.linspace(t0, t1, 200)
+        ax.fill(np.concatenate(([t0], arc, [t1])),
+                np.concatenate(([0], np.full(len(arc), max_r), [0])),
+                color=AGGREGATION_COLORS.get(agg, "#f0f0f0"), alpha=0.4, zorder=0)
 
-    # Figure-level legend built from explicit proxies, not from one panel's
-    # artists: a panel missing a method (partial coverage) would otherwise emit a
-    # short or mislabeled legend. Identity is carried by colour AND line style AND
-    # marker, so the dark-mode CVD warning is discharged.
-    present = set(sub["Method"])
-    handles = [Line2D([0], [0], color=theme["series"][i], linestyle=SERIES_STYLE[i],
-                      marker=SERIES_MARKER[i], markersize=5, linewidth=2.0,
-                      markeredgecolor=theme["surface"], markeredgewidth=0.8,
-                      label=AGG_LABELS[m])
-               for i, m in enumerate(AGG_METHODS) if m in present]
-    if handles:
-        fig.legend(handles=handles, loc="lower center", ncol=min(4, len(handles)),
-                   frameon=False, fontsize=9, labelcolor=theme["text"],
-                   bbox_to_anchor=(0.5, -0.005))
+    for (fm, values), color in zip(models_data.items(), MODEL_COLORS):
+        stats = close_circle(values)
+        ax.plot(angles_closed, stats, color=color,
+                label=MODEL_DISPLAY_NAMES.get(fm, fm),
+                linewidth=3, marker="o", markersize=6, zorder=5)
+        ax.fill(angles_closed, stats, color=color, alpha=0.06, zorder=4)
 
-    # Generous vertical room: polar spoke labels sit outside the axes and will
-    # collide with the next row's panel title otherwise.
-    fig.subplots_adjust(hspace=0.30, wspace=0.32,
-                        top=0.90, bottom=0.10 if nrows > 1 else 0.14)
+    ax.set_xticks(angles)
+    ax.set_xticklabels([])
+    for angle, label, agg in zip(angles, axis_labels, agg_groups):
+        ax.text(angle, label_position, label, ha="center", va="center",
+                fontsize=14, fontweight="bold", rotation=0, clip_on=False,
+                bbox=dict(facecolor=AGGREGATION_COLORS.get(agg, "#f0f0f0"),
+                          edgecolor="black", boxstyle="square,pad=0.5",
+                          linewidth=1.5))
+
+    ax.set_yticklabels([])
+    ax.set_ylim(0.0, max_r)
+    r_ticks = np.arange(0.50, max_r, 0.10)
+    ax.set_yticks(r_ticks)
+    # The notebook used fontsize 24 for 15 spokes; 20 spokes need a smaller face
+    # or the numbers collide with their neighbours.
+    tick_fs = 24 if n_spokes <= 15 else 15
+    for angle in angles:
+        for r in r_ticks:
+            ax.text(angle, r, f"{r:.2f}", ha="center", va="center",
+                    fontsize=tick_fs, color="black", zorder=6, clip_on=False)
+
+    # Legends sit in the top corners; the title goes on a band above them, so a
+    # long N note (SurGen carries two exceptions) can never run underneath.
+    handles, labels = ax.get_legend_handles_labels()
+    fig.legend(handles, labels, loc="upper right", bbox_to_anchor=(0.98, 0.995),
+               title="Models", fontsize=18, title_fontsize=20, borderpad=1.2,
+               framealpha=0.95, edgecolor="black", fancybox=True, shadow=True)
+
+    agg_handles = [mpatches.Patch(facecolor=AGGREGATION_COLORS.get(a, "#f0f0f0"),
+                                  edgecolor="black",
+                                  label=f"{AGG_ABBREV.get(a, a)} = {a}")
+                   for a in methods]
+    fig.legend(handles=agg_handles, loc="upper left", bbox_to_anchor=(0.02, 0.995),
+               title="Aggregation Methods (Key)", fontsize=16, title_fontsize=18,
+               borderpad=1.2, framealpha=0.95, edgecolor="black",
+               fancybox=True, shadow=True)
+
+    tag = "" if value_set == "frozen" else "  [corrected thresholds]"
+    fig.text(0.5, 1.055, f"Radar Plot - {experiment} | Metric: {metric}{tag}",
+             ha="center", va="bottom", fontsize=30, fontweight="bold")
+    fig.text(0.5, 1.030, f"N = {n_txt}", ha="center", va="bottom", fontsize=19)
+    if scheme_note:
+        fig.text(0.5, 1.010, scheme_note, ha="center", va="bottom",
+                 fontsize=15, style="italic", color="#444444")
 
     out_dir.mkdir(parents=True, exist_ok=True)
-    path = out_dir / f"{experiment}_{metric}_{theme_name}.png"
-    fig.savefig(path, dpi=200, facecolor=theme["surface"], bbox_inches="tight",
-                pad_inches=0.3)
+    suffix = "" if value_set == "frozen" else "_corrected"
+    path = out_dir / f"{experiment}_{metric}_radar{suffix}.png"
+    plt.savefig(path, dpi=300, bbox_inches="tight", pad_inches=0.5)
     plt.close(fig)
     return path
 
 
 def archive_old_plots() -> None:
-    """Task 4.4: archive 3_agg_methods / 4_agg_methods - they predate every
-    Phase 1 and Phase 2 correction."""
     stamp = date.today().strftime("%Y%m%d")
     for name in ("3_agg_methods", "4_agg_methods"):
         src = PLOTS_ROOT / name
@@ -217,8 +321,15 @@ def archive_old_plots() -> None:
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--metrics", default="AUROC,BalAcc")
-    ap.add_argument("--themes", default="light,dark")
+    ap.add_argument("--metrics", default="AUROC,BalAcc",
+                    help="comma list; AUC is accepted as an alias for AUROC")
+    ap.add_argument("--methods", default=",".join(AGG_METHODS),
+                    help="aggregation methods, in spoke order")
+    ap.add_argument("--experiments", default="",
+                    help="comma list; default is every experiment with results")
+    ap.add_argument("--values", default="frozen", choices=["frozen", "corrected", "both"],
+                    help="which numbers to plot; corrected goes to a separate "
+                         "<exp>_corrected/ folder so both sets can be kept")
     ap.add_argument("--archive", action="store_true",
                     help="archive the pre-correction 3_agg_methods/4_agg_methods folders")
     args = ap.parse_args()
@@ -227,17 +338,28 @@ def main():
         archive_old_plots()
 
     df = load_table()
-    experiments = [e for e in ["TCGA-CV", "PAIP-IV", "PAIP-EV", "SurGen-CV", "SurGen-EV"]
-                   if e in set(df["Experiment"])]
+    methods = [m.strip() for m in args.methods.split(",") if m.strip()]
+
+    wanted = [e.strip() for e in args.experiments.split(",") if e.strip()]
+    experiments = wanted or [e for e in EXPERIMENT_ORDER
+                             if e in set(df["Experiment"])]
     print(f"experiments with results: {experiments}")
 
     written = 0
     for exp in experiments:
-        for metric in args.metrics.split(","):
-            for theme in args.themes.split(","):
-                p = make_figure(df, exp, metric, theme, PLOTS_ROOT / exp)
-                if p:
-                    print(f"  wrote {p.relative_to(REPO_ROOT)}")
+        for raw in args.metrics.split(","):
+            raw = raw.strip()
+            metric = METRIC_ALIASES.get(raw, raw)
+            if metric not in df.columns:
+                print(f"  [skip] unknown metric {raw!r}")
+                continue
+            for value_set in (["frozen", "corrected"] if args.values == "both"
+                              else [args.values]):
+                out = (PLOTS_ROOT / exp if value_set == "frozen"
+                       else PLOTS_ROOT / f"{exp}_corrected")
+                path = make_figure(df, exp, metric, methods, out, value_set)
+                if path:
+                    print(f"  wrote {path.relative_to(REPO_ROOT)}")
                     written += 1
     print(f"{written} figure(s) written under {PLOTS_ROOT.relative_to(REPO_ROOT)}")
 

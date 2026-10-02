@@ -28,6 +28,8 @@ Run:  python tools/build_supplementary_results.py
 from __future__ import annotations
 
 import argparse
+import glob
+import json
 import sys
 from pathlib import Path
 from typing import Dict, List, Optional
@@ -35,15 +37,22 @@ from typing import Dict, List, Optional
 import pandas as pd
 from docx import Document
 from docx.enum.text import WD_ALIGN_PARAGRAPH
-from docx.shared import Pt, RGBColor
+from docx.shared import Inches, Pt, RGBColor
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SLIDE_CLS = REPO_ROOT / "slide_classification"
+RADAR_ROOT = REPO_ROOT / "Analysis_and_Visualization" / "Radar_Plots"
 sys.path.insert(0, str(REPO_ROOT / "tools"))
 
-from build_report import discover, _rows_from, SLIDE_LEVEL_ENCODERS, sort_summary  # noqa: E402
+from build_report import (discover, _rows_from, SLIDE_LEVEL_ENCODERS,  # noqa: E402
+                          sort_summary, fill_threshold_scheme)
+from build_ev_experiment_report import (load_results, promoted_state,  # noqa: E402
+                                        config_rows as ev_config_rows, CLF_NAME)
 
 OUT_DOCX = REPO_ROOT / "Supplementary_Results_UPDATED.docx"
+
+CONFIG_HEADER = ["Classifier", "Model configuration", "Trained on",
+                 "Threshold / decision rule", "Selection basis"]
 
 SECTIONS = [
     ("4.1", "TCGA-CV — Internal Cross-Validation on TCGA", "TCGA-CV"),
@@ -66,10 +75,21 @@ BLURB = {
         "provider-defined split, and has been renamed accordingly."),
     "PAIP-IV": (
         "The PAIP provider's own train/test split, evaluated as a single fixed split "
-        "with no averaging. Of the 47 declared training slides, 42 have extracted "
-        "features (10 MSI-H); all 31 test slides have features (7 MSI-H). A stratified "
-        "20% of the 42 training slides is held out for ANN early stopping; the 31 test "
+        "with no averaging. All 47 declared training slides have extracted features "
+        "(12 MSI-H); all 31 test slides have features (7 MSI-H). A stratified 20% of "
+        "the 47 training slides is held out for ANN early stopping; the 31 test "
         "slides take no part in any tuning decision. Reported at threshold 0.5.\n\n"
+        "Five training slides (training_data_19/30/41/42/46, two of them MSI-H) "
+        "previously had no features and the split was reported as 42/31. Their patches "
+        "were recovered, features and slide aggregations rebuilt, and the split is now "
+        "the full 47/31 the provider defines.\n\n"
+        "The ANN head searches its 18-point grid on a 9-slide stratified carve-out of "
+        "the 47 training slides (the `legacy` protocol) and is fitted on the "
+        "remaining 38; the linear, kNN, prototype and random-forest heads merge that "
+        "carve-out back and train on all 47. A TCGA-CV-derived, no-search alternative "
+        "(the `fixed` protocol, training the ANN on all 47) was evaluated and is not "
+        "the published configuration - see §4.2.1 for the current, exact per-classifier "
+        "training split.\n\n"
         "Because the test set is only 31 slides with 7 positives, every metric is "
         "accompanied by a percentile bootstrap 95% confidence interval (1000 resamples "
         "with replacement). The intervals are wide and should be quoted alongside the "
@@ -78,7 +98,7 @@ BLURB = {
         "reported a four-fold cross-validation on PAIP. That experiment has been "
         "retired - see the note at the end of this section."),
     "PAIP-EV": (
-        "External validation: models trained entirely on TCGA, applied to all 73 PAIP "
+        "External validation: models trained entirely on TCGA, applied to all 78 PAIP "
         "slides that have features. No PAIP data enters training, and no threshold is "
         "tuned on PAIP - doing so would silently convert external validation into "
         "internal validation.\n\n"
@@ -88,8 +108,31 @@ BLURB = {
         "one prediction per slide before thresholding. The 4-fold average is the legacy "
         "convention, applying each fold-model separately and averaging the four metric "
         "sets; it is retained for continuity with previously circulated numbers.\n\n"
-        "Operating-point metrics are reported at a threshold fitted on TCGA "
-        "out-of-fold predictions and applied to PAIP unchanged."),
+        "TWO THRESHOLD SCHEMES ARE IN USE IN THIS SECTION, and the tables below mix "
+        "them, so every row states which one produced it.\n\n"
+        "kNN and Random Forest are reported under a corrected scheme. kNN is scored at "
+        "k = 35 neighbours with uniform weights and thresholded at a cut-point refitted "
+        "by Youden's J on TCGA out-of-fold probabilities AT THAT k; because k changes "
+        "the scores themselves, kNN is the only classifier whose AUROC changes. Random "
+        "Forest keeps its scores and takes a rate-matched (quantile) threshold: the "
+        "fraction of TCGA out-of-fold slides that the fixed TCGA threshold calls "
+        "positive is measured, and PAIP is cut at its own corresponding quantile - so "
+        "Random Forest's AUROC is unchanged and only its operating point moves.\n\n"
+        "Logistic Regression, the ANN and ProtoNet are unchanged. They keep the fixed "
+        "TCGA threshold, fitted by Youden's J on pooled TCGA out-of-fold predictions and "
+        "applied to PAIP as-is, and their figures are identical to those previously "
+        "circulated.\n\n"
+        "Both schemes are derived from TCGA alone: k, the refitted cut-point and the "
+        "matched rate all come from TCGA out-of-fold predictions, and the quantile rule "
+        "reads PAIP SCORES but never PAIP LABELS, which enter only the reported metrics. "
+        "External validation is therefore not compromised. The motivation is that the "
+        "fixed TCGA threshold left several kNN and Random Forest configurations at a "
+        "dead operating point - predicting no positives at all, which yields a balanced "
+        "accuracy of 0.50 while still looking like a working threshold. Under the "
+        "corrected scheme no configuration is dead or saturated.\n\n"
+        "SurGen-EV is unaffected and remains entirely on the fixed TCGA threshold, so "
+        "kNN and Random Forest are NOT directly comparable between the two external "
+        "cohorts."),
     "SurGen-CV": (
         "Four-fold cross-validation within the SurGen cohort, with folds constructed at "
         "CASE level. Seventy of SurGen's 554 labelled cases contribute two slides each; "
@@ -150,7 +193,7 @@ def load() -> pd.DataFrame:
         rows.extend(_rows_from(rec))
     if not rows:
         raise SystemExit("no result files found - run the experiments first")
-    return pd.DataFrame(rows)
+    return fill_threshold_scheme(pd.DataFrame(rows))
 
 
 def load_comparison() -> Optional[pd.DataFrame]:
@@ -210,6 +253,200 @@ def add_table(doc, df: pd.DataFrame, cols: List[str], max_rows: int = None,
             r = cells[i].paragraphs[0].add_run(txt)
             r.font.size = Pt(8.5)
     doc.add_paragraph()
+
+
+def _cv_reference_record(experiment: str) -> Optional[dict]:
+    """One representative result_<exp>_*_default.json - any combo will do; the
+    protocol, grid size and train/val split are the same for all of them."""
+    tree = "TCGA_Results" if experiment == "TCGA-CV" else "SurGen_Results"
+    files = sorted(glob.glob(str(SLIDE_CLS / tree / "**" / f"result_{experiment}_*_default.json"),
+                             recursive=True))
+    return json.loads(Path(files[0]).read_text(encoding="utf-8")) if files else None
+
+
+def cv_config_rows(experiment: str) -> List[List[str]]:
+    """TCGA-CV / SurGen-CV: identical classifier treatment, read from one fold
+    record so the grid size and split counts stay correct if GRIDS ever changes,
+    rather than being retyped by hand."""
+    rec = _cv_reference_record(experiment)
+    if rec is None:
+        return []
+    ann_fold = next((f for f in rec["folds"] if f["classifier"] == "ann"), None)
+    lin_fold = next((f for f in rec["folds"] if f["classifier"] == "lin"), None)
+    n_grid = len(ann_fold["selection"]["grid_trace"]) if ann_fold else 18
+    n_tr = lin_fold["n_train"] if lin_fold else "?"
+    n_val = lin_fold["n_val"] if lin_fold else "?"
+    n_merged = (n_tr + n_val) if isinstance(n_tr, int) else "?"
+    return [
+        ["Logistic Regression", "C=10, max_iter=300",
+         f"train+val merged ({n_merged} rows, ~75% of the cohort)", "0.5", "none - single-point grid"],
+        ["Neural Network", f"{n_grid}-point grid "
+         f"(hidden_dim1∈{{128,256,512}} × hidden_dim2∈{{64,128,256}} × "
+         f"max_iter∈{{500,1000}})",
+         f"train only ({n_tr} rows, ~50%); val ({n_val} rows) used for "
+         f"selection and early stopping, never merged in",
+         "0.5", "selected on validation macro-F1 (this fold's own val split)"],
+        ["k-Nearest Neighbours", "internal GridSearchCV, 30 points "
+         "(k∈{3,5,7,10,15} × metric∈{cosine,euclidean,manhattan} × "
+         "weights∈{uniform,distance}), scored on balanced accuracy",
+         f"train+val merged ({n_merged} rows)", "0.5",
+         "GridSearchCV on the merged training data, not this fold's test set"],
+        ["ProtoNet", "no hyperparameters - class means of L2-normalised features",
+         f"train+val merged ({n_merged} rows)", "0.5", "none - no hyperparameters"],
+        ["Random Forest", "n_estimators=500, max_depth=None, "
+         "min_samples_split=5, min_samples_leaf=1, class_weight={0:1, 1:10}",
+         f"train+val merged ({n_merged} rows)", "0.5", "none - single-point grid"],
+    ]
+
+
+def paip_iv_config_rows() -> List[List[str]]:
+    """PAIP-IV: read straight from the published stamp, not retyped by hand -
+    the ANN protocol here has already changed once (fixed -> legacy) without
+    every piece of prose describing it being updated at the same time."""
+    files = sorted(glob.glob(str(SLIDE_CLS / "PAIP_IV_Results" / "**" /
+                                 "result_PAIP-IV_*_default.json"), recursive=True))
+    if not files:
+        return []
+    st = json.loads(Path(files[0]).read_text(encoding="utf-8"))["stamp"]
+    protocol = st.get("ann_protocol", "legacy")
+    held = st.get("ann_held_back_for_tuning", 9)
+    trained_on = st.get("ann_trained_on", "38 of 47 training slides")
+    hp_source = st.get("ann_hparam_source", "searched on the PAIP early-stop carve-out")
+    fixed = ("all 47 training slides", "0.5", "none - single-point grid")
+    return [
+        ["Logistic Regression", "C=10, max_iter=300", *fixed],
+        ["Neural Network", f"18-point grid (protocol: {protocol})",
+         trained_on, "0.5", hp_source],
+        ["k-Nearest Neighbours", "internal GridSearchCV, 30 points, scored on "
+         "balanced accuracy", *fixed],
+        ["ProtoNet", "no hyperparameters - class means of L2-normalised features", *fixed],
+        ["Random Forest", "n_estimators=500, max_depth=None, "
+         "min_samples_split=5, min_samples_leaf=1, class_weight={0:1, 1:10}", *fixed],
+    ]
+
+
+def ev_config_rows_for(experiment: str) -> List[List[str]]:
+    """PAIP-EV / SurGen-EV: reuse the exact data-driven function that builds
+    the standalone EV reports, so this table cannot silently disagree with
+    those - both read the same promoted/frozen state from the same files."""
+    payloads = load_results(experiment)
+    return ev_config_rows(payloads) if payloads else []
+
+
+def _combos_for(experiment: str) -> List[tuple]:
+    """Every valid (method, model) pair, aggregation combinations AND the two
+    slide-level baselines (TITAN/Conch1_5, PRISM/PRISM) - both are still real
+    trained combinations with their own ANN grid search and kNN GridSearchCV,
+    just with the encoder itself standing in for a foundation-model choice."""
+    from config import paths as P
+    return [(m, mo) for m in P.AGGREGATION_METHODS for mo in P.CANONICAL_MODELS
+            if P.is_combination_valid(m, mo)]
+
+
+def _ann_config(models_dir: Path, fold_tag: str) -> Optional[dict]:
+    p = models_dir / f"{fold_tag}_ann_config.json"
+    if not p.exists():
+        return None
+    try:
+        return json.loads(p.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+
+
+def _knn_hparams(pkl_path: Path):
+    """(n_neighbors, metric, weights) read straight off the fitted sklearn
+    estimator. This is the ONLY place these live - eval_knn's GridSearchCV
+    winner is never written into any result JSON, so there is no faster path
+    that does not risk quietly reporting the nominal single-point grid
+    (n_neighbors=3) instead of what was actually selected per combination."""
+    if not pkl_path.exists():
+        return None
+    try:
+        import warnings
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            import joblib
+            m = joblib.load(pkl_path)
+        return (getattr(m, "n_neighbors", None), getattr(m, "metric", None),
+                getattr(m, "weights", None))
+    except Exception:
+        return None
+
+
+def hparam_rows(experiment: str) -> List[List[str]]:
+    """Per-combination ANN and kNN hyperparameters, actually read off disk -
+    the saved *_ann_config.json (no pickle needed) and the fitted kNN
+    estimator's own attributes (only place n_neighbors/metric/weights live).
+
+    CV experiments (TCGA-CV, SurGen-CV) select separately per fold, so one
+    row per (combination, fold). PAIP-IV is a single split - one "fold0" row.
+    PAIP-EV and SurGen-EV both apply the SAME TCGA-FULL artifact (seed 42),
+    so this reads TCGA_FULL_Models rather than either EV tree.
+    """
+    from config import paths as P
+    from runners.full_trainer import artifact_dir
+
+    rows = []
+    if experiment in ("TCGA-CV", "SurGen-CV"):
+        fold_tags = ["fold0", "fold1", "fold2", "fold3"]
+        for method, model in _combos_for(experiment):
+            models_dir = P.results_root(experiment, method, model, "MSIH") / "models"
+            for i, tag in enumerate(fold_tags, start=1):
+                ann = _ann_config(models_dir, tag)
+                knn = _knn_hparams(models_dir / f"{tag}_knn_model.pkl")
+                if ann is None and knn is None:
+                    continue
+                rows.append([method, model, f"Fold {i}",
+                            str(ann["hidden_dim1"]) if ann else "—",
+                            str(ann["hidden_dim2"]) if ann else "—",
+                            str(ann["max_iter"]) if ann else "—",
+                            str(knn[0]) if knn else "—",
+                            knn[1] if knn else "—", knn[2] if knn else "—"])
+    elif experiment == "PAIP-IV":
+        for method, model in _combos_for(experiment):
+            models_dir = P.results_root("PAIP-IV", method, model, "MSIH") / "models"
+            ann = _ann_config(models_dir, "fold0")
+            knn = _knn_hparams(models_dir / "fold0_knn_model.pkl")
+            if ann is None and knn is None:
+                continue
+            rows.append([method, model, "single split",
+                        str(ann["hidden_dim1"]) if ann else "—",
+                        str(ann["hidden_dim2"]) if ann else "—",
+                        str(ann["max_iter"]) if ann else "—",
+                        str(knn[0]) if knn else "—",
+                        knn[1] if knn else "—", knn[2] if knn else "—"])
+    elif experiment in ("PAIP-EV", "SurGen-EV"):
+        for method, model in _combos_for(experiment):
+            models_dir = artifact_dir(method, model, 42, "MSIH")
+            ann = _ann_config(models_dir, "foldfull")
+            knn = _knn_hparams(models_dir / "full_knn_model.pkl")
+            if ann is None and knn is None:
+                continue
+            rows.append([method, model, "TCGA-FULL (seed 42)",
+                        str(ann["hidden_dim1"]) if ann else "—",
+                        str(ann["hidden_dim2"]) if ann else "—",
+                        str(ann["max_iter"]) if ann else "—",
+                        str(knn[0]) if knn else "—",
+                        knn[1] if knn else "—", knn[2] if knn else "—"])
+    return rows
+
+
+HPARAM_HEADER = ["Method", "Model", "Fold", "ANN h1", "ANN h2", "ANN max_iter",
+                 "kNN k", "kNN metric", "kNN weights"]
+
+
+def add_radar_pair(doc, experiment: str) -> bool:
+    """Embed the AUROC and BalAcc radar PNGs for one experiment. Returns False
+    (and adds nothing) if the figures have not been generated for it."""
+    rdir = RADAR_ROOT / experiment
+    paths = [rdir / f"{experiment}_AUROC_radar.png", rdir / f"{experiment}_BalAcc_radar.png"]
+    if not all(p.exists() for p in paths):
+        return False
+    for p in paths:
+        doc.add_picture(str(p), width=Inches(6.3))
+        doc.paragraphs[-1].alignment = WD_ALIGN_PARAGRAPH.CENTER
+        doc.add_paragraph()
+    return True
 
 
 def coverage_df(df: pd.DataFrame, experiment: str) -> pd.DataFrame:
@@ -280,10 +517,28 @@ def build(out: Path = OUT_DOCX) -> Path:
         add_body(doc, f"Test set size: N = {n_test}.")
         add_body(doc, BLURB[exp])
 
-        add_heading(doc, f"{number}.1  Coverage", 12)
+        # ---- classifier configuration: how each of the five heads was ------
+        # actually trained and thresholded for THIS experiment. Read from the
+        # result files rather than retyped, so a protocol change (PAIP-IV's
+        # ANN already changed once) cannot leave this table quietly wrong.
+        add_heading(doc, f"{number}.1  Classifier configuration", 12)
+        if exp in ("TCGA-CV", "SurGen-CV"):
+            cfg_rows = cv_config_rows(exp)
+        elif exp == "PAIP-IV":
+            cfg_rows = paip_iv_config_rows()
+        else:
+            cfg_rows = ev_config_rows_for(exp)
+        if cfg_rows:
+            add_table(doc, pd.DataFrame(cfg_rows, columns=CONFIG_HEADER),
+                      CONFIG_HEADER)
+        else:
+            add_body(doc, "(configuration unavailable - no result file found)",
+                     italic=True)
+
+        add_heading(doc, f"{number}.2  Coverage", 12)
         add_table(doc, coverage_df(df, exp), list(coverage_df(df, exp).columns))
 
-        add_heading(doc, f"{number}.2  Results by aggregation method", 12)
+        add_heading(doc, f"{number}.3  Results by aggregation method", 12)
         add_body(doc,
                  "Sorted by balanced accuracy with AUROC as the tie-break. AUROC is the "
                  "primary metric throughout: it is threshold-free and therefore immune "
@@ -293,13 +548,27 @@ def build(out: Path = OUT_DOCX) -> Path:
         if exp == "PAIP-IV":
             cols = ["Method", "Model", "Classifier", "BalAcc", "BalAcc_CI",
                     "AUROC", "AUROC_CI", "Acc", "MacroF1"]
+        # PAIP-EV mixes two threshold schemes, so a row's metrics do not say what
+        # produced them. Carry the scheme into the table rather than leaving it to
+        # the prose, since these tables get lifted out of the document.
+        if "Threshold_scheme" in sub.columns and sub["Threshold_scheme"].notna().any():
+            cols = cols + ["Threshold_scheme"]
         add_table(doc, sort_summary(agg), cols, max_rows=30)
         if len(agg) > 30:
             add_body(doc, f"Showing the 30 best of {len(agg)} rows; the complete table "
                           f"is in best_of_all_exps_metric.xlsx.", italic=True, size=9)
 
+        add_heading(doc, f"{number}.4  Radar plots", 12)
+        add_body(doc, "Primary variant, all aggregation-method × encoder "
+                      "combinations. Each spoke is one (classifier, aggregation "
+                      "method) pair; colour distinguishes the foundation model.",
+                 italic=True)
+        if not add_radar_pair(doc, exp):
+            add_body(doc, "(radar plots not found - run "
+                          "tools/make_radar_plots.py first)", italic=True)
+
         if not enc.empty:
-            add_heading(doc, f"{number}.3  TITAN and PRISM (slide-level encoders)", 12)
+            add_heading(doc, f"{number}.5  TITAN and PRISM (slide-level encoders)", 12)
             add_body(doc,
                      "TITAN and PRISM produce a slide-level embedding directly and have "
                      "no patch-aggregation step. They are baselines rather than "
@@ -308,7 +577,7 @@ def build(out: Path = OUT_DOCX) -> Path:
             add_table(doc, sort_summary(enc), cols, max_rows=20)
 
         if exp == "PAIP-IV":
-            add_heading(doc, f"{number}.4  Note on the retired PAIP cross-validation", 12)
+            add_heading(doc, f"{number}.6  Note on the retired PAIP cross-validation", 12)
             add_body(doc,
                      "Earlier drafts reported a four-fold cross-validation on PAIP. It "
                      "has been withdrawn for two reasons. First, its folds were built by "
@@ -357,6 +626,39 @@ def build(out: Path = OUT_DOCX) -> Path:
     for title, body in CAVEATS:
         add_heading(doc, title, 11.5, space_before=10)
         add_body(doc, body)
+
+    # ---- appendix: per-combination hyperparameters ------------------------
+    # The classifier-configuration tables in each 4.N.1 give the SEARCH SPACE
+    # for ANN and kNN (both have real multi-point grids), not which point won
+    # for each of the ~20 aggregation-method x encoder combinations - a
+    # 5-row-per-classifier table cannot say that. This appendix does, read
+    # straight off the saved artifacts rather than retyped: ANN from each
+    # fold's *_ann_config.json, kNN from the fitted estimator's own
+    # n_neighbors/metric/weights attributes - eval_knn's GridSearchCV winner
+    # is never written into any result JSON, so this is the only source.
+    doc.add_page_break()
+    add_heading(doc, "Appendix A  Per-combination hyperparameters", 17, space_before=0)
+    add_body(doc,
+             "LR, ProtoNet and Random Forest have single-point grids (stated fully "
+             "in each section's 4.N.1) so there is nothing per-combination to add. "
+             "ANN and kNN are searched separately for every aggregation-method x "
+             "foundation-model combination; this appendix states what each search "
+             "actually selected, read directly off the saved model files rather "
+             "than retyped by hand.")
+    for i, exp in enumerate(["TCGA-CV", "PAIP-IV", "PAIP-EV",
+                             "SurGen-CV", "SurGen-EV"], start=1):
+        rows = hparam_rows(exp)
+        add_heading(doc, f"A.{i}  {exp}", 12)
+        if exp in ("PAIP-EV", "SurGen-EV"):
+            add_body(doc,
+                     "Both external-validation experiments apply the same "
+                     "TCGA-FULL artifact, so this table is identical to the "
+                     "other EV experiment's.", italic=True, size=9)
+        if rows:
+            add_table(doc, pd.DataFrame(rows, columns=HPARAM_HEADER), HPARAM_HEADER)
+        else:
+            add_body(doc, "(no saved model files found for this experiment)",
+                     italic=True)
 
     out.parent.mkdir(parents=True, exist_ok=True)
     doc.save(out)

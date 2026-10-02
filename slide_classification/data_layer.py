@@ -344,7 +344,18 @@ def load_cohort(
     labels = np.empty(len(keep), dtype=np.int64)
 
     for row, wsi_id in enumerate(keep):
-        tensor = torch.load(fdir / f"{wsi_id}.pt", map_location="cpu")
+        # Feature files are trusted local artifacts; some PRISM files use the
+        # legacy archive format, which PyTorch 2.6 rejects in weights-only mode.
+        feature_path = fdir / f"{wsi_id}.pt"
+        try:
+            tensor = torch.load(
+                feature_path, map_location="cpu", weights_only=False
+            )
+        except Exception as exc:
+            raise RuntimeError(
+                f"Could not load feature file {feature_path}. "
+                "Restore or re-create this artifact before running CV."
+            ) from exc
         if not isinstance(tensor, torch.Tensor):
             raise TypeError(
                 f"{fdir / (wsi_id + '.pt')} holds {type(tensor).__name__}, expected a Tensor"

@@ -1,0 +1,13 @@
+{
+  "timestamp": "2026-08-11T00:53:56.064",
+  "pid": 2124,
+  "stage": "batch_start",
+  "gpu_mem": {
+    "allocated_mb": 0.0,
+    "reserved_mb": 0.0
+  },
+  "details": {
+    "batch_idx": 0,
+    "n_wsis": 2
+  }
+}

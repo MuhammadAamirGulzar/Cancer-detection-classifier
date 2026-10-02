@@ -25,9 +25,20 @@ import subprocess
 import sys
 import time
 
-SCRIPT_DIR      = os.path.dirname(os.path.abspath(__file__))
-PIPELINE_SCRIPT = os.path.join(SCRIPT_DIR, "combined_pipeline_final_error_checks_v6.py")
-LOG_DIR         = os.path.join(SCRIPT_DIR, "logs")
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# Which pipeline to supervise. Defaults to the combined orchestrator, so
+# existing invocations are unchanged; pass a script name to supervise another
+# resume-safe pipeline in this folder, e.g.
+#     python run_pipeline_supervisor.py surgen_processing_prism.py
+DEFAULT_PIPELINE = "combined_pipeline_final_error_checks_v6.py"
+_requested       = sys.argv[1] if len(sys.argv) > 1 else DEFAULT_PIPELINE
+PIPELINE_SCRIPT  = _requested if os.path.isabs(_requested) else os.path.join(SCRIPT_DIR, _requested)
+
+if not os.path.isfile(PIPELINE_SCRIPT):
+    sys.exit(f"[SUPERVISOR] No such pipeline script: {PIPELINE_SCRIPT}")
+
+LOG_DIR = os.path.join(SCRIPT_DIR, "logs")
 
 RESTART_COOLDOWN_SECONDS = 6     # let GPU/OS resources settle before relaunch
 MAX_CRASHES_IN_WINDOW    = 5      # crash-loop guard
@@ -38,7 +49,12 @@ TAIL_LINES_KEPT          = 200    # enough to reliably catch the halt marker
 
 def _log_path():
     os.makedirs(LOG_DIR, exist_ok=True)
-    return os.path.join(LOG_DIR, f"pipeline_{datetime.date.today():%Y%m%d}.log")
+    # Name the log after the supervised script so two pipelines running on the
+    # same day do not interleave into one unreadable file.
+    stem = os.path.splitext(os.path.basename(PIPELINE_SCRIPT))[0]
+    if stem == os.path.splitext(DEFAULT_PIPELINE)[0]:
+        stem = "pipeline"   # keep the historical filename for the default
+    return os.path.join(LOG_DIR, f"{stem}_{datetime.date.today():%Y%m%d}.log")
 
 def _stamp():
     return datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -63,19 +79,55 @@ def run_once(log_fh):
         cwd=SCRIPT_DIR,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
-        encoding="utf-8",
-        errors="replace",
-        bufsize=1,
+        bufsize=0,              # raw bytes: see the read loop below
         env=env,
     )
 
+    # Stream the child's output BYTE-FOR-BYTE rather than line-by-line.
+    #
+    # The pipeline draws one progress bar that rewrites itself with carriage
+    # returns and no newline. Iterating "for line in proc.stdout" waits for a
+    # newline, so every one of those frames would sit unseen in the pipe until
+    # some other print flushed them, then arrive in a single burst -- which is
+    # exactly the "every update on its own line" behaviour we are fixing.
+    # Passing bytes through as they arrive lets the bar animate in place.
+    #
+    # The log file still gets clean lines: carriage-return frames are collapsed
+    # so only the final state of each rewritten line is stored, rather than
+    # thousands of near-identical bar frames.
     tail = collections.deque(maxlen=TAIL_LINES_KEPT)
+    out_stream = sys.stdout.buffer
+    pending = ""            # current line being built; may be rewritten via CR
+
+    def _emit_to_log(text):
+        """Record one completed line, dropping intermediate CR frames.
+
+        The trailing CR must come off FIRST. On Windows the child's text
+        stdout ends every line with CRLF, so after splitting on LF the line
+        still ends in CR - and taking the text after the *last* CR would
+        then yield an empty string and silently drop every line from the
+        log. Interior CRs (progress-bar frames) are still collapsed.
+        """
+        final = text.rstrip("\r\n").split("\r")[-1].rstrip()
+        if final:
+            log_fh.write(final + "\n")
+            tail.append(final)
+
     try:
-        for line in proc.stdout:
-            line = line.rstrip("\n")
-            print(line, flush=True)
-            log_fh.write(line + "\n")
-            tail.append(line)
+        while True:
+            chunk = proc.stdout.read(1024)
+            if not chunk:
+                break
+            out_stream.write(chunk)     # untouched, so CR still works
+            out_stream.flush()
+
+            pending += chunk.decode("utf-8", errors="replace")
+            while "\n" in pending:
+                line, pending = pending.split("\n", 1)
+                _emit_to_log(line)
+            log_fh.flush()
+        if pending:
+            _emit_to_log(pending)
         log_fh.flush()
     except KeyboardInterrupt:
         supervisor_log(log_fh, "Ctrl+C received — terminating child process ...")

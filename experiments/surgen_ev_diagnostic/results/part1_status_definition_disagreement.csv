@@ -1,0 +1,6 @@
+method,model,clf,variant,status_meanprob,status_confmatrix,n_pos_meanprob,n_pos_confmatrix
+Averaging,Virchow2,ann,tcga_full,near_saturated,ok,617,553
+Averaging,Virchow2,rf,tcga_full,near_dead,ok,6,14
+Tissue_Type_Clustering,ConchV1,rf,tcga_full,dead,near_dead,0,2
+Tissue_Type_Clustering,UNI2,ann,tcga_full,saturated,near_saturated,622,618
+TITAN,Conch1_5,ann,tcga_full,saturated,ok,622,607

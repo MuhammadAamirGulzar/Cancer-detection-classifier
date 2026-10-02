@@ -1,4 +1,4 @@
-import torch
+﻿import torch
 import torch.nn.functional as F
 import numpy as np
 import random, os
@@ -17,14 +17,41 @@ import torch.nn as nn
 import torch.optim as optim
 
 # ANN Binary Classifier (Now Outputs Two Class Probabilities)
+DEEP_DROPOUT = 0.3      # the two-hidden-layer default this pipeline has always used
+SHALLOW_DROPOUT = 0.7   # the single-hidden-layer variant's default
+DEEP_PATIENCE = 20
+SHALLOW_PATIENCE = 10
+
+
 class ANNBinaryClassifier:
-    def __init__(self, input_dim=512, hidden_dim1=512, hidden_dim2=128, max_iter=100, verbose=True):
+    """MLP head, in one of two depths.
+
+    ``hidden_dim2`` selects the architecture: an int gives the **two**-hidden-layer
+    network behind every published result (``D -> h1 -> h2 -> 2``, dropout 0.3
+    after each block); ``None`` gives the **single**-hidden-layer network
+    (``D -> h1 -> 2``) with a heavier dropout, for small training cohorts where
+    the second layer has little data to justify it.
+
+    ``dropout`` and ``patience`` default per depth, so the two-layer path is
+    unchanged from before these parameters existed.
+    """
+
+    def __init__(self, input_dim=512, hidden_dim1=512, hidden_dim2=128, max_iter=100,
+                 verbose=True, dropout=None, patience=None, lr=1e-4, weight_decay=1e-4):
         self.max_iter = max_iter
         self.verbose = verbose
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.input_dim = input_dim
         self.hidden_dim1 = hidden_dim1
         self.hidden_dim2 = hidden_dim2
+        self.lr = lr
+        self.weight_decay = weight_decay
+
+        shallow = hidden_dim2 is None
+        self.dropout = float(dropout) if dropout is not None else (
+            SHALLOW_DROPOUT if shallow else DEEP_DROPOUT)
+        self.patience = int(patience) if patience is not None else (
+            SHALLOW_PATIENCE if shallow else DEEP_PATIENCE)
 
         # [CORRECTION 2026-08-04, work order Task 1.3] The final nn.Softmax was
         # removed from the training graph. nn.CrossEntropyLoss applies log-softmax
@@ -32,17 +59,28 @@ class ANNBinaryClassifier:
         # twice - flattening gradients and leaving the network underfitted.
         # The network now emits logits; softmax is applied explicitly in
         # predict_proba() only.
-        self.model = nn.Sequential(
-            nn.Linear(self.input_dim, self.hidden_dim1),
-            nn.ReLU(),
-            nn.BatchNorm1d(self.hidden_dim1),
-            nn.Dropout(0.3),
-            nn.Linear(self.hidden_dim1, self.hidden_dim2),
-            nn.ReLU(),
-            nn.BatchNorm1d(self.hidden_dim2),
-            nn.Dropout(0.3),
-            nn.Linear(self.hidden_dim2, 2),
-        ).to(self.device)
+        # This holds for BOTH depths - ann_old.py still has the double softmax
+        # and must not be used as a template.
+        if shallow:
+            self.model = nn.Sequential(
+                nn.Linear(self.input_dim, self.hidden_dim1),
+                nn.ReLU(),
+                nn.BatchNorm1d(self.hidden_dim1),
+                nn.Dropout(self.dropout),
+                nn.Linear(self.hidden_dim1, 2),
+            ).to(self.device)
+        else:
+            self.model = nn.Sequential(
+                nn.Linear(self.input_dim, self.hidden_dim1),
+                nn.ReLU(),
+                nn.BatchNorm1d(self.hidden_dim1),
+                nn.Dropout(self.dropout),
+                nn.Linear(self.hidden_dim1, self.hidden_dim2),
+                nn.ReLU(),
+                nn.BatchNorm1d(self.hidden_dim2),
+                nn.Dropout(self.dropout),
+                nn.Linear(self.hidden_dim2, 2),
+            ).to(self.device)
 
         self.loss_func = nn.CrossEntropyLoss()
 
@@ -70,12 +108,12 @@ class ANNBinaryClassifier:
 
         # opt = optim.Adam(self.model.parameters(), lr=1e-4)
         # scheduler = optim.lr_scheduler.StepLR(opt, step_size=30, gamma=0.1)  #   Using original StepLR
-        opt = optim.Adam(self.model.parameters(), lr=1e-4, weight_decay=1e-4)
-        scheduler = optim.lr_scheduler.ReduceLROnPlateau(opt, mode='min', factor=0.3, patience=5, verbose=True)
+        opt = optim.Adam(self.model.parameters(), lr=self.lr, weight_decay=self.weight_decay)
+        scheduler = optim.lr_scheduler.ReduceLROnPlateau(opt, mode='min', factor=0.3, patience=5)
 
         train_loss_history, val_loss_history = [], []
         best_val_loss = float("inf")
-        patience, epochs_no_improve = 20, 0
+        patience, epochs_no_improve = self.patience, 0
 
         for epoch in range(self.max_iter):
             self.model.train()
@@ -137,6 +175,8 @@ def eval_ANN(
     combine_trainval: bool = False,
     model_save_path: str = None,
     verbose: bool = False,
+    dropout: float = None,
+    patience: int = None,
 ) -> tuple:
 
     if verbose:
@@ -145,9 +185,11 @@ def eval_ANN(
     classifier = ANNBinaryClassifier(
         input_dim=input_dim,
         hidden_dim1=hidden_dim,       # Pass old `hidden_dim` as `hidden_dim1`
-        hidden_dim2=hidden_dim2,
+        hidden_dim2=hidden_dim2,   # None selects the single-hidden-layer variant
         max_iter=max_iter,
-        verbose=verbose
+        verbose=verbose,
+        dropout=dropout,
+        patience=patience,
     )
 
     train_loss, val_loss = classifier.fit(train_feats, train_labels, valid_feats, valid_labels, combine_trainval)
@@ -214,7 +256,7 @@ def save_ann_checkpoint(
     """
     os.makedirs(model_save_path, exist_ok=True)
     h1, h2, d = classifier.hidden_dim1, classifier.hidden_dim2, classifier.input_dim
-    ckpt_name = f"fold{fold}_ann_{d}_{h1}_{h2}.pth"
+    ckpt_name = f"fold{fold}_ann_{d}_{h1}_{'none' if h2 is None else h2}.pth"
     ckpt_path = os.path.join(model_save_path, ckpt_name)
     torch.save(classifier.model.state_dict(), ckpt_path)
 
@@ -222,6 +264,11 @@ def save_ann_checkpoint(
         "input_dim": d,
         "hidden_dim1": h1,
         "hidden_dim2": h2,
+        "n_hidden_layers": 1 if h2 is None else 2,
+        "dropout": classifier.dropout,
+        "patience": classifier.patience,
+        "lr": classifier.lr,
+        "weight_decay": classifier.weight_decay,
         "max_iter": classifier.max_iter,
         "checkpoint": ckpt_name,
         "selection_metric": selection_metric,
@@ -245,12 +292,14 @@ def load_ann_checkpoint(model_save_path: str, fold: int, input_dim: int = None):
     cfg_path = os.path.join(model_save_path, f"fold{fold}_ann_config.json")
     state_path = None
     legacy = False
+    dropout = patience = None
 
     if os.path.exists(cfg_path):
         with open(cfg_path) as fh:
             cfg = json.load(fh)
         state_path = os.path.join(model_save_path, cfg["checkpoint"])
         h1, h2, d = cfg["hidden_dim1"], cfg["hidden_dim2"], cfg["input_dim"]
+        dropout, patience = cfg.get("dropout"), cfg.get("patience")
         legacy = bool(cfg.get("softmax_in_graph", False))
     else:
         # Legacy checkpoint: infer from state-dict shapes.
@@ -263,7 +312,10 @@ def load_ann_checkpoint(model_save_path: str, fold: int, input_dim: int = None):
         sd = torch.load(state_path, map_location="cpu")
         d = sd["0.weight"].shape[1]
         h1 = sd["0.weight"].shape[0]
-        h2 = sd["4.weight"].shape[0]
+        # Layer 4 is the second Linear in the two-layer network; the one-layer
+        # network ends there with 2 outputs, so absence or width 2 means shallow.
+        w4 = sd.get("4.weight")
+        h2 = None if w4 is None or w4.shape[0] == 2 else w4.shape[0]
         legacy = True
         print(f"[WARN] {os.path.basename(state_path)} has no config.json; "
               f"inferred input_dim={d} h1={h1} h2={h2}. This checkpoint predates "
@@ -275,7 +327,8 @@ def load_ann_checkpoint(model_save_path: str, fold: int, input_dim: int = None):
             f"Checkpoint input_dim={d} does not match expected {input_dim} "
             f"({state_path}). Refusing to load a mismatched architecture.")
 
-    clf = ANNBinaryClassifier(input_dim=d, hidden_dim1=h1, hidden_dim2=h2, verbose=False)
+    clf = ANNBinaryClassifier(input_dim=d, hidden_dim1=h1, hidden_dim2=h2, verbose=False,
+                              dropout=dropout, patience=patience)
     state = torch.load(state_path, map_location=clf.device)
     clf.model.load_state_dict(state)
     clf.model.eval()
@@ -331,3 +384,4 @@ def plot_roc_auc(targets, probs):
     plt.legend(loc="lower right")
     plt.grid(True)
     plt.show()
+

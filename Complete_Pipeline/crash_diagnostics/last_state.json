@@ -1,12 +1,17 @@
 {
-  "timestamp": "2026-07-27T13:21:15.690",
-  "pid": 5396,
-  "stage": "all_batches_complete",
+  "timestamp": "2026-09-09T16:02:15.348",
+  "pid": 24928,
+  "stage": "process_start",
   "open_fds": -1,
   "gpu_mem": {
-    "allocated_mb": 8.1,
-    "reserved_mb": 20.0,
-    "max_allocated_mb": 5804.4
+    "allocated_mb": 0.0,
+    "reserved_mb": 0.0,
+    "max_allocated_mb": 0.0
   },
-  "details": {}
+  "details": {
+    "python": "3.10.18 | packaged by conda-forge | (main, Jun  4 2025, 14:42:04) [MSC v.1943 64 bit (AMD64)]",
+    "argv": [
+      "-c"
+    ]
+  }
 }

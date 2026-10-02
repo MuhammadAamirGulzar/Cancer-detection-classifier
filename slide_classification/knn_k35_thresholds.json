@@ -1,0 +1,190 @@
+{
+  "_meta": {
+    "k": 35,
+    "weights": "uniform",
+    "policy": "Youden J on TCGA-CV out-of-fold probs at k=35",
+    "note": "NEW file; thresholds_TCGA.json unmodified"
+  },
+  "thresholds": {
+    "Averaging|UNI2|MSIH": {
+      "tau": 0.17142857142857143,
+      "k": 35,
+      "metric": "cosine",
+      "weights": "uniform",
+      "fitted_on": "TCGA-CV out-of-fold",
+      "n": 413,
+      "n_pos": 60
+    },
+    "Averaging|H-Optimus-1|MSIH": {
+      "tau": 0.14285714285714285,
+      "k": 35,
+      "metric": "cosine",
+      "weights": "uniform",
+      "fitted_on": "TCGA-CV out-of-fold",
+      "n": 413,
+      "n_pos": 60
+    },
+    "Averaging|Virchow2|MSIH": {
+      "tau": 0.17142857142857143,
+      "k": 35,
+      "metric": "cosine",
+      "weights": "uniform",
+      "fitted_on": "TCGA-CV out-of-fold",
+      "n": 413,
+      "n_pos": 60
+    },
+    "Averaging|Conch1_5|MSIH": {
+      "tau": 0.17142857142857143,
+      "k": 35,
+      "metric": "cosine",
+      "weights": "uniform",
+      "fitted_on": "TCGA-CV out-of-fold",
+      "n": 413,
+      "n_pos": 60
+    },
+    "Averaging|ConchV1|MSIH": {
+      "tau": 0.14285714285714285,
+      "k": 35,
+      "metric": "cosine",
+      "weights": "uniform",
+      "fitted_on": "TCGA-CV out-of-fold",
+      "n": 413,
+      "n_pos": 60
+    },
+    "Caption_based_aggregation|UNI2|MSIH": {
+      "tau": 0.17142857142857143,
+      "k": 35,
+      "metric": "manhattan",
+      "weights": "uniform",
+      "fitted_on": "TCGA-CV out-of-fold",
+      "n": 413,
+      "n_pos": 60
+    },
+    "Caption_based_aggregation|H-Optimus-1|MSIH": {
+      "tau": 0.17142857142857143,
+      "k": 35,
+      "metric": "cosine",
+      "weights": "uniform",
+      "fitted_on": "TCGA-CV out-of-fold",
+      "n": 413,
+      "n_pos": 60
+    },
+    "Caption_based_aggregation|Virchow2|MSIH": {
+      "tau": 0.17142857142857143,
+      "k": 35,
+      "metric": "cosine",
+      "weights": "uniform",
+      "fitted_on": "TCGA-CV out-of-fold",
+      "n": 413,
+      "n_pos": 60
+    },
+    "Caption_based_aggregation|Conch1_5|MSIH": {
+      "tau": 0.2,
+      "k": 35,
+      "metric": "manhattan",
+      "weights": "uniform",
+      "fitted_on": "TCGA-CV out-of-fold",
+      "n": 413,
+      "n_pos": 60
+    },
+    "Caption_based_aggregation|ConchV1|MSIH": {
+      "tau": 0.17142857142857143,
+      "k": 35,
+      "metric": "manhattan",
+      "weights": "uniform",
+      "fitted_on": "TCGA-CV out-of-fold",
+      "n": 413,
+      "n_pos": 60
+    },
+    "Caption_based_aggregation_15_classes|UNI2|MSIH": {
+      "tau": 0.17142857142857143,
+      "k": 35,
+      "metric": "cosine",
+      "weights": "uniform",
+      "fitted_on": "TCGA-CV out-of-fold",
+      "n": 413,
+      "n_pos": 60
+    },
+    "Caption_based_aggregation_15_classes|H-Optimus-1|MSIH": {
+      "tau": 0.17142857142857143,
+      "k": 35,
+      "metric": "manhattan",
+      "weights": "uniform",
+      "fitted_on": "TCGA-CV out-of-fold",
+      "n": 413,
+      "n_pos": 60
+    },
+    "Caption_based_aggregation_15_classes|Virchow2|MSIH": {
+      "tau": 0.17142857142857143,
+      "k": 35,
+      "metric": "cosine",
+      "weights": "uniform",
+      "fitted_on": "TCGA-CV out-of-fold",
+      "n": 413,
+      "n_pos": 60
+    },
+    "Caption_based_aggregation_15_classes|Conch1_5|MSIH": {
+      "tau": 0.14285714285714285,
+      "k": 35,
+      "metric": "manhattan",
+      "weights": "uniform",
+      "fitted_on": "TCGA-CV out-of-fold",
+      "n": 413,
+      "n_pos": 60
+    },
+    "Caption_based_aggregation_15_classes|ConchV1|MSIH": {
+      "tau": 0.17142857142857143,
+      "k": 35,
+      "metric": "manhattan",
+      "weights": "uniform",
+      "fitted_on": "TCGA-CV out-of-fold",
+      "n": 413,
+      "n_pos": 60
+    },
+    "Tissue_Type_Clustering|UNI2|MSIH": {
+      "tau": 0.17142857142857143,
+      "k": 35,
+      "metric": "cosine",
+      "weights": "uniform",
+      "fitted_on": "TCGA-CV out-of-fold",
+      "n": 413,
+      "n_pos": 60
+    },
+    "Tissue_Type_Clustering|H-Optimus-1|MSIH": {
+      "tau": 0.17142857142857143,
+      "k": 35,
+      "metric": "cosine",
+      "weights": "uniform",
+      "fitted_on": "TCGA-CV out-of-fold",
+      "n": 413,
+      "n_pos": 60
+    },
+    "Tissue_Type_Clustering|Virchow2|MSIH": {
+      "tau": 0.17142857142857143,
+      "k": 35,
+      "metric": "manhattan",
+      "weights": "uniform",
+      "fitted_on": "TCGA-CV out-of-fold",
+      "n": 413,
+      "n_pos": 60
+    },
+    "Tissue_Type_Clustering|Conch1_5|MSIH": {
+      "tau": 0.2,
+      "k": 35,
+      "metric": "cosine",
+      "weights": "uniform",
+      "fitted_on": "TCGA-CV out-of-fold",
+      "n": 413,
+      "n_pos": 60
+    },
+    "Tissue_Type_Clustering|ConchV1|MSIH": {
+      "tau": 0.17142857142857143,
+      "k": 35,
+      "metric": "cosine",
+      "weights": "uniform",
+      "fitted_on": "TCGA-CV out-of-fold",
+      "n": 413,
+      "n_pos": 60
+    }
+  }
+}

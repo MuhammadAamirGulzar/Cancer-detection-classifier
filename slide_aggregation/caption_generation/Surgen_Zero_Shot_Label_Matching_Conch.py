@@ -50,22 +50,27 @@ from pylibCZIrw import czi as pyczi
 DEVICE = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
 # ── CONCH model / prompts ────────────────────────────────────────────────────
-CHECKPOINT_PATH  = r"D:\Aamir Gulzar\KSA_project2\Cancer-detection-classifier\slide_aggregation\caption_generation\checkpoints\CONCH\pytorch_model.bin"
-PROMPT_FILE      = r"D:\Aamir Gulzar\KSA_project2\Cancer-detection-classifier\slide_aggregation\caption_generation\config_files\config_15_classes.json"
+CHECKPOINT_PATH  = r"/media/dp-psau/Datum/Aamir/Azfaar/surgen_processed/checkpoints/CONCH/pytorch_model.bin"
+PROMPT_FILE      = r"/home/mle/Aamir/Azfaar/surgen_processing/conch/config_15_classes.json"
 FORCE_IMAGE_SIZE = 224
 
 # ── Zero-shot classifier weights ─────────────────────────────────────────────
-ZEROSHOT_WEIGHTS_PATH = r"D:\Aamir Gulzar\KSA_project2\Cancer-detection-classifier\slide_aggregation\caption_generation\classifier_weights\Conch_zeroshot_weights_15_classes.pt"
+ZEROSHOT_WEIGHTS_PATH = r"/home/mle/Aamir/Azfaar/surgen_processing/conch/Conch_zeroshot_weights_15_classes.pt"
 # Set True to recompute weights from class_prompts (e.g. if captions/templates changed).
 # Set False to just load the existing .pt file.
+# If the weights path above doesn't exist yet, this will build+save fresh
+# weights automatically on first run regardless of this flag. You can leave it
+# False afterwards to reuse the cached 15-class weights.
 REBUILD_WEIGHTS = False
 
 # ── Input: patch metadata + source CZIs ──────────────────────────────────────
-CZI_ROOT     = "/media/dp-psau/dp-psau-wsi/SurGen/S-BIAD1285/Files"   # folder containing the .czi WSIs
-NONWHITE_CSV = r"D:\Aamir Gulzar\KSA_project2\dataset\tcga_clean_no_back.csv"  # patch metadata (slide_name, patch_number, patch_x, patch_y)
+CZI_ROOT     = r"/media/dp-psau/dp-psau-wsi1/SurGen/S-BIAD1285/Files/"   # folder containing the .czi WSIs
+# Updated to the nonwhite CSV produced by the UNI2-h pipeline
+# (same slide_name/patch_number/patch_x/patch_y schema — compatible as-is).
+NONWHITE_CSV = r"/media/dp-psau/Datum/Aamir/Azfaar/surgen_processed/h-optimus-1/patch_metadata_nonwhite.csv"
 
 # ── Output ────────────────────────────────────────────────────────────────────
-OUTPUT_CSV = r"Results\classification_results_tcga_15_classes.csv"
+OUTPUT_CSV = r"Results/classification_results_surgen_15_classes.csv"
 
 # ── Patch coordinate settings (must match the extraction pipeline) ──────────
 PATCH_SIZE = 512   # pixels at target magnification
@@ -73,7 +78,6 @@ TARGET_MAG = 20    # desired magnification (x)
 
 # ── Checkpointing ─────────────────────────────────────────────────────────────
 CHECKPOINT_INTERVAL = 10000   # save progress every N patches
-
 
 # ══════════════════════════════════════════════════════════════════════════════
 # ░░  SHARED UTILITIES  ░░
@@ -156,7 +160,17 @@ def get_zeroshot_weights(model, classnames_text, templates):
         return weights
     else:
         log(f"Loading existing zero-shot weights from {ZEROSHOT_WEIGHTS_PATH}")
-        return load_zeroshot_weights(ZEROSHOT_WEIGHTS_PATH)
+        weights = load_zeroshot_weights(ZEROSHOT_WEIGHTS_PATH)
+        # Safety check: catches exactly the stale-weights-from-old-class-count
+        # scenario described above, instead of failing deep inside a matmul.
+        if weights.shape[1] != len(classnames_text):
+            raise ValueError(
+                f"Loaded zero-shot weights have {weights.shape[1]} classes but "
+                f"the prompt file defines {len(classnames_text)}. The cached "
+                f".pt file at {ZEROSHOT_WEIGHTS_PATH} is stale for this prompt "
+                f"file — delete it or set REBUILD_WEIGHTS=True."
+            )
+        return weights
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -277,9 +291,10 @@ def run_zero_shot_matching(model, preprocess, loaded_weights, idx_to_class):
                         )
                         image = Image.fromarray(raw[:, :, :3].astype('uint8')).convert('RGB')
 
-                        image_tensor   = preprocess(image).unsqueeze(0).to(DEVICE)
-                        image_features = model.encode_image(image_tensor)
-                        sim_scores     = (image_features @ loaded_weights).squeeze(0)
+                        image_tensor = preprocess(image).unsqueeze(0).to(DEVICE)
+                        with torch.autocast(device_type=DEVICE.type, dtype=torch.float16):
+                            image_features = model.encode_image(image_tensor)
+                            sim_scores     = (image_features @ loaded_weights).squeeze(0)
                         top_score, top_idx = torch.max(sim_scores, dim=0)
                         top_class = idx_to_class[top_idx.item()]
 

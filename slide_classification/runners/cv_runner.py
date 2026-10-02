@@ -235,13 +235,27 @@ def sweep(
 def main():
     ap = argparse.ArgumentParser(description="K-fold CV runner (TCGA-CV / SurGen-CV)")
     ap.add_argument("--experiment", default="TCGA-CV", choices=["TCGA-CV", "SurGen-CV"])
-    ap.add_argument("--methods", default=",".join(P.AGGREGATION_METHODS))
+    ap.add_argument("--methods", default=None)
     ap.add_argument("--models", default=",".join(P.CANONICAL_MODELS))
     ap.add_argument("--classifiers", default=",".join(MODEL_TYPES))
     ap.add_argument("--task", default="MSIH")
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--force", action="store_true", help="re-run completed combinations")
+    # Without this, a SUBSET run is destructive: the archive step renames the
+    # whole results tree aside, and only the combinations named on this command
+    # line are then written back - so the rest vanish from the live tree.
+    # ev_runner already carries the same flag for the same reason.
+    ap.add_argument("--no-archive", action="store_true",
+                    help="skip the automatic _ARCHIVED_ copy of the previous tree. "
+                         "REQUIRED when re-running a subset of combinations, or the "
+                         "combinations you did not name are left out of the live tree; "
+                         "take your own stamped backup first")
     args = ap.parse_args()
+
+    methods = (args.methods.split(",") if args.methods else [
+        method for method in P.AGGREGATION_METHODS
+        if not (args.experiment == "SurGen-CV" and method == "PRISM")
+    ])
 
     cohort = "tcga" if args.experiment == "TCGA-CV" else "surgen"
     fold_map, group_of = None, None
@@ -252,9 +266,10 @@ def main():
 
     sweep(
         experiment=args.experiment, cohort=cohort,
-        methods=args.methods.split(","), models=args.models.split(","),
+        methods=methods, models=args.models.split(","),
         task=args.task, model_types=args.classifiers.split(","),
         fold_map=fold_map, group_of=group_of, seed=args.seed, force=args.force,
+        archive=not args.no_archive,
         write_thresholds=(args.experiment == "TCGA-CV"),
     )
 

@@ -139,8 +139,8 @@ _MODEL_DIR_NAMES: Dict[str, Dict[str, str]] = {
         "Conch1_5": "conch1-5",
         "Virchow2": "virchow2",
         "H-Optimus-1": "h-optimus-1",
-        "UNI2": "uni2",
-        "ConchV1": "conchv1",
+        "UNI2": "uni2-h",
+        "ConchV1": "conch-v1",
         "PRISM": "prism",
     },
 }

@@ -1,0 +1,3 @@
+cohort,method,model,task,wsi_id,reason
+surgen,Caption_based_aggregation_15_classes,UNI2,MSIH,SR386_40X_HE_T086_01,labelled_but_no_features
+surgen,Caption_based_aggregation_15_classes,UNI2,MSIH,SR386_40X_HE_T339_01,labelled_but_no_features
