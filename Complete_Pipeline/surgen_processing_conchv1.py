@@ -54,7 +54,26 @@ PATCH_SIZE = 512   # pixels at target magnification
 TARGET_MAG = 20    # desired magnification (x)
 
 # ── Feature extraction ────────────────────────────────────────────────────────
-HF_TOKEN = "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"
+# The Hugging Face token is read from the environment (or a local, git-ignored
+# .env file). Never hard-code it: this file is tracked in a public repository.
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ModuleNotFoundError:
+    # No python-dotenv in this env: read .env by hand (script folder, then up to
+    # two parents), without overriding anything already in os.environ.
+    _here = os.path.dirname(os.path.abspath(__file__))
+    for _root in (_here, os.path.dirname(_here), os.path.dirname(os.path.dirname(_here))):
+        _envf = os.path.join(_root, ".env")
+        if os.path.isfile(_envf):
+            with open(_envf, encoding="utf-8") as _fh:
+                for _ln in _fh:
+                    _ln = _ln.strip()
+                    if _ln and not _ln.startswith("#") and "=" in _ln:
+                        _k, _v = _ln.split("=", 1)
+                        os.environ.setdefault(_k.strip(), _v.strip().strip('"').strip("'"))
+            break
+HF_TOKEN = os.environ.get("HF_TOKEN", "")
 DEVICE   = "cuda"   # "cuda" or "cpu"
 
 # ── Pixel filter thresholds (Stage 1 of Step A-2) ────────────────────────────
