@@ -1,6 +1,6 @@
 # Project status - MSI-H classification from colorectal whole-slide images
 
-Last updated: 2026-10-05, after a full read-only audit (2026-10-04) and a repository cleanup.
+Last updated: 2026-10-05, after a full read-only audit (2026-10-04), a repository cleanup, and the first analysis round (section 4).
 
 This page answers three questions: where are the current results, can they be trusted, and what is left to do.
 For the history of what has already been tried, see [EXPERIMENT_LEDGER.md](EXPERIMENT_LEDGER.md).
@@ -68,24 +68,33 @@ Ranked by how much a reviewer would care.
 4. **The corrected threshold was applied to kNN and RF only, after seeing external results.** ProtoNet is dead or nearly dead (balanced accuracy 0.50) in 16 of 21 SurGen-EV rows, although the same correction would fix it. Apply one rule to all heads, or to none.
 5. **PAIP-IV ANN rows use the `legacy` protocol** (hyperparameters picked on 9 slides, trained on 38 of 47). `final_models/ann_old` records a different final choice, and `RESULTS.md` describes a third. Decide, then regenerate that tree.
 6. **Provenance.** The `git_commit` stamp in results from 2026-08-10 to 09-03 names a commit that does not contain the code that ran. The external-validation runs loaded scikit-learn 1.7.0 models in an environment with scikit-learn 1.9.0. Fix one environment before any re-run.
-7. **PRISM on SurGen cannot be used as is.** Slide `SR386_40X_HE_T241_01` is missing 52% of its tiles and four more slides miss 6-9 tiles each (incomplete downloads). Regenerate those five first.
+7. **PRISM on SurGen cannot be used as is.** The embedding file for `SR386_40X_HE_T237_01` is corrupt, slide `SR386_40X_HE_T241_01` is missing 52% of its tiles, and four more slides miss 6-9 tiles each (incomplete downloads). Re-encode at least the first two.
 8. Smaller items: random-forest predictions in cross-validation are cut at 0.30 although tables say 0.5; the kNN row of the mean-by-head table mixes k = 3, 35 and 20; the tissue-class subset experiments (TCGA balanced accuracy 0.85-0.87) were selected on test folds with the pre-fix ANN and were never validated.
 
 ## 4. Remaining work
 
-Not started unless stated. Items 1-7 need no GPU: they run on stored predictions and cached features.
+Items 1-7 need no GPU: they run on stored predictions and cached features.
 
-| # | Task | Effort |
+| # | Task | Status |
 |---|---|---|
-| 1 | One threshold rule on both external cohorts: k = 35 everywhere, quantile threshold for all heads or none | hours |
-| 2 | Case-level bootstrap CIs and paired tests (aggregation vs averaging; encoder comparisons) | about 1 day |
-| 3 | Report the TCGA-selected configuration as primary; keep best-of-100 as exploratory | hours |
-| 4 | Settle the PAIP-IV ANN protocol and regenerate `PAIP_IV_Results/` | minutes |
-| 5 | PRISM on SurGen (after regenerating the five incomplete slides) | small |
-| 6 | Probability ensembles. The 4-fold ensemble already beats the single TCGA model on AUROC for LR, ANN and RF on both external cohorts | hours |
-| 7 | Redo the top-k tissue-class aggregation with nested cross-validation and take it to external validation | about 1 day |
-| 8 | Attention-based MIL baseline on the cached patch features | 2-4 days, one GPU |
-| 9 | Finish the 991-slide SurGen encoding and re-run SurGen | days to weeks of GPU |
+| 1 | One threshold rule on both external cohorts: k = 35 everywhere, corrected threshold for all five heads | **analysed** in `experiments/final_analysis/`; the published trees, workbook and README still show the old scheme |
+| 2 | Case-level bootstrap CIs and paired tests (aggregation vs averaging; encoders; heads) | **done** in `experiments/final_analysis/` |
+| 3 | Report the TCGA-selected configuration as primary; keep best-of-100 as exploratory | **computed**; the README still headlines best-of-100 |
+| 4 | Regenerate `PAIP_IV_Results/` with the `ann_old` ANN protocol (owner decision) | not started |
+| 5 | PRISM on SurGen | blocked: `SR386_40X_HE_T237_01.pt` is corrupt and `SR386_40X_HE_T241_01` is missing 52% of its tiles; both need re-encoding |
+| 6 | Probability ensembles | tested: the 4-fold ensemble gains 0.015-0.018 AUROC on SurGen for LR and RF and nothing on PAIP; low priority |
+| 7 | Redo the top-k tissue-class aggregation with nested cross-validation and take it to external validation | not started, about 1 day |
+| 8 | Attention-based MIL baseline on the cached patch features | not started, 2-4 days on one GPU |
+| 9 | Finish the 991-slide SurGen encoding and re-run SurGen | in progress (owner) |
+
+**What the analysis of items 1-3 found** (details and tables in [../experiments/final_analysis/SUMMARY.md](../experiments/final_analysis/SUMMARY.md)):
+
+- Semantic aggregation beats averaging on the external cohorts (SurGen-EV +0.054 mean AUROC, p < 0.001; PAIP-EV +0.050 for Caption-15, p = 0.016) but **not** within TCGA cross-validation (+0.016, p = 0.22). The supportable claim is that it generalises better.
+- The uniform threshold rule removes all 38 dead or saturated operating points and raises mean balanced accuracy for every head on both cohorts.
+- The configuration TCGA-CV selects (H-Optimus-1 / Caption-15 / LR) scores 0.879 [0.73, 0.98] on PAIP, not distinguishable from the best, and 0.740 [0.65, 0.82] on SurGen, clearly below the best.
+- H-Optimus-1 is the best encoder within TCGA; UNI2 is the best on SurGen. On the same CONCH 1.5 patch features the TITAN slide encoder beats all four aggregation methods.
+
+**Next:** make the published trees, workbook, README tables and figures match the uniform rule, and regenerate PAIP-IV with `ann_old`. One choice is open first: whether ANN and RF report the AUROC of the five-seed mean probability (one prediction per slide, what the analysis uses) or the mean of five single-seed AUROCs (what the workbook has now).
 
 **SurGen 991 encoding** is being continued separately by the project owner. State on 2026-10-04: 630 of 991 slides screened (tissue filter), 622 with features, last pipeline activity 2026-09-09. Before resuming on this machine:
 

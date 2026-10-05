@@ -1,0 +1,19 @@
+{
+  "machine": "local",
+  "timestamp": "2026-10-05T07:20:04+00:00",
+  "git_commit": "7c66cc72",
+  "script": "experiments/final_analysis/01_uniform_ev_scores.py",
+  "knn_k": 35,
+  "rule": "knn: k=35 + tau refit on TCGA out-of-fold at that k; lin/ann/proto/rf: rate-matched quantile threshold",
+  "seeds": [
+    42,
+    43,
+    44,
+    45,
+    46
+  ],
+  "python": "3.10.18",
+  "sklearn": "1.7.0",
+  "torch": "2.2.0",
+  "numpy": "1.26.3"
+}

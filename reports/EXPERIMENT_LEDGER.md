@@ -183,6 +183,18 @@ Format: **ID - title** | question | varied / values | cohort | date | outcome (k
 
 **X49 - Multi-class slide classifier scaffold** | - | - | - | 2025-08-12 | cell has no outputs | `Slide_Classification.ipynb` cell 12, `eval_patch_features/ann_multiclass.py` | abandoned (never run).
 
+### 2.7 Final analysis (2026-10-05)
+
+All four entries live in `experiments/final_analysis/` (scripts, `results/`, `SUMMARY.md`). They are derived from the saved TCGA models and stored predictions; the published result trees were not changed.
+
+**X50 - One threshold rule on both external cohorts** | Does a single rule work for every head | KNN at k=35 with tau refitted on TCGA out-of-fold; rate-matched quantile threshold for LR / ANN / ProtoNet / RF (the `corrected` scheme, all five heads) | PAIP-EV (22 combos), SurGen-EV (21) | 2026-10-05 | unhealthy operating points 38 of 200 -> 0. Mean balanced accuracy, frozen -> uniform: PAIP LR 0.743 -> 0.789, ANN 0.750 -> 0.814, KNN 0.596 -> 0.703, ProtoNet 0.727 -> 0.794, RF 0.662 -> 0.772; SurGen LR 0.594 -> 0.649, ANN 0.581 -> 0.672, KNN 0.565 -> 0.571, ProtoNet 0.523 -> 0.653, RF 0.558 -> 0.642. SurGen KNN mean AUROC 0.653 at k=35 against 0.677 at the SurGen-selected k=20 | `01_uniform_ev_scores.py`, `results/ev_uniform_summary.csv`; `validate_against_published.py` reproduces the published frozen values for all 215 classifier-combinations and the archived corrected-mode values (WT, VERIFIED) | conclusive-positive. The published trees, workbook and README still carry the old two-scheme tables.
+
+**X51 - Confidence intervals and paired tests** | Are the paper's claims statistically supported | case-level, class-stratified bootstrap, 2,000 resamples, same resampled cases for every configuration | all five experiments | 2026-10-05 | mean AUROC, three semantic aggregations minus Averaging (25 encoder x head cells): TCGA-CV +0.016 [-0.010, +0.042], p=0.22; PAIP-IV +0.090 [+0.025, +0.176], p=0.003; PAIP-EV +0.037 [-0.001, +0.074], p=0.063 (Caption-15 alone +0.050, p=0.016); SurGen-CV +0.040 [+0.019, +0.063], p=0.001; SurGen-EV +0.054 [+0.035, +0.072], p<0.001. Caption-15 vs Caption-14: no difference. Encoders: H-Optimus-1 best within TCGA (+0.055 to +0.121 over the others, p<0.001); UNI2 best on SurGen (+0.049 to +0.148, p<=0.001). TITAN beats the four aggregations on the same CONCH 1.5 features (TCGA-CV 0.085, SurGen-CV 0.057, SurGen-EV 0.066). 4-fold ensemble vs full-data model: +0.018 (LR) and +0.015 (RF) on SurGen, nothing on PAIP | `02_uncertainty.py`, `results/ci_per_config.csv`, `results/contrasts.csv` (WT, VERIFIED) | conclusive: the aggregation advantage is an external-generalisation effect, not an in-domain one.
+
+**X52 - The TCGA-selected configuration on the external cohorts** | What does the pre-specified configuration achieve | H-Optimus-1 / Caption-15 / LR (best TCGA-CV AUROC, 0.928 [0.887, 0.960]) | PAIP-EV, SurGen-EV | 2026-10-05 | PAIP 0.879 [0.733, 0.984], rank 19 of 100, gap to the best 0.037 [-0.038, +0.125]; SurGen 0.740 [0.652, 0.821], rank 32, gap 0.116 [+0.050, +0.184]. Spearman between TCGA-CV and external AUROC over the 100 configurations: 0.58 (PAIP-EV), 0.50 (SurGen-EV). With the encoder fixed to UNI2, TCGA selects TTC / LR: 0.886 on PAIP, 0.834 on SurGen (rank 7) | `results/prespecified.csv`, `results/selection_transfer.csv` (WT, VERIFIED) | conclusive.
+
+**X53 - PRISM on SurGen** | Complete the slide-encoder baseline | - | SurGen | 2026-10-05 | not run: `SR386_40X_HE_T237_01.pt` is not a readable torch file (621 of 622 load), and `SR386_40X_HE_T241_01` was built from a slide missing 52% of its tiles | load test in the session log; data audit | blocked until the two slides are re-encoded.
+
 ---
 
 ## 3. B. Hyperparameters
@@ -296,7 +308,7 @@ Known but **not fixed**: `Taiga_Paip_inference.ipynb` invalid JSON; `Slide_Class
 | O22 | Where "409" TCGA slides came from | COHORT_COUNTS | unknown |
 | O23 | Fold-file provenance (`kfolds_IDARS_fixed.csv`, "fixed" how?) | - | unknown |
 | O24 | `conch1-5` SurGen feature tree missing locally | this audit | **resolved 2026-10-05** (restored, S6) |
-| O25 | PRISM SurGen patch-loss audit before use | owner memory note 2026-08-26 | unknown whether the final 622 passed |
+| O25 | PRISM SurGen patch-loss audit before use | owner memory note 2026-08-26 | **failed for 2 slides** (2026-10-05): `T237_01` embedding file is corrupt, `T241_01` is missing 52% of its tiles; four more slides miss 6-9 tiles each |
 | O26 | Stale documents: `reports/COHORT_COUNTS.md` (PAIP 73), RESULTS.md policy text, `Supplementary_Results_UPDATED.docx` (SurGen-EV "partial coverage", "frozen") | - | open |
 
 ---
@@ -304,6 +316,8 @@ Known but **not fixed**: `Taiga_Paip_inference.ipynb` invalid JSON; `Slide_Class
 ## 6. E. Not yet tried - suggestions, ranked for a project that must finish quickly
 
 All items below are **suggestions**. "Already tried?" states what I searched for.
+
+**Update 2026-10-05:** N1 and N2 are done (X50-X52). N3 is blocked (X53). N4 was tested for the 4-fold ensemble only (X51); cross-encoder ensembles remain untried.
 
 | Rank | Idea | Already tried? (evidence searched) | Expected benefit | Cost | GPU / server? |
 |---|---|---|---|---|---|
