@@ -30,23 +30,27 @@ The raw 0.5-threshold numbers, and ``RF @ 0.3`` (the pre-existing hardcoded
 random-forest threshold), are kept in a per-run audit CSV so the old behaviour
 stays reproducible. They are not headline figures.
 
-``--threshold-mode=promoted`` (PAIP-EV, 2026-09-02)
----------------------------------------------------
-Owner decision: for **PAIP-EV only**, KNN and RF report under the corrected
-scheme, and those become the published numbers.
+``--threshold-mode=promoted`` - the published scheme (2026-10-05)
+---------------------------------------------------------------
+Owner decision: on **both** external cohorts, **all five heads** report under the
+corrected scheme, and those are the published numbers (``tcga_full`` variant).
 
   * **KNN** - scored at k=35 with ``weights='uniform'``, thresholded at a tau
     refitted on TCGA out-of-fold probabilities *at that k*. The taus are read
-    from ``knn_k35_thresholds.json``, not recomputed. k changes the scores, so
-    KNN's AUROC moves too; it is the only head whose AUROC moves.
-  * **RF** - rate-matched (quantile) threshold. Ranking is untouched, so AUROC is
-    unchanged and only the operating point moves.
-  * **LR, ANN, ProtoNet** - frozen tau_TCGA, exactly as before, and *not*
-    evaluated under the corrected scheme at all. Their numbers are unchanged.
+    from ``knn_k35_thresholds.json``, not recomputed.
+  * **LR, ANN, ProtoNet, RF** - rate-matched (quantile) threshold on the mean
+    probability of the five seed models.
 
-So one PAIP-EV table now carries two threshold schemes. Every row therefore
-states its own ``Threshold_scheme``, and the stamp's ``threshold_policy`` names
-both. SurGen-EV is untouched and stays entirely frozen.
+A promoted row's AUROC is the AUROC of the score its operating point uses: the
+k=35 scores for KNN, the five-seed mean probability for the others. For LR and
+ProtoNet that is the single-seed AUROC; for ANN and RF it is the seed ensemble.
+The frozen values (tau_TCGA, mean of single-seed AUROCs) stay in every record
+under ``*_frozen``.
+
+History: from 2026-09-02 only KNN and RF were promoted, on PAIP-EV at k=35 and
+on SurGen-EV at k=20 (a value chosen on SurGen). ``runners/threshold_modes.py``
+explains why that was replaced. ``--promote-classifiers knn,rf --knn-k 20``
+still reproduces the old SurGen-EV table.
 """
 
 from __future__ import annotations
@@ -101,10 +105,13 @@ def _add_corrected(entry: Dict, kind: str, method: str, model: str, task: str,
                    knn_k: int, log) -> None:
     """Attach the corrected operating point *alongside* the frozen one.
 
-    Adds ``bacc_corrected`` / ``threshold_corrected`` / ``status_*`` and, for
-    KNN, ``auroc_corrected`` (its scores change because k changes). The frozen
-    keys are left exactly as they were, so both numbers travel together and the
-    strict zero-shot result is never overwritten.
+    Adds ``bacc_corrected`` / ``threshold_corrected`` / ``status_*`` and
+    ``auroc_corrected``: the AUROC of the very score the corrected operating
+    point is computed on. For KNN that is the k-neighbour fraction (k changes
+    the scores); for the other heads it is the mean probability of the seed
+    models, i.e. one prediction per slide. ``auroc_corrected_basis`` says which.
+    The frozen keys are left exactly as they were, so both numbers travel
+    together and the strict zero-shot result is never overwritten.
 
     All logic lives in runners.threshold_modes - the same module the validated
     experiment imports, so the two paths cannot drift.
@@ -155,7 +162,6 @@ def _add_corrected(entry: Dict, kind: str, method: str, model: str, task: str,
         except Exception as exc:                       # never break the sweep
             log.warning(f"  {kind}: corrected mode unavailable ({exc})")
             return
-        entry["auroc_corrected"] = float(_metrics_at(targets, probs_c, tau_c)["auroc"])
         entry["knn_k_corrected"] = int(knn_k)
         entry["knn_tau_source"] = tau_src
     else:
@@ -171,6 +177,11 @@ def _add_corrected(entry: Dict, kind: str, method: str, model: str, task: str,
     entry.update({
         "threshold_mode": "corrected",
         "threshold_corrected": float(tau_c),
+        # AUROC of the score this operating point uses - one score per slide, so
+        # the row's AUROC and its balanced accuracy describe the same model.
+        "auroc_corrected": float(m["auroc"]),
+        "auroc_corrected_basis": ("knn_k%d" % knn_k if kind == "knn"
+                                  else "seed_mean_probability"),
         "bacc_corrected": float(m["bacc"]),
         "acc_corrected": float(m["acc"]),
         "macro_f1_corrected": float(m["macro_f1"]),
@@ -189,20 +200,25 @@ _PROMOTED_METRICS = ("bacc", "acc", "macro_f1", "weighted_f1", "conf_matrix")
 
 
 def _promoted_policy(promote: List[str], classifiers: List[str], knn_k: int) -> str:
-    """One sentence naming both schemes and which heads use each."""
+    """One sentence naming the schemes and which heads use each."""
     frozen = [c for c in classifiers if c not in promote]
     parts = []
     if "knn" in promote:
         parts.append(f"knn: k={knn_k} scores, tau refit on TCGA out-of-fold at "
-                     f"that k (knn_k35_thresholds.json)")
+                     f"that k" + (" (knn_k35_thresholds.json)"
+                                  if knn_k == tm.KNN_K_VALIDATED else ""))
     rate = [c for c in promote if c != "knn"]
     if rate:
-        parts.append(f"{'/'.join(rate)}: rate-matched (quantile) threshold, "
-                     f"r from tau_TCGA on TCGA out-of-fold")
+        parts.append(f"{'/'.join(rate)}: rate-matched (quantile) threshold on the "
+                     f"mean probability of the seed models, r from tau_TCGA on "
+                     f"TCGA out-of-fold")
     if frozen:
         parts.append(f"{'/'.join(frozen)}: frozen tau_TCGA, Youden J on pooled "
                      f"out-of-fold TCGA-CV probabilities (unchanged)")
-    return "TWO SCHEMES IN ONE TABLE - " + "; ".join(parts)
+    head = ("TWO SCHEMES IN ONE TABLE" if frozen else
+            "CORRECTED SCHEME FOR EVERY HEAD (tcga_full variant)")
+    return (head + " - " + "; ".join(parts) +
+            ". AUROC of a corrected row is that of the score its cut point uses.")
 
 
 def _promote(entry: Dict, kind: str, log) -> bool:
@@ -217,12 +233,19 @@ def _promote(entry: Dict, kind: str, log) -> bool:
     same record, so the pre-promotion number is still readable without going back
     to the archive.
 
-    Two things are deliberately **not** carried over:
+    Two details:
 
-    * ``auroc`` moves only when the scheme changed the scores. The quantile rule
-      moves the cut point, not the ranking, so RF's AUROC is identical either way
-      and copying ``auroc_corrected`` over it would imply a change that did not
-      happen. KNN's k really does change the scores, so its AUROC does move.
+    * ``auroc`` becomes the AUROC of the score the corrected operating point is
+      computed on (``auroc_corrected``), so the two headline numbers of a row
+      describe one model. For KNN that is the k=35 score. For the other heads it
+      is the mean probability of the seed models: identical to the single-seed
+      AUROC for LR and ProtoNet, which do not vary with the seed, and the seed
+      ensemble for ANN and RF. The quantile rule itself moves only the cut point,
+      never the ranking; what changes for ANN and RF is that five rankings are
+      averaged into one. Before 2026-10-05 this field was left at the mean of the
+      five single-seed AUROCs while the balanced accuracy beside it was already
+      the ensemble's - two different models in one row. The displaced value is
+      kept as ``auroc_frozen``.
     * the across-seed SDs describe five models scored at the frozen tau. The
       corrected point is computed once, from the seed-averaged probabilities, so
       it has no SD of its own. Inventing one, or leaving the frozen one in place
@@ -245,8 +268,9 @@ def _promote(entry: Dict, kind: str, log) -> bool:
         entry[key] = entry[f"{key}_corrected"]
 
     entry["auroc_frozen"] = entry["auroc"]
-    if "auroc_corrected" in entry:                # KNN only: k changed the scores
+    if "auroc_corrected" in entry:        # AUROC of the score the cut point uses
         entry["auroc"] = entry["auroc_corrected"]
+        entry["auroc_basis"] = entry.get("auroc_corrected_basis")
 
     entry["threshold_frozen"] = entry["threshold"]
     entry["threshold"] = entry["threshold_corrected"]
@@ -630,7 +654,8 @@ def main():
                          "the frozen path always uses the grid-searched k")
     ap.add_argument("--promote-classifiers", default=",".join(tm.PROMOTED_CLASSIFIERS),
                     help="comma list; only meaningful with "
-                         "--threshold-mode=promoted (default: knn,rf)")
+                         "--threshold-mode=promoted (default: all five heads, "
+                         "the published scheme)")
     ap.add_argument("--no-archive", action="store_true",
                     help="skip the automatic _ARCHIVED_ copy of the previous "
                          "tree; use only when a stamped backup already exists")

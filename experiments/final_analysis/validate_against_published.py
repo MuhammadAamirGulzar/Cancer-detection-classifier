@@ -3,10 +3,11 @@
 Three independent comparisons:
   A. frozen path  - seed-mean probabilities, mean-of-seeds AUROC and frozen balanced accuracy
                     against the published result JSONs (all heads, both cohorts).
-  B. promoted heads - the uniform rule equals what is already published for PAIP KNN (k=35)
-                    and for RF on both cohorts.
-  C. other heads  - LR / ANN / ProtoNet quantile values, and SurGen KNN at k=35, against the
-                    corrected-mode snapshots kept in the *_ARCHIVED_* trees.
+  B. published scheme - the uniform rule equals the published headline of every promoted row
+                    (all five heads on both cohorts since the trees were regenerated on
+                    2026-10-05): balanced accuracy, AUROC and threshold.
+  C. snapshots    - the same values against the corrected-mode snapshots of 31 Aug / 2 Sep kept
+                    in the *_ARCHIVED_* trees, which were produced before this analysis existed.
 
 Reads only. Exit code 1 if any comparison exceeds its tolerance.
 """
@@ -61,7 +62,11 @@ for cohort, (tree, exp) in TREES.items():
             if e.get("promoted"):
                 same_k = (k != "knn") or (e.get("knn_k_corrected") == 35)
                 if same_k:
-                    b_rows.append((k, abs(r.bacc_uniform - e["bacc"]), abs(r.auroc_uniform - e["auroc"]) if k == "knn" else 0.0,
+                    # The headline AUROC is the AUROC of the score the cut point uses
+                    # (auroc_basis); rows written before 2026-10-05 only did that for KNN.
+                    cmp_auroc = (k == "knn") or bool(e.get("auroc_basis"))
+                    b_rows.append((k, abs(r.bacc_uniform - e["bacc"]),
+                                   abs(r.auroc_uniform - e["auroc"]) if cmp_auroc else 0.0,
                                    abs(r.threshold_uniform - e["threshold"])))
             # C. corrected-mode snapshot
             a = arc.get((method, model), {}).get("results", {}).get(k, {}).get("tcga_full")
@@ -78,7 +83,7 @@ for cohort, (tree, exp) in TREES.items():
         fail.append("%s: frozen path differs from the published tree" % cohort)
     if max(dbacc) > 0.02:
         fail.append("%s: frozen balanced accuracy differs by more than 0.02" % cohort)
-    for name, rows in (("B. already-promoted heads vs published", b_rows), ("C. corrected-mode snapshot", c_rows)):
+    for name, rows in (("B. published scheme (promoted rows)", b_rows), ("C. corrected-mode snapshot", c_rows)):
         if not rows:
             print("%s: nothing comparable" % name); continue
         t = pd.DataFrame(rows, columns=["head", "d_bacc", "d_auroc", "d_thr"])

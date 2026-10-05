@@ -50,11 +50,12 @@ SLIDE_LEVEL_ENCODERS = {"TITAN", "PRISM"}
 
 SUMMARY_COLUMNS = ["Method", "Model", "Classifier", "Variant",
                    "BalAcc", "AUROC", "Acc", "MacroF1", "N_test",
-                   # Which threshold scheme produced this row. PAIP-EV now mixes
-                   # two of them (KNN k=35 + refit tau, RF rate-matched, the rest
-                   # frozen tau_TCGA), so a bare metric is no longer
-                   # self-describing. Sits beside the metrics, not at the far
-                   # right, because it qualifies them.
+                   # Which threshold scheme produced this row. In the external
+                   # experiments the primary `tcga_full` rows use the corrected
+                   # scheme (KNN k=35 + refit tau; the other heads rate-matched)
+                   # while the two fold-based variants stay at frozen tau_TCGA,
+                   # so a bare metric is not self-describing. Sits beside the
+                   # metrics, not at the far right, because it qualifies them.
                    "Threshold_scheme",
                    # Corrected-mode columns. Every sheet filters this list with
                    # `if c in agg.columns`, so on a frozen run they are absent
@@ -162,6 +163,9 @@ def _metric_cols(m: dict) -> dict:
             "Threshold_prev_frozen": m.get("threshold_frozen"),
             "Status_prev_frozen": m.get("status_frozen"),
             "N_pos_pred": m.get("n_pos_pred_corrected"),
+            # What the row's AUROC is the AUROC of: the k=35 scores for KNN, the
+            # mean probability of the seed models for the other heads.
+            "AUROC_basis": m.get("auroc_basis"),
             "KNN_k": m.get("knn_k_corrected"),
             "KNN_tau_source": m.get("knn_tau_source"),
         }

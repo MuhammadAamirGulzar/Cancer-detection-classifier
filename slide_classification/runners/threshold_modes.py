@@ -21,19 +21,37 @@ Three modes
               its own (1 - r) quantile.
 
 ``promoted``
-    The corrected scheme applied to ``PROMOTED_CLASSIFIERS`` **only**, with its
-    values taking over the headline metric fields. The remaining heads are not
-    merely left at the frozen operating point - they are not evaluated under the
-    corrected scheme at all, so no ``*_corrected`` column is written for them and
-    a reader cannot mistake a leftover column for a live number.
+    The corrected scheme applied to ``PROMOTED_CLASSIFIERS``, with its values
+    taking over the headline metric fields. Since 2026-10-05 that is **all five
+    heads, on both external cohorts** - the published scheme. A head left out of
+    the list is not merely kept at the frozen operating point: it is not
+    evaluated under the corrected scheme at all, so no ``*_corrected`` column is
+    written for it and a reader cannot mistake a leftover column for a live
+    number.
 
-    This mode therefore changes published figures by design, which ``corrected``
-    never does. The frozen values it displaces are kept under ``*_frozen`` in the
-    same record, so nothing is lost and the change is legible in the file itself.
+    This mode changes published figures by design, which ``corrected`` never
+    does. The frozen values it displaces are kept under ``*_frozen`` in the same
+    record, so nothing is lost and the change is legible in the file itself.
 
-    Two threshold schemes then coexist in one table. Anything rendering that
-    table has to say which row uses which - ``ev_runner`` writes a per-row
-    ``Threshold_scheme`` for exactly that purpose.
+    Every row states its own ``Threshold_scheme`` (``refit_tau_k35`` for KNN,
+    ``quantile_rate_matched`` for the others).
+
+    Why all five (history). Until 2026-10-05 only KNN and RF were promoted, and
+    SurGen-EV ran KNN at k=20, a value taken from a sweep on SurGen itself. Two
+    problems: the choice of which heads to correct was made after looking at
+    external results, and it left ProtoNet dead or nearly dead in 16 of 21
+    SurGen-EV configurations although the same quantile rule repairs it. One rule
+    for every head and one k for both cohorts removes both. Measured effect in
+    ``experiments/final_analysis/SUMMARY.md``: unhealthy operating points fall
+    from 38 of 200 to 0.
+
+    AUROC of a promoted row. The corrected operating point is computed on one
+    score per slide: the k=35 neighbour fraction for KNN, the mean probability of
+    the five seed models for the others. The row's AUROC is the AUROC of that
+    same score, so both headline numbers describe one model. For LR and ProtoNet
+    (deterministic across seeds) this equals the single-seed AUROC; for ANN and
+    RF it is the seed ensemble, about 0.01-0.03 above the mean of the five
+    single-seed AUROCs, which stays available as ``auroc_frozen``.
 
 Why KNN is excluded from the quantile rule
 ------------------------------------------
@@ -74,11 +92,12 @@ from sklearn.metrics.pairwise import (
 MODES = ("frozen", "corrected", "promoted")
 DEFAULT_MODE = "frozen"
 
-#: Under ``promoted`` these classifiers - and only these - are scored and
-#: thresholded by the corrected scheme, and those values become the **headline**
-#: metrics. Every other head keeps the frozen tau untouched and gets no
-#: corrected columns at all. See ``runners.ev_runner`` for the promotion itself.
-PROMOTED_CLASSIFIERS = ("knn", "rf")
+#: Under ``promoted`` these classifiers are scored and thresholded by the
+#: corrected scheme, and those values become the **headline** metrics. A head not
+#: listed keeps the frozen tau untouched and gets no corrected columns at all.
+#: All five since 2026-10-05 (was ``("knn", "rf")``); see the module docstring.
+#: See ``runners.ev_runner`` for the promotion itself.
+PROMOTED_CLASSIFIERS = ("lin", "ann", "knn", "proto", "rf")
 
 #: Validated neighbourhood size; see module docstring for the two derivations.
 KNN_K_VALIDATED = 35

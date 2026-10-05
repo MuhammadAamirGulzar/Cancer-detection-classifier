@@ -184,13 +184,19 @@ def describe_schemes(sub: pd.DataFrame) -> str:
         m = re.fullmatch(r"refit_tau_k(\d+)", s)
         return f"k={m.group(1)} + TCGA-refit tau" if m else s
     named = {"quantile_rate_matched": "rate-matched tau"}
-    parts = [f"{clf.upper()} {named.get(s, label(s))}"
-             for clf, v in sorted(per_clf.items()) for s in v
-             if s != "frozen_tau_TCGA"]
+    # Group heads by scheme, so five heads on two schemes read as two phrases
+    # rather than five.
+    by_scheme: dict = {}
+    for clf, v in sorted(per_clf.items()):
+        for s in sorted(v):
+            if s != "frozen_tau_TCGA":
+                by_scheme.setdefault(named.get(s, label(s)), []).append(clf.upper())
+    parts = [f"{'/'.join(clfs)} {scheme}" for scheme, clfs in by_scheme.items()]
     frozen = sorted(c.upper() for c, v in per_clf.items()
                     if v == {"frozen_tau_TCGA"})
-    return (f"Two threshold schemes: {', '.join(parts)}; "
-            f"{'/'.join(frozen)} at the frozen TCGA tau")
+    if frozen:
+        parts.append(f"{'/'.join(frozen)} at the frozen TCGA tau")
+    return "Thresholds: " + "; ".join(parts)
 
 
 def make_figure(df: pd.DataFrame, experiment: str, metric: str,

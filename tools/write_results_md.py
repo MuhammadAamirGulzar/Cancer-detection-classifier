@@ -33,44 +33,50 @@ from build_report import (discover, _rows_from, SLIDE_LEVEL_ENCODERS,  # noqa: E
 
 OUT = REPO_ROOT / "RESULTS.md"
 
+#: One rule for both external cohorts since 2026-10-05; see
+#: slide_classification/runners/threshold_modes.py for the reasoning.
+_EV_NOTE = (
+    "All five heads use the corrected scheme (`tcga_full` variant). kNN is scored at "
+    "k=35 (uniform weights) and cut at a tau refitted on TCGA out-of-fold probabilities "
+    "at that k. LR, ANN, ProtoNet and RF take a rate-matched (quantile) threshold on the "
+    "mean probability of the five seed models. A row's AUROC is the AUROC of that same "
+    "score: the k=35 scores for kNN, the five-seed ensemble for the others. k, tau and "
+    "the positive rate come from TCGA alone; the quantile reads {cohort} scores but never "
+    "{cohort} labels. The two fold-based variants stay at the frozen tau_TCGA. The same "
+    "rule is applied to both external cohorts.")
+
 DEFINITIONS = {
     "TCGA-CV": dict(
         cohort="TCGA (primary)", protocol="4-fold cross-validation, averaged",
         train="TCGA folds", test="TCGA held-out fold",
         kind="CV",
-        note="Each of the 413 slides is tested exactly once. Reported at threshold 0.5."),
+        note="Each of the 413 slides is tested exactly once. Reported at threshold 0.5, "
+             "except the random forest, which predicts at its fixed 0.30 cut-point."),
     "PAIP-IV": dict(
         cohort="PAIP (external cohort, internal split)",
         protocol="single fixed provider split, no averaging",
         train="PAIP official train (all 47 have features, 12 MSI-H)",
         test="PAIP official test (31, all have features)",
         kind="IV",
-        note="Reported at threshold 0.5 with bootstrap 95% CIs over the 31 test slides. "
-             "The ANN head is fitted on all 47 training slides with the TCGA-CV-derived "
-             "configuration, matching the other four heads; the 20% carve-out is used "
-             "for early stopping only."),
+        note="Reported at threshold 0.5 (random forest: 0.30) with bootstrap 95% CIs over "
+             "the 31 test slides. The ANN is the `ann_old` configuration - one hidden layer "
+             "of 512 units, dropout 0.5 - trained once on all 47 training slides with no "
+             "hyperparameter search (`--ann-protocol full --ann-preset ann_old`). Its "
+             "weights are frozen in `slide_classification/final_models/ann_old/`."),
     "PAIP-EV": dict(
         cohort="PAIP (external)", protocol="external validation",
         train="TCGA (see variant)", test="all 78 PAIP slides", kind="EV",
-        note="**Two threshold schemes in one table.** kNN is scored at k=35 "
-             "(uniform weights) and cut at a tau refitted on TCGA out-of-fold "
-             "probabilities at that k, so kNN is the only head whose AUROC moves. "
-             "RF keeps its scores and takes a rate-matched (quantile) threshold, so "
-             "its AUROC is unchanged and only the operating point moves. LR, ANN and "
-             "ProtoNet keep the frozen tau_TCGA and are unchanged. Both schemes come "
-             "from TCGA alone — the quantile reads PAIP scores but never PAIP labels. "
-             "Applies to the `tcga_full` variant; the two fold-based variants stay "
-             "entirely frozen, as does all of SurGen-EV, so kNN/RF are not comparable "
-             "across the two external cohorts."),
+        note=_EV_NOTE.format(cohort="PAIP")),
     "SurGen-CV": dict(
         cohort="SurGen (second external cohort, internal CV)",
         protocol="4-fold cross-validation, case-grouped",
         train="SurGen folds", test="SurGen held-out fold", kind="CV",
-        note="Folds are built at CASE level (Task 2.1). Reported at threshold 0.5."),
+        note="Folds are built at CASE level (Task 2.1). Reported at threshold 0.5 "
+             "(random forest: 0.30)."),
     "SurGen-EV": dict(
         cohort="SurGen (external)", protocol="external validation",
         train="TCGA (see variant)", test="all SurGen slides with features", kind="EV",
-        note="Reported at tau_TCGA. Partial coverage on the local machine by design."),
+        note=_EV_NOTE.format(cohort="SurGen")),
 }
 
 DEFINITION_TEXT = """\
@@ -170,9 +176,15 @@ def main():
         "|---|---|---|---|\n"
         "| TCGA | 416 | **413** (60 MSI-H / 353 non) | `TCGA-AD-6895_MSIH`, "
         "`TCGA-AD-6899_nonMSIH`, `TCGA-CM-6680_nonMSIH` |\n"
-        "| PAIP | 78 | **73** (17 MSI-H / 56 non) | `training_data_19/30/41/42/46` |\n"
+        "| PAIP | 78 | **78** (19 MSI-H / 59 non) | none (five slides were recovered on "
+        "2026-08-10) |\n"
         "| SurGen | 624 usable (of 1020; 396 are label −1) | **622** (60 MSI-H / 562 non) | "
         "`SR386_40X_HE_T086_01`, `SR386_40X_HE_T339_01` |\n")
+    parts.append(
+        "\nThe SurGen row describes the label set the results were computed on. On "
+        "2026-09-08 the label file was rebuilt to 991 labelled slides (100 MSI-H). None "
+        "of the 622 modelled slides changed label, so the results stand; the 369 added "
+        "slides are not encoded yet.\n")
 
     parts.append("\n## Definitions\n")
     parts.append(DEFINITION_TEXT)
@@ -222,13 +234,15 @@ def main():
     # ---- caveats -----------------------------------------------------------
     parts.append("\n---\n\n## Known caveats — state these in Methods\n")
     parts.append("""\
-1. **Training uses 50% of each cohort, not 75%.** The CV rotation is
-   test = fold *i*, val = fold *i+1*, train = the remaining two. Owner-confirmed as
-   deliberate. A reviewer comparing against 5-fold work will otherwise assume more
-   training data than was used.
-2. **"Validation fold" means two different things.** `combine_trainval=True` for
-   `lin`/`knn`/`proto`/`rf` merges the validation fold back into training; only the
-   ANN uses it as a true early-stopping set.
+1. **The heads do not train on the same amount of data.** The CV rotation is
+   test = fold *i*, val = fold *i+1*, train = the remaining two. The ANN trains on
+   those two folds (about 50% of the cohort) and uses the validation fold for
+   selection and early stopping. `lin`/`knn`/`proto`/`rf` merge the validation fold
+   back (`combine_trainval=True`) and train on about 75%.
+2. **The "best" rows are maxima over 100 configurations** chosen on the data they
+   are reported on, so they are optimistic. Confidence intervals, paired tests and
+   the configuration TCGA-CV itself selects are in
+   `experiments/final_analysis/SUMMARY.md`.
 3. **Fold numbering offset.** Folds are 1–4 in the CSVs and reported `Fold1..Fold4`,
    but checkpoints are saved `fold0..fold3`.
 4. **Empty tissue rows.** In Tissue_Type_Clustering an absent tissue class yields an
@@ -241,8 +255,8 @@ def main():
    and the class balance came out even by luck of ordering rather than by design.
    The deciding argument, though, is that the experiment is strictly dominated:
    even repaired it would train on ~36 slides and test on 18 with ~4 positives,
-   where PAIP-IV trains on 42 and tests on 31. Previous numbers are preserved at
-   `slide_classification/PAIP_Results_ARCHIVED_20260804/`.
+   where PAIP-IV trains on 47 and tests on 31. Previous numbers are preserved in git
+   history (`slide_classification/PAIP_Results_ARCHIVED_20260804/` at commit `277a878e`).
 6. **All SurGen numbers published before 2026-08-04 are leak-inflated.** Folds were
    built at slide level while 70 of 554 cases contribute two slides each, so ~67% of
    those cases had one slide in train and the other in test. Correcting to

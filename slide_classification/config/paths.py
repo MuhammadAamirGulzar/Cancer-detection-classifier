@@ -362,12 +362,51 @@ def git_commit(short: bool = True) -> str:
         return "unknown"
 
 
+#: Code whose state decides what a results run computes. Result files, documents
+#: and figures are left out on purpose: a run rewrites those by design.
+_CODE_PATHS = ("slide_classification/runners", "slide_classification/eval_patch_features",
+               "slide_classification/config", "slide_classification/data_layer.py")
+
+
+def code_is_dirty() -> Optional[bool]:
+    """True when the result-producing code has uncommitted changes.
+
+    ``git_commit`` in a stamp identifies the code only when this is False. The
+    results of 2026-08-10..09-03 all carry a commit that did not yet contain the
+    code that produced them; recording this flag makes that visible in the file
+    instead of leaving it to be reconstructed from logs. ``None`` on failure.
+    """
+    try:
+        out = subprocess.run(
+            ["git", "status", "--porcelain", "--untracked-files=no", "--", *_CODE_PATHS],
+            cwd=str(REPO_ROOT), capture_output=True, text=True, timeout=15)
+        return bool(out.stdout.strip()) if out.returncode == 0 else None
+    except Exception:
+        return None
+
+
+def library_versions() -> Dict[str, str]:
+    """Interpreter and the libraries a result can depend on."""
+    import platform
+    from importlib import metadata
+    out = {"python": platform.python_version()}
+    for label, dist in (("sklearn", "scikit-learn"), ("torch", "torch"),
+                        ("numpy", "numpy"), ("pandas", "pandas")):
+        try:
+            out[label] = metadata.version(dist)
+        except Exception:
+            out[label] = "unknown"
+    return out
+
+
 def run_stamp(**extra) -> Dict[str, object]:
     """Provenance block attached to every result file (1c.2 item 4)."""
     stamp = {
         "machine": MACHINE,
         "timestamp": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "git_commit": git_commit(),
+        "git_code_dirty": code_is_dirty(),
+        "versions": library_versions(),
     }
     stamp.update(extra)
     return stamp
