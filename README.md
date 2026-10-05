@@ -12,9 +12,10 @@ The project compares **how patch embeddings are aggregated into a slide represen
 
 - **Six foundation-model encoders** (CONCH v1, CONCH 1.5, H-Optimus-1, UNI2-h, Virchow2, PRISM) × **four patch-aggregation strategies** (plus the TITAN slide encoder as a baseline) × **five classifier heads** (logistic regression, ANN, kNN, ProtoNet, random forest). The result is one 4-fold CV table plus three external tables.
 - **TCGA 4-fold CV (413 slides): best AUROC 0.928** (H-Optimus-1, 15-class caption aggregation, logistic regression). Best balanced accuracy is 0.828 (same encoder/aggregation, ANN).
-- **PAIP external validation (TCGA → 78 slides): best AUROC 0.915** (UNI2, averaging, logistic regression). Best balanced accuracy is 0.870 (H-Optimus-1, averaging, ProtoNet).
-- **SurGen external validation (TCGA → 622 slides): best AUROC 0.856** (UNI2, 15-class caption aggregation, logistic regression). This was run on the earlier 624-slide label set (see [Status](#11-status-and-limitations)).
-- **Evaluation bugs found and fixed without moving the baseline.** kNN scores had collapsed to 2–4 distinct values, and RF/ProtoNet thresholds did not transfer across cohorts. The fixes are layered on as opt-in threshold modes, and the frozen headline metrics are checked to be bit-identical (see [Data integrity](#6-data-integrity-work)).
+- **PAIP external validation (TCGA → 78 slides): best AUROC 0.915** [0.83, 0.97] (UNI2, averaging, logistic regression). Best balanced accuracy is 0.896 (UNI2, 14-class caption aggregation, ANN).
+- **SurGen external validation (TCGA → 622 slides): best AUROC 0.856** [0.80, 0.91] (UNI2, 15-class caption aggregation, logistic regression). This was run on the earlier 624-slide label set (see [Status](#9-status-and-limitations)).
+- **What the comparison supports.** Semantic aggregation beats plain averaging on the external cohorts (SurGen: +0.054 mean AUROC, p < 0.001) but not within TCGA cross-validation (+0.016, p = 0.22): it generalises better, it does not fit better. The configuration TCGA cross-validation selects scores 0.879 on PAIP and 0.740 on SurGen.
+- **Evaluation bugs found and fixed.** kNN scores had collapsed to 2–4 distinct values, and thresholds fitted on TCGA did not transfer, leaving 38 of 200 external operating points dead or saturated. One correction rule now applies to every classifier head on both external cohorts and removes all of them; the uncorrected values stay in every result record (see [Data integrity](#4-data-integrity-work)).
 - **SurGen label set rebuilt from 624 to 991 slides (822 cases, 100 MSI-H)** by reconciling MMR-IHC and PCR-MSI evidence across the SR386 and SR1482 sub-cohorts. A single master CSV is the source of truth, with a verification script that asserts the counts.
 - **Leakage fix.** Case-level folds for SurGen (70 two-slide cases in the earlier 622-slide set) removed patient-level leakage that had inflated earlier SurGen-CV numbers.
 
@@ -144,10 +145,11 @@ Implemented in [slide_classification/runners/threshold_modes.py](slide_classific
 |---|---|
 | `frozen` (default) | τ_TCGA is fitted by Youden's J on pooled TCGA out-of-fold probabilities and applied unchanged. The strict zero-shot number; the default so every earlier result reproduces exactly. |
 | `corrected` | kNN is scored at a larger k with τ refitted on TCGA out-of-fold probabilities **at that k**. Other heads (LR, ANN, ProtoNet, RF) get a rate-matched **quantile threshold**: the target is cut at the (1 − r) quantile, where r is the fraction of TCGA out-of-fold slides flagged positive. |
-| `promoted` | The corrected scheme applied to kNN and RF only, with its values taking over the headline fields. The displaced frozen values are kept under `*_frozen` in the same record, and every row carries a `Threshold_scheme` label. |
+| `promoted` | The corrected scheme, with its values taking over the headline fields. **This is the published scheme: all five heads, on both external cohorts.** The displaced frozen values are kept under `*_frozen` in the same record, and every row carries a `Threshold_scheme` label. |
 
 - **kNN k = 35** is justified from TCGA alone: it maximised TCGA out-of-fold balanced accuracy (0.6971), and 35 × 0.145 ≈ 5 expected positive neighbours.
-- **SurGen kNN uses k = 20**, taken from a SurGen k-sweep. That choice is target-informed (see Limitations).
+- **The same k = 35 is used on both cohorts.** An earlier SurGen table used k = 20, taken from a sweep on SurGen itself; it was replaced on 5 Oct 2026 at a cost of 0.024 mean kNN AUROC on SurGen.
+- **AUROC of a corrected row** is the AUROC of the score its threshold is applied to: the k = 35 scores for kNN, and the mean probability of the five seed models for the other heads. For ANN and RF that is a five-seed ensemble, about 0.01–0.03 above the mean of the five single-seed AUROCs. LR and ProtoNet do not vary with the seed.
 - The quantile rule reads target **scores** but never target **labels**.
 
 ---
@@ -180,7 +182,7 @@ In the earlier SurGen label set, 70 cases contribute two slides (primary and met
 | **RF/ProtoNet threshold mismatch.** The frozen τ_TCGA does not transfer to a shifted score distribution. ProtoNet's τ sits near 0.50 on scores that barely cross it. | SurGen: 16 of 21 ProtoNet and 7 of 21 RF configurations were dead or near-dead (frozen baseline). The quantile threshold recovered 84% (ProtoNet) and 74% (RF) of the gap to the oracle threshold. |
 | **Detector blind spot.** The old health check only caught zero predicted positives, not saturation. | Added saturated and near-dead/near-saturated (1% band) detection. |
 
-**Keeping the baseline reproducible.** `frozen` stays the default, and the corrected schemes are opt-in. Diagnostics wrote only derived copies. The published tree was verified byte-identical by SHA-256 before and after, and 16 headline keys × 315 entries showed zero drift ([experiments/surgen_ev_diagnostic/SUMMARY.md](experiments/surgen_ev_diagnostic/SUMMARY.md), [experiments/threshold_and_k/SUMMARY.md](experiments/threshold_and_k/SUMMARY.md); see the note in Status).
+**Keeping the baseline reproducible.** `frozen` stays the runner default, and every corrected record keeps its frozen values beside the published ones, so the strict zero-shot numbers stay reproducible. Diagnostics wrote only derived copies. The published tree was verified byte-identical by SHA-256 before and after, and 16 headline keys × 315 entries showed zero drift ([experiments/surgen_ev_diagnostic/SUMMARY.md](experiments/surgen_ev_diagnostic/SUMMARY.md), [experiments/threshold_and_k/SUMMARY.md](experiments/threshold_and_k/SUMMARY.md); see the note in Status).
 
 Other audit fixes ([reports/](reports/)): ANN hyperparameters are now selected on validation metrics rather than test metrics; a double-softmax in the ANN training graph was removed; unseeded data shuffling that made RF numbers non-reproducible was removed; and missing slides now fail loudly instead of being dropped silently.
 
@@ -188,54 +190,102 @@ Other audit fixes ([reports/](reports/)): ANN hyperparameters are now selected o
 
 ## 5. Results
 
-All numbers are from [slide_classification/best_of_all_exps_metric.xlsx](slide_classification/best_of_all_exps_metric.xlsx). Aggregation methods only (TITAN/PRISM are separate rows). External-validation figures use the primary `tcga_full` variant. Single-seed CV means; no confidence intervals except PAIP-IV.
+Point estimates come from [slide_classification/best_of_all_exps_metric.xlsx](slide_classification/best_of_all_exps_metric.xlsx) (rebuilt 5 Oct 2026). Intervals and tests come from [experiments/final_analysis/](experiments/final_analysis/SUMMARY.md): case-level bootstrap, 2,000 resamples, the same resampled cases for every configuration. Tables cover the aggregation methods; TITAN and PRISM are reported separately. External-validation figures use the primary `tcga_full` variant under the corrected threshold scheme.
 
-### Best result per cohort
+### Does aggregation beat averaging?
 
-| Experiment | N | Best AUROC | Configuration | Best BalAcc | Configuration |
+Difference in mean AUROC over 5 encoders × 5 heads, with 95% interval.
+
+| Contrast | TCGA-CV | PAIP-IV | PAIP-EV | SurGen-CV | SurGen-EV |
 |---|---|---|---|---|---|
-| TCGA-CV | 413 | **0.928** | H-Optimus-1 · Caption-15 · LR | **0.828** | H-Optimus-1 · Caption-15 · ANN |
-| PAIP-IV (31 test) | 31 | 0.926 | CONCH 1.5 · Caption-15 · kNN | 0.908 | CONCH 1.5 · Caption-15 / TTC · kNN |
-| PAIP-EV | 78 | **0.915** | UNI2 · Averaging · LR | **0.870** | H-Optimus-1 · Averaging · ProtoNet |
-| SurGen-CV (case-grouped) | 622 | 0.853 | UNI2 · Caption-15 · RF | 0.733 | UNI2 · Caption-15 · ANN |
-| SurGen-EV | 622 | **0.856** | UNI2 · Caption-15 · LR | 0.779 | UNI2 · TTC · RF |
+| Caption-14 − Averaging | +0.024 [−0.005, +0.054] | +0.093 [+0.019, +0.189] | +0.041 [+0.002, +0.081] | +0.046 [+0.022, +0.071] | +0.058 [+0.033, +0.079] |
+| Caption-15 − Averaging | +0.011 [−0.017, +0.040] | +0.077 [−0.007, +0.173] | +0.050 [+0.010, +0.088] | +0.052 [+0.026, +0.079] | +0.068 [+0.041, +0.095] |
+| Tissue-type clustering − Averaging | +0.013 [−0.011, +0.036] | +0.085 [+0.034, +0.150] | +0.018 [−0.022, +0.059] | +0.022 [−0.001, +0.046] | +0.036 [+0.011, +0.060] |
+| Mean of the three − Averaging | +0.016 [−0.010, +0.042] | +0.085 [+0.018, +0.169] | +0.037 [−0.001, +0.074] | +0.040 [+0.019, +0.063] | +0.054 [+0.035, +0.072] |
 
-PAIP-IV has only 31 test slides (7 MSI-H), so one slide moves balanced accuracy by about 0.07. Its bootstrap CIs are wide, for example [0.72, 1.00] on the best balanced accuracy.
+- On SurGen the advantage is clear for all three methods, in cross-validation and externally (mean of the three: p ≤ 0.001).
+- On PAIP external validation the two caption methods are better than averaging (p = 0.04 and 0.02); tissue-type clustering is not.
+- Within TCGA cross-validation no aggregation method is significantly better than averaging (p = 0.22).
+- The two caption class sets (14 and 15) differ only on the 31-slide PAIP-IV test set, where the 14-class set is slightly ahead (0.016, p = 0.02).
+
+Mean AUROC by aggregation method (5 encoders × 5 heads):
+
+| Method | TCGA-CV | PAIP-IV | PAIP-EV | SurGen-CV | SurGen-EV |
+|---|---|---|---|---|---|
+| Averaging | 0.775 | 0.760 | 0.819 | 0.665 | 0.662 |
+| Caption-14 | 0.802 | 0.853 | 0.861 | 0.711 | 0.720 |
+| Caption-15 | 0.792 | 0.837 | 0.869 | 0.718 | 0.730 |
+| Tissue-type clustering | 0.794 | 0.845 | 0.838 | 0.686 | 0.697 |
+
+### The configuration TCGA cross-validation selects
+
+TCGA-CV selects H-Optimus-1 · Caption-15 · LR (AUROC 0.928 [0.887, 0.960]). Applied unchanged to the external cohorts:
+
+| Cohort | AUROC [95% CI] | Rank among 100 | Balanced accuracy [95% CI] | Sensitivity / specificity | Gap to the best configuration |
+|---|---|---|---|---|---|
+| PAIP-EV | 0.879 [0.733, 0.984] | 19 | 0.799 [0.685, 0.904] | 0.63 / 0.97 | 0.037 [−0.038, +0.125] |
+| SurGen-EV | 0.740 [0.652, 0.821] | 32 | 0.688 [0.621, 0.758] | 0.52 / 0.86 | 0.116 [+0.050, +0.184] |
+
+This is the unbiased external estimate. On PAIP it cannot be distinguished from the best configuration; on SurGen it is clearly below it. The TCGA ranking transfers only moderately (Spearman 0.58 with PAIP-EV and 0.50 with SurGen-EV over the 100 configurations).
+
+### Best of 100 configurations per experiment
+
+These are maxima over 100 configurations chosen on the data they are reported on, so they are optimistic, and their intervals do not account for the selection.
+
+| Experiment | N | Best AUROC [95% CI] | Configuration | Best BalAcc | Configuration |
+|---|---|---|---|---|---|
+| TCGA-CV | 413 | **0.928** [0.887, 0.960] | H-Optimus-1 · Caption-15 · LR | **0.828** | H-Optimus-1 · Caption-15 · ANN |
+| PAIP-IV (31 test) | 31 | 0.926 [0.774, 1.000] | CONCH 1.5 · Caption-15 · kNN | 0.908 | CONCH 1.5 · Caption-15 / TTC · kNN |
+| PAIP-EV | 78 | **0.915** [0.829, 0.974] | UNI2 · Averaging · LR | **0.896** [0.800, 0.975] | UNI2 · Caption-14 · ANN |
+| SurGen-CV (case-grouped) | 622 | 0.853 [0.799, 0.896] | UNI2 · Caption-15 · RF | 0.733 | UNI2 · Caption-15 · ANN |
+| SurGen-EV | 622 | **0.856** [0.800, 0.905] | UNI2 · Caption-15 · LR | 0.781 [0.715, 0.842] | UNI2 · Caption-14 · LR |
+
+PAIP-IV has only 31 test slides (7 MSI-H), so one slide moves balanced accuracy by about 0.07. For the two cross-validation rows the point estimate is the mean of the four fold AUROCs and the interval is for the pooled out-of-fold AUROC, which differs by a few thousandths.
 
 ### Best AUROC per encoder (any aggregation × classifier)
 
 | Encoder | TCGA-CV | PAIP-EV | SurGen-EV |
 |---|---|---|---|
-| H-Optimus-1 | **0.928** | 0.901 | 0.802 |
+| H-Optimus-1 | **0.928** | 0.902 | 0.814 |
 | UNI2-h | 0.894 | **0.915** | **0.856** |
 | Virchow2 | 0.881 | 0.910 | 0.784 |
-| CONCH 1.5 | 0.839 | 0.883 | 0.747 |
-| CONCH v1 | 0.817 | 0.864 | 0.739 |
+| CONCH 1.5 | 0.839 | 0.883 | 0.721 |
+| CONCH v1 | 0.817 | 0.872 | 0.739 |
+
+Averaged over all aggregation methods and heads, H-Optimus-1 is the best encoder within TCGA (by 0.06 to 0.12 mean AUROC, p < 0.001) and UNI2-h is the best on SurGen (by 0.05 to 0.15, p ≤ 0.001). On PAIP-EV the top three encoders cannot be distinguished.
 
 ### Mean AUROC by classifier head (TCGA-CV, PAIP-EV and SurGen-EV, aggregation methods)
 
 | Head | TCGA-CV | PAIP-EV | SurGen-EV |
 |---|---|---|---|
 | LR | 0.850 | 0.872 | 0.709 |
-| ANN | 0.845 | 0.850 | 0.714 |
-| RF | 0.845 | 0.825 | 0.669 |
+| ANN | 0.845 | 0.864 | 0.737 |
+| RF | 0.845 | 0.836 | 0.703 |
 | ProtoNet | 0.720 | 0.850 | 0.710 |
-| kNN | 0.694 | 0.811 | 0.677 |
+| kNN | 0.694 | 0.811 | 0.653 |
 
-PAIP-EV and SurGen-EV kNN/RF rows use the corrected scheme (kNN k = 35 on PAIP and k = 20 on SurGen; RF quantile threshold). The other heads use frozen τ_TCGA. The two external cohorts therefore do not use identical kNN/RF settings and are not directly comparable for those two heads.
+The two external columns use the corrected scheme with the same settings on both cohorts: kNN at k = 35, and for ANN and RF the AUROC of the five-seed mean probability. The TCGA-CV column is the grid-searched kNN (mostly k = 3) and single-seed models.
 
 ### Effect of the threshold correction (`tcga_full`, mean over 20 aggregation combinations)
 
-| Cohort | Head | AUROC before → after | BalAcc before → after |
-|---|---|---|---|
-| PAIP-EV | kNN (k = 3 → 35, refit τ) | 0.611 → 0.811 | 0.596 → 0.703 |
-| PAIP-EV | RF (quantile τ) | 0.825 → 0.825 (unchanged by design) | 0.662 → 0.772 |
-| SurGen-EV | kNN (k = 3 → 20, refit τ) | 0.589 → 0.677 | 0.566 → 0.575 |
-| SurGen-EV | RF (quantile τ) | 0.669 → 0.669 (unchanged by design) | 0.559 → 0.642 |
+| Cohort | Head | AUROC before → after | BalAcc before → after | Dead or saturated thresholds before → after |
+|---|---|---|---|---|
+| PAIP-EV | LR | 0.872 → 0.872 | 0.743 → 0.789 | 0 → 0 |
+| PAIP-EV | ANN | 0.850 → 0.864 | 0.750 → 0.814 | 0 → 0 |
+| PAIP-EV | ProtoNet | 0.850 → 0.850 | 0.727 → 0.794 | 3 → 0 |
+| PAIP-EV | RF | 0.825 → 0.836 | 0.662 → 0.772 | 3 → 0 |
+| PAIP-EV | kNN (k = 3 → 35) | 0.611 → 0.811 | 0.596 → 0.703 | 2 → 0 |
+| SurGen-EV | LR | 0.709 → 0.709 | 0.594 → 0.649 | 4 → 0 |
+| SurGen-EV | ANN | 0.714 → 0.737 | 0.581 → 0.672 | 2 → 0 |
+| SurGen-EV | ProtoNet | 0.710 → 0.710 | 0.523 → 0.653 | 16 → 0 |
+| SurGen-EV | RF | 0.669 → 0.703 | 0.558 → 0.642 | 8 → 0 |
+| SurGen-EV | kNN (k = 3 → 35) | 0.589 → 0.653 | 0.565 → 0.571 | 0 → 0 |
+
+"Before" is the frozen τ_TCGA with single-seed AUROCs averaged over five seeds. The quantile threshold moves only the cut point, so LR and ProtoNet keep their AUROC; ANN and RF gain from averaging five seeds into one prediction; kNN gains from the larger neighbourhood. kNN stays weak on SurGen at any k (sensitivity 0.85, specificity 0.30).
 
 ### Slide-level encoder baselines
 
-PRISM (TCGA-CV): best AUROC 0.869 (ANN). TITAN on CONCH 1.5 features (TCGA-CV): best AUROC 0.877 (RF). Both are below the best aggregated configuration (0.928). See the `*_TITAN_PRISM` sheets of the workbook.
+PRISM (TCGA-CV): best AUROC 0.869 (ANN). TITAN on CONCH 1.5 features (TCGA-CV): best AUROC 0.877 (RF). Both are below the best aggregated configuration (0.928). The comparison on equal terms is less favourable: on the same CONCH 1.5 patch features, TITAN is better than the four aggregation methods by 0.085 mean AUROC in TCGA-CV, 0.057 in SurGen-CV and 0.066 in SurGen-EV. The aggregation methods overtake TITAN only when paired with a stronger patch encoder. PRISM has not been evaluated on SurGen (two of its 622 embeddings need regenerating). See the `*_TITAN_PRISM` sheets of the workbook.
 
 ### Figures
 
@@ -244,10 +294,10 @@ Radar plots (spokes are aggregation × classifier; one line per encoder; radius 
 | | AUROC | Balanced accuracy |
 |---|---|---|
 | TCGA-CV | [radar](Analysis_and_Visualization/Radar_Plots/TCGA-CV/TCGA-CV_AUROC_radar.png) | [radar](Analysis_and_Visualization/Radar_Plots/TCGA-CV/TCGA-CV_BalAcc_radar.png) |
-| PAIP-EV (kNN k = 35 and RF corrected) | [radar](Analysis_and_Visualization/Radar_Plots/PAIP-EV/PAIP-EV_AUROC_radar.png) | [radar](Analysis_and_Visualization/Radar_Plots/PAIP-EV/PAIP-EV_BalAcc_radar.png) |
-| SurGen-EV (kNN k = 20 and RF corrected) | [radar](Analysis_and_Visualization/Radar_Plots/SurGen-EV/SurGen-EV_AUROC_radar.png) | [radar](Analysis_and_Visualization/Radar_Plots/SurGen-EV/SurGen-EV_BalAcc_radar.png) |
+| PAIP-EV | [radar](Analysis_and_Visualization/Radar_Plots/PAIP-EV/PAIP-EV_AUROC_radar.png) | [radar](Analysis_and_Visualization/Radar_Plots/PAIP-EV/PAIP-EV_BalAcc_radar.png) |
+| SurGen-EV | [radar](Analysis_and_Visualization/Radar_Plots/SurGen-EV/SurGen-EV_AUROC_radar.png) | [radar](Analysis_and_Visualization/Radar_Plots/SurGen-EV/SurGen-EV_BalAcc_radar.png) |
 
-These are the figures drawn from the current workbook (3 Sep 2026). The `PAIP-EV_corrected/` and `SurGen-EV_corrected/` folders hold older plots from a superseded run and should not be cited.
+These figures are drawn from the current workbook (5 Oct 2026).
 
 ![TCGA-CV AUROC radar](Analysis_and_Visualization/Radar_Plots/TCGA-CV/TCGA-CV_AUROC_radar.png)
 
@@ -267,6 +317,7 @@ slide_classification/     Classifiers, data layer, CV/IV/EV runners, threshold m
   config/paths.py         Machine-keyed data roots, encoder dims, aggregation row counts
   runners/                cv_runner, iv_runner, ev_runner, full_trainer, classifiers, thresholds, threshold_modes
 tools/                    Report, workbook, radar-plot, t-SNE and audit builders
+experiments/              Threshold and k studies, external-validation diagnostics, final analysis (intervals, paired tests)
 reports/                  Phase reports (audit and remediation), cohort accounting, SurGen audit CSVs
 Analysis_and_Visualization/  Radar plots, zero-shot and t-SNE shift statistics, classifier comparisons
 ```
@@ -275,7 +326,7 @@ Analysis_and_Visualization/  Radar plots, zero-shot and t-SNE shift statistics, 
 
 ## 7. Reproducing
 
-**Requirements.** Python 3.10 (conda). [Complete_Pipeline/requirements.txt](Complete_Pipeline/requirements.txt) lists the pinned stack (PyTorch 2.11, timm, scikit-learn 1.8, pandas, pylibCZIrw for SurGen `.czi` slides). A CUDA GPU is needed for encoding. The foundation-model checkpoints are gated on Hugging Face, so set `HF_TOKEN` (via environment or a local `.env`; never committed). Raw slides and checkpoints are **not** included in this repository.
+**Requirements.** Python 3.10 (conda). The classification results were produced with scikit-learn 1.7.0 and PyTorch 2.2.0; use the same scikit-learn version to load the saved models. [Complete_Pipeline/requirements.txt](Complete_Pipeline/requirements.txt) lists the pinned stack (PyTorch 2.11, timm, scikit-learn 1.8, pandas, pylibCZIrw for SurGen `.czi` slides). A CUDA GPU is needed for encoding. The foundation-model checkpoints are gated on Hugging Face, so set `HF_TOKEN` (via environment or a local `.env`; never committed). Raw slides and checkpoints are **not** included in this repository.
 
 **Data roots.** All data paths come from [slide_classification/config/paths.py](slide_classification/config/paths.py), selected by the `MACHINE` environment variable (`local` by default). Edit the roots there to point at your own copy of the data.
 
@@ -295,10 +346,10 @@ python Complete_Pipeline/run_pipeline_supervisor.py       # runs the v6 batch pi
 
 ```bash
 python runners/cv_runner.py --experiment TCGA-CV          # or SurGen-CV
-python runners/iv_runner.py                               # PAIP provider split
+python runners/iv_runner.py --ann-protocol full --ann-preset ann_old   # PAIP provider split, published ANN
 python runners/full_trainer.py                            # final TCGA models, 5 seeds
-python runners/ev_runner.py --experiment PAIP-EV          # or SurGen-EV
-python runners/ev_runner.py --experiment PAIP-EV --threshold-mode promoted   # corrected kNN/RF
+python runners/ev_runner.py --experiment PAIP-EV --threshold-mode promoted   # published scheme; same for SurGen-EV
+python runners/ev_runner.py --experiment PAIP-EV          # frozen tau_TCGA only (strict zero-shot)
 ```
 
 Common flags: `--methods`, `--models`, `--classifiers`, `--force`. The `ev_runner` also takes `--variants`, `--seeds` and `--knn-k`.
@@ -309,6 +360,14 @@ Common flags: `--methods`, `--models`, `--classifiers`, `--force`. The `ev_runne
 python tools/build_report.py             # writes best_of_all_exps_metric.xlsx
 python tools/make_radar_plots.py         # radar figures
 python tools/write_results_md.py         # RESULTS.md tables
+```
+
+**4. Intervals and tests** (reads the saved models and stored predictions; changes no result tree):
+
+```bash
+python experiments/final_analysis/01_uniform_ev_scores.py         # per-slide external scores
+python experiments/final_analysis/validate_against_published.py   # must agree with the result trees
+python experiments/final_analysis/02_uncertainty.py               # bootstrap intervals, paired contrasts
 ```
 
 Treat the sequence above as a guide: it reflects the entry points that exist in the code, but a full end-to-end re-run has not been verified from a clean checkout [TBD: confirm on a clean machine].
@@ -328,11 +387,11 @@ Foundation models: CONCH / CONCH 1.5, H-Optimus-1, UNI2-h, Virchow2, PRISM, TITA
 - **SurGen is only partly encoded under the new labels.** 991 slides are labelled, but features exist for 622 (11,870,098 patches). The remaining 369 slides are not yet patched or encoded, which means **all SurGen results here are on the earlier 622-slide, 60-MSI-H set** and have not been re-run on the 991-slide labels. SurGen results will change when they are.
 - **Published-benchmark match is not verified here.** [TBD: cite the published SurGen benchmark and its label/case counts to confirm 991 / 822 matches it.] The only comparison on file is the earlier-label audit against the published split.
 - **The 622-slide results remain valid under the new labels.** None of the 622 modelled slides changed label in the relabel (562 non-MSI-H / 60 MSI-H in both files). The relabel only adds 369 slides, 40 of them MSI-H.
-- **No confidence intervals** are reported for CV and EV (single run on TCGA-CV; 5 seeds for final EV models), and PAIP-IV's 31-slide test set is very small.
+- **Uncertainty.** Case-level bootstrap intervals and paired tests for every configuration are in [experiments/final_analysis/](experiments/final_analysis/SUMMARY.md); the workbook carries point estimates only. Cross-validation is a single seed, and PAIP-IV's 31-slide test set is very small.
 - **Chosen configurations are optimistic.** The "best" rows above are maxima over 100+ configurations per experiment, selected on the same results they are reported from. Use them as a ranking aid, not as an unbiased performance estimate. The unselected mean-by-head tables are the safer summary.
-- **SurGen k = 20 for kNN is target-informed.** It was picked from a sweep run on SurGen itself, unlike k = 35, which is derived from TCGA alone. A target-selected k would not be expected to transfer.
+- **The aggregation advantage is external, not internal.** Within TCGA cross-validation no aggregation method is significantly better than averaging (+0.016 mean AUROC, p = 0.22). The supportable claim is better generalisation.
 - **The quantile threshold uses unlabelled target scores** (like unsupervised domain adaptation), not labels. It is not a strict zero-shot setting.
-- **SurGen performance is modest** and the kNN representation is weak on SurGen. Frozen operating points left many configurations dead or near-dead, which is why the corrected schemes exist.
+- **SurGen performance is modest.** The configuration TCGA selects reaches 0.740 there, and kNN is weak on SurGen at any neighbourhood size.
 - **TITAN is evaluated on a single encoder** (CONCH 1.5), and PRISM does not appear in the SurGen result tables. PRISM embeddings now exist for all 622 SurGen slides but have not been classified; five of them were built from slides with missing tiles and need regenerating first.
 - **CIMP/BRAF/KRAS/TP53 label files exist, but only the MSI-H task is evaluated.**
 - **Repository state.** `RESULTS.md` is generated: its tables match the workbook, but some of its hard-coded prose is out of date (it still says PAIP has 73 slides). Radar PNGs are git-ignored by default; the links resolve locally but not on GitHub unless the images are force-added. Superseded snapshots, old reports and test outputs were moved out of the repository in October 2026 (see [reports/PROJECT_STATUS.md](reports/PROJECT_STATUS.md)).

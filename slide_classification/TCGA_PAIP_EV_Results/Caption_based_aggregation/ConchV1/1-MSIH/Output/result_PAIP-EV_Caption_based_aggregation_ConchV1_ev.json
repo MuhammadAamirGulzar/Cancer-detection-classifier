@@ -1,8 +1,16 @@
 {
   "stamp": {
     "machine": "local",
-    "timestamp": "2026-09-03T07:23:14+00:00",
-    "git_commit": "e8cbb894",
+    "timestamp": "2026-10-05T09:34:14+00:00",
+    "git_commit": "e9b92471",
+    "git_code_dirty": false,
+    "versions": {
+      "python": "3.10.18",
+      "sklearn": "1.7.0",
+      "torch": "2.2.0",
+      "numpy": "1.26.3",
+      "pandas": "2.3.1"
+    },
     "experiment": "PAIP-EV",
     "cohort": "paip",
     "method": "Caption_based_aggregation",
@@ -28,10 +36,13 @@
     "threshold_mode": "promoted",
     "knn_k_corrected": 35,
     "promoted_classifiers": [
+      "lin",
+      "ann",
       "knn",
+      "proto",
       "rf"
     ],
-    "threshold_policy": "TWO SCHEMES IN ONE TABLE - knn: k=35 scores, tau refit on TCGA out-of-fold at that k (knn_k35_thresholds.json); rf: rate-matched (quantile) threshold, r from tau_TCGA on TCGA out-of-fold; lin/ann/proto: frozen tau_TCGA, Youden J on pooled out-of-fold TCGA-CV probabilities (unchanged)"
+    "threshold_policy": "CORRECTED SCHEME FOR EVERY HEAD (tcga_full variant) - knn: k=35 scores, tau refit on TCGA out-of-fold at that k (knn_k35_thresholds.json); lin/ann/proto/rf: rate-matched (quantile) threshold on the mean probability of the seed models, r from tau_TCGA on TCGA out-of-fold. AUROC of a corrected row is that of the score its cut point uses."
   },
   "results": {
     "lin": {
@@ -44,27 +55,27 @@
           45,
           46
         ],
-        "acc": 0.8333333333333334,
-        "acc_sd": 0.0,
-        "bacc": 0.8184656556645852,
-        "bacc_sd": 0.0,
-        "macro_f1": 0.7913150854085202,
-        "macro_f1_sd": 0.0,
-        "weighted_f1": 0.8393359401797353,
-        "weighted_f1_sd": 1.1102230246251565e-16,
+        "acc": 0.8461538461538461,
+        "acc_sd": null,
+        "bacc": 0.8269402319357717,
+        "bacc_sd": null,
+        "macro_f1": 0.8045112781954887,
+        "macro_f1_sd": null,
+        "weighted_f1": 0.8507807981492193,
+        "weighted_f1_sd": null,
         "auroc": 0.8483496877787688,
-        "auroc_sd": 0.0,
+        "auroc_sd": null,
         "conf_matrix": [
           [
-            50,
-            9
+            51,
+            8
           ],
           [
             4,
             15
           ]
         ],
-        "threshold": 0.0032489040412152417,
+        "threshold": 0.03031467976668032,
         "mean_probs": [
           0.9281491951178638,
           1.6031052476851157e-08,
@@ -144,7 +155,54 @@
           6.109353773047595e-14,
           1.9701336344348764e-08,
           0.06640112420620546
-        ]
+        ],
+        "status_frozen": "ok",
+        "threshold_mode": "corrected",
+        "threshold_corrected": 0.03031467976668032,
+        "auroc_corrected": 0.8483496877787688,
+        "auroc_corrected_basis": "seed_mean_probability",
+        "bacc_corrected": 0.8269402319357717,
+        "acc_corrected": 0.8461538461538461,
+        "macro_f1_corrected": 0.8045112781954887,
+        "weighted_f1_corrected": 0.8507807981492193,
+        "conf_matrix_corrected": [
+          [
+            51,
+            8
+          ],
+          [
+            4,
+            15
+          ]
+        ],
+        "n_pos_pred_corrected": 23,
+        "status_corrected": "ok",
+        "corrected_scheme": "quantile_rate_matched",
+        "bacc_frozen": 0.8184656556645852,
+        "acc_frozen": 0.8333333333333334,
+        "macro_f1_frozen": 0.7913150854085202,
+        "weighted_f1_frozen": 0.8393359401797353,
+        "conf_matrix_frozen": [
+          [
+            50,
+            9
+          ],
+          [
+            4,
+            15
+          ]
+        ],
+        "auroc_frozen": 0.8483496877787688,
+        "auroc_basis": "seed_mean_probability",
+        "threshold_frozen": 0.0032489040412152417,
+        "bacc_sd_frozen": 0.0,
+        "acc_sd_frozen": 0.0,
+        "macro_f1_sd_frozen": 0.0,
+        "weighted_f1_sd_frozen": 1.1102230246251565e-16,
+        "auroc_sd_frozen": 0.0,
+        "threshold_scheme": "quantile_rate_matched",
+        "promoted": true,
+        "status": "ok"
       },
       "fold_ensemble": {
         "acc": 0.8076923076923077,
@@ -200,27 +258,27 @@
           45,
           46
         ],
-        "acc": 0.6307692307692307,
-        "acc_sd": 0.15520765077355442,
-        "bacc": 0.7024085637823372,
-        "bacc_sd": 0.10259488779946817,
-        "macro_f1": 0.6102652174116168,
-        "macro_f1_sd": 0.14221000091262223,
-        "weighted_f1": 0.6430204872388073,
-        "weighted_f1_sd": 0.16377256780529512,
-        "auroc": 0.8367528991971455,
-        "auroc_sd": 0.009491122981816529,
+        "acc": 0.7307692307692307,
+        "acc_sd": null,
+        "bacc": 0.7685102586975914,
+        "bacc_sd": null,
+        "macro_f1": 0.6999450448800146,
+        "macro_f1_sd": null,
+        "weighted_f1": 0.7492637423027604,
+        "weighted_f1_sd": null,
+        "auroc": 0.8421052631578947,
+        "auroc_sd": null,
         "conf_matrix": [
           [
-            33,
-            26
+            41,
+            18
           ],
           [
             3,
             16
           ]
         ],
-        "threshold": 0.3815231919288635,
+        "threshold": 0.4041117342851929,
         "mean_probs": [
           0.9003594040870666,
           0.2714335173368454,
@@ -300,7 +358,54 @@
           0.1473655015230179,
           0.30089387893676756,
           0.6372248232364655
-        ]
+        ],
+        "status_frozen": "ok",
+        "threshold_mode": "corrected",
+        "threshold_corrected": 0.4041117342851929,
+        "auroc_corrected": 0.8421052631578947,
+        "auroc_corrected_basis": "seed_mean_probability",
+        "bacc_corrected": 0.7685102586975914,
+        "acc_corrected": 0.7307692307692307,
+        "macro_f1_corrected": 0.6999450448800146,
+        "weighted_f1_corrected": 0.7492637423027604,
+        "conf_matrix_corrected": [
+          [
+            41,
+            18
+          ],
+          [
+            3,
+            16
+          ]
+        ],
+        "n_pos_pred_corrected": 34,
+        "status_corrected": "ok",
+        "corrected_scheme": "quantile_rate_matched",
+        "bacc_frozen": 0.7024085637823372,
+        "acc_frozen": 0.6307692307692307,
+        "macro_f1_frozen": 0.6102652174116168,
+        "weighted_f1_frozen": 0.6430204872388073,
+        "conf_matrix_frozen": [
+          [
+            33,
+            26
+          ],
+          [
+            3,
+            16
+          ]
+        ],
+        "auroc_frozen": 0.8367528991971455,
+        "auroc_basis": "seed_mean_probability",
+        "threshold_frozen": 0.3815231919288635,
+        "bacc_sd_frozen": 0.10259488779946817,
+        "acc_sd_frozen": 0.15520765077355442,
+        "macro_f1_sd_frozen": 0.14221000091262223,
+        "weighted_f1_sd_frozen": 0.16377256780529512,
+        "auroc_sd_frozen": 0.009491122981816529,
+        "threshold_scheme": "quantile_rate_matched",
+        "promoted": true,
+        "status": "ok"
       },
       "fold_ensemble": {
         "acc": 0.7435897435897436,
@@ -458,11 +563,12 @@
           0.3333333333333333
         ],
         "status_frozen": "ok",
-        "auroc_corrected": 0.7524531668153434,
         "knn_k_corrected": 35,
         "knn_tau_source": "knn_k35_thresholds.json",
         "threshold_mode": "corrected",
         "threshold_corrected": 0.17142857142857143,
+        "auroc_corrected": 0.7524531668153434,
+        "auroc_corrected_basis": "knn_k35",
         "bacc_corrected": 0.6752899197145406,
         "acc_corrected": 0.5897435897435898,
         "macro_f1_corrected": 0.5760869565217391,
@@ -495,6 +601,7 @@
           ]
         ],
         "auroc_frozen": 0.6628010704727921,
+        "auroc_basis": "knn_k35",
         "threshold_frozen": 0.09525873179930806,
         "bacc_sd_frozen": 0.0,
         "acc_sd_frozen": 0.0,
@@ -559,27 +666,27 @@
           45,
           46
         ],
-        "acc": 0.6538461538461539,
-        "acc_sd": 0.0,
-        "bacc": 0.7355040142729705,
-        "bacc_sd": 0.0,
-        "macro_f1": 0.6365832614322692,
-        "macro_f1_sd": 0.0,
-        "weighted_f1": 0.6772018318178801,
-        "weighted_f1_sd": 0.0,
+        "acc": 0.7948717948717948,
+        "acc_sd": null,
+        "bacc": 0.7752007136485282,
+        "bacc_sd": null,
+        "macro_f1": 0.7467532467532467,
+        "macro_f1_sd": null,
+        "weighted_f1": 0.8033633033633034,
+        "weighted_f1_sd": null,
         "auroc": 0.8510258697591437,
-        "auroc_sd": 0.0,
+        "auroc_sd": null,
         "conf_matrix": [
           [
-            34,
-            25
+            48,
+            11
           ],
           [
-            2,
-            17
+            5,
+            14
           ]
         ],
-        "threshold": 0.4997349977493286,
+        "threshold": 0.5029487084534209,
         "mean_probs": [
           0.5082663893699646,
           0.5001078248023987,
@@ -659,7 +766,54 @@
           0.4954166114330292,
           0.4950634837150574,
           0.5038155913352966
-        ]
+        ],
+        "status_frozen": "ok",
+        "threshold_mode": "corrected",
+        "threshold_corrected": 0.5029487084534209,
+        "auroc_corrected": 0.8510258697591437,
+        "auroc_corrected_basis": "seed_mean_probability",
+        "bacc_corrected": 0.7752007136485282,
+        "acc_corrected": 0.7948717948717948,
+        "macro_f1_corrected": 0.7467532467532467,
+        "weighted_f1_corrected": 0.8033633033633034,
+        "conf_matrix_corrected": [
+          [
+            48,
+            11
+          ],
+          [
+            5,
+            14
+          ]
+        ],
+        "n_pos_pred_corrected": 25,
+        "status_corrected": "ok",
+        "corrected_scheme": "quantile_rate_matched",
+        "bacc_frozen": 0.7355040142729705,
+        "acc_frozen": 0.6538461538461539,
+        "macro_f1_frozen": 0.6365832614322692,
+        "weighted_f1_frozen": 0.6772018318178801,
+        "conf_matrix_frozen": [
+          [
+            34,
+            25
+          ],
+          [
+            2,
+            17
+          ]
+        ],
+        "auroc_frozen": 0.8510258697591437,
+        "auroc_basis": "seed_mean_probability",
+        "threshold_frozen": 0.4997349977493286,
+        "bacc_sd_frozen": 0.0,
+        "acc_sd_frozen": 0.0,
+        "macro_f1_sd_frozen": 0.0,
+        "weighted_f1_sd_frozen": 0.0,
+        "auroc_sd_frozen": 0.0,
+        "threshold_scheme": "quantile_rate_matched",
+        "promoted": true,
+        "status": "ok"
       },
       "fold_ensemble": {
         "acc": 0.6794871794871795,
@@ -723,7 +877,7 @@
         "macro_f1_sd": null,
         "weighted_f1": 0.7970322360566263,
         "weighted_f1_sd": null,
-        "auroc": 0.8376449598572702,
+        "auroc": 0.847457627118644,
         "auroc_sd": null,
         "conf_matrix": [
           [
@@ -741,7 +895,7 @@
           0.10724312055622123,
           0.13880529495704125,
           0.10825211394258231,
-          0.1691552243561766,
+          0.16915522435617658,
           0.26736683343025575,
           0.08485421161086534,
           0.15498235167656557,
@@ -754,7 +908,7 @@
           0.10151832455653138,
           0.2466940286660581,
           0.11885332843673195,
-          0.06671241375638907,
+          0.06671241375638909,
           0.07617451936570044,
           0.22692796171472254,
           0.10083771523662144,
@@ -779,7 +933,7 @@
           0.08470041812513078,
           0.08652184894554568,
           0.1505501090389961,
-          0.07725130646728158,
+          0.07725130646728157,
           0.17862717633964717,
           0.12638612582863057,
           0.08772635701050666,
@@ -807,7 +961,7 @@
           0.07812117712577593,
           0.11926191523530234,
           0.07224332697393163,
-          0.05959049318532935,
+          0.059590493185329364,
           0.08608489727659285,
           0.05560906765493162,
           0.24752985617433634,
@@ -819,6 +973,8 @@
         "status_frozen": "ok",
         "threshold_mode": "corrected",
         "threshold_corrected": 0.18876577124289598,
+        "auroc_corrected": 0.847457627118644,
+        "auroc_corrected_basis": "seed_mean_probability",
         "bacc_corrected": 0.6944692239072257,
         "acc_corrected": 0.8076923076923077,
         "macro_f1_corrected": 0.7117516629711751,
@@ -851,6 +1007,7 @@
           ]
         ],
         "auroc_frozen": 0.8376449598572702,
+        "auroc_basis": "seed_mean_probability",
         "threshold_frozen": 0.18896159501472592,
         "bacc_sd_frozen": 0.01942235474408745,
         "acc_sd_frozen": 0.017008332258232825,

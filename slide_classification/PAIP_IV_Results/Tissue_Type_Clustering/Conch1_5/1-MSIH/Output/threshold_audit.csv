@@ -1,8 +1,8 @@
 experiment,method,model,classifier,threshold_label,threshold,bacc,auroc,conf_matrix
 PAIP-IV,Tissue_Type_Clustering,Conch1_5,lin,0.5,0.5,0.7440476190476191,0.9047619047619047,"[[22, 2], [3, 4]]"
 PAIP-IV,Tissue_Type_Clustering,Conch1_5,lin,tau_TCGA,0.004347521555347131,0.7916666666666667,0.9047619047619047,"[[14, 10], [0, 7]]"
-PAIP-IV,Tissue_Type_Clustering,Conch1_5,ann,0.5,0.5,0.7708333333333333,0.8928571428571428,"[[13, 11], [0, 7]]"
-PAIP-IV,Tissue_Type_Clustering,Conch1_5,ann,tau_TCGA,0.36952877044677734,0.75,0.8928571428571428,"[[12, 12], [0, 7]]"
+PAIP-IV,Tissue_Type_Clustering,Conch1_5,ann,0.5,0.5,0.7946428571428572,0.7619047619047619,"[[21, 3], [2, 5]]"
+PAIP-IV,Tissue_Type_Clustering,Conch1_5,ann,tau_TCGA,0.36952877044677734,0.7738095238095238,0.7619047619047619,"[[20, 4], [2, 5]]"
 PAIP-IV,Tissue_Type_Clustering,Conch1_5,knn,0.5,0.5,0.9077380952380952,0.9196428571428572,"[[23, 1], [1, 6]]"
 PAIP-IV,Tissue_Type_Clustering,Conch1_5,knn,tau_TCGA,0.0934986907133482,0.625,0.9196428571428572,"[[6, 18], [0, 7]]"
 PAIP-IV,Tissue_Type_Clustering,Conch1_5,proto,0.5,0.5,0.7738095238095238,0.8511904761904762,"[[20, 4], [2, 5]]"

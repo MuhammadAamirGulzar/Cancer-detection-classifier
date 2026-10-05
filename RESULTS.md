@@ -16,8 +16,10 @@ These differ from the raw label-file counts, because a slide needs **both** a la
 | Cohort | Slides in label file | With features (modelled) | Excluded |
 |---|---|---|---|
 | TCGA | 416 | **413** (60 MSI-H / 353 non) | `TCGA-AD-6895_MSIH`, `TCGA-AD-6899_nonMSIH`, `TCGA-CM-6680_nonMSIH` |
-| PAIP | 78 | **73** (17 MSI-H / 56 non) | `training_data_19/30/41/42/46` |
+| PAIP | 78 | **78** (19 MSI-H / 59 non) | none (five slides were recovered on 2026-08-10) |
 | SurGen | 624 usable (of 1020; 396 are label −1) | **622** (60 MSI-H / 562 non) | `SR386_40X_HE_T086_01`, `SR386_40X_HE_T339_01` |
+
+The SurGen row describes the label set the results were computed on. On 2026-09-08 the label file was rebuilt to 991 labelled slides (100 MSI-H). None of the 622 modelled slides changed label, so the results stand; the 369 added slides are not encoded yet.
 
 ## Definitions
 - **CV (cross-validation)** — the cohort is split into K folds; each fold serves as
@@ -36,7 +38,7 @@ These differ from the raw label-file counts, because a slide needs **both** a la
 - **Protocol:** 4-fold cross-validation, averaged
 - **Train:** TCGA folds
 - **Test:** TCGA held-out fold
-- **Threshold policy:** Each of the 413 slides is tested exactly once. Reported at threshold 0.5.
+- **Threshold policy:** Each of the 413 slides is tested exactly once. Reported at threshold 0.5, except the random forest, which predicts at its fixed 0.30 cut-point.
 
 ### Coverage
 | Method \ Model | Conch1_5 | ConchV1 | H-Optimus-1 | PRISM | UNI2 | Virchow2 |
@@ -104,7 +106,7 @@ TITAN and PRISM are **slide-level encoders with no patch aggregation step**. The
 - **Protocol:** single fixed provider split, no averaging
 - **Train:** PAIP official train (all 47 have features, 12 MSI-H)
 - **Test:** PAIP official test (31, all have features)
-- **Threshold policy:** Reported at threshold 0.5 with bootstrap 95% CIs over the 31 test slides. The ANN head is fitted on all 47 training slides with the TCGA-CV-derived configuration, matching the other four heads; the 20% carve-out is used for early stopping only.
+- **Threshold policy:** Reported at threshold 0.5 (random forest: 0.30) with bootstrap 95% CIs over the 31 test slides. The ANN is the `ann_old` configuration - one hidden layer of 512 units, dropout 0.5 - trained once on all 47 training slides with no hyperparameter search (`--ann-protocol full --ann-preset ann_old`). Its weights are frozen in `slide_classification/final_models/ann_old/`.
 
 ### Coverage
 | Method \ Model | Conch1_5 | ConchV1 | H-Optimus-1 | PRISM | UNI2 | Virchow2 |
@@ -134,6 +136,8 @@ Sorted by balanced accuracy, with AUROC as the tie-break. AUROC is the primary m
 | Averaging | Conch1_5 | lin | 0.8244 | [0.6412, 0.9566] | 0.8690 | [0.7154, 0.9837] | 0.8065 | 0.7652 | 31 |
 | Caption_based_aggregation_15_classes | ConchV1 | knn | 0.8155 | [0.6220, 0.9815] | 0.8452 | [0.6331, 0.9934] | 0.8710 | 0.8155 | 31 |
 | Caption_based_aggregation | H-Optimus-1 | lin | 0.8155 | [0.6067, 0.9822] | 0.8333 | [0.6087, 1.0000] | 0.8710 | 0.8155 | 31 |
+| Averaging | Conch1_5 | ann | 0.8125 | [0.7222, 0.9000] | 0.8810 | [0.7067, 1.0000] | 0.7097 | 0.6890 | 31 |
+| Caption_based_aggregation | UNI2 | ann | 0.8036 | [0.6100, 0.9400] | 0.8869 | [0.6800, 1.0000] | 0.7742 | 0.7344 | 31 |
 | Caption_based_aggregation | UNI2 | lin | 0.8036 | [0.6100, 0.9400] | 0.8810 | [0.6852, 1.0000] | 0.7742 | 0.7344 | 31 |
 | Caption_based_aggregation | UNI2 | proto | 0.8036 | [0.6100, 0.9400] | 0.8810 | [0.6481, 1.0000] | 0.7742 | 0.7344 | 31 |
 | Caption_based_aggregation_15_classes | UNI2 | proto | 0.8036 | [0.6100, 0.9400] | 0.8750 | [0.6309, 1.0000] | 0.7742 | 0.7344 | 31 |
@@ -144,8 +148,6 @@ Sorted by balanced accuracy, with AUROC as the tie-break. AUROC is the primary m
 | Caption_based_aggregation | Virchow2 | knn | 0.7946 | [0.6004, 0.9646] | 0.8601 | [0.6343, 1.0000] | 0.8387 | 0.7801 | 31 |
 | Caption_based_aggregation | ConchV1 | knn | 0.7946 | [0.6004, 0.9646] | 0.8512 | [0.6799, 0.9907] | 0.8387 | 0.7801 | 31 |
 | Caption_based_aggregation | ConchV1 | lin | 0.7946 | [0.5899, 0.9751] | 0.8393 | [0.6413, 0.9892] | 0.8387 | 0.7801 | 31 |
-| Caption_based_aggregation | Virchow2 | lin | 0.7946 | [0.5899, 0.9751] | 0.8393 | [0.6265, 1.0000] | 0.8387 | 0.7801 | 31 |
-| Caption_based_aggregation | H-Optimus-1 | proto | 0.7946 | [0.5899, 0.9751] | 0.8333 | [0.5773, 1.0000] | 0.8387 | 0.7801 | 31 |
 
 _Showing the top 25 of 100 rows; the full table is in `slide_classification/best_of_all_exps_metric.xlsx`._
 
@@ -157,10 +159,10 @@ TITAN and PRISM are **slide-level encoders with no patch aggregation step**. The
 | TITAN | Conch1_5 | lin | 0.9167 | [0.8409, 0.9792] | 0.9345 | [0.8369, 1.0000] | 0.8710 | 0.8434 | 31 |
 | TITAN | Conch1_5 | knn | 0.8155 | [0.6100, 0.9815] | 0.9345 | [0.8333, 0.9970] | 0.8710 | 0.8155 | 31 |
 | PRISM | PRISM | lin | 0.7946 | [0.5809, 0.9643] | 0.8214 | [0.6130, 0.9773] | 0.8387 | 0.7801 | 31 |
+| PRISM | PRISM | ann | 0.7738 | [0.5652, 0.9483] | 0.8333 | [0.6200, 1.0000] | 0.8065 | 0.7473 | 31 |
 | PRISM | PRISM | rf | 0.7738 | [0.5595, 0.9583] | 0.8125 | [0.5800, 0.9942] | 0.8065 | 0.7473 | 31 |
-| PRISM | PRISM | ann | 0.7530 | [0.5324, 0.9349] | 0.7917 | [0.5153, 1.0000] | 0.7742 | 0.7163 | 31 |
 | PRISM | PRISM | proto | 0.7530 | [0.5324, 0.9349] | 0.7679 | [0.4691, 1.0000] | 0.7742 | 0.7163 | 31 |
-| TITAN | Conch1_5 | ann | 0.7411 | [0.5505, 0.8846] | 0.8690 | [0.6903, 1.0000] | 0.6774 | 0.6477 | 31 |
+| TITAN | Conch1_5 | ann | 0.7411 | [0.5516, 0.8800] | 0.8929 | [0.7133, 1.0000] | 0.6774 | 0.6477 | 31 |
 | TITAN | Conch1_5 | rf | 0.7411 | [0.5500, 0.8864] | 0.8690 | [0.6573, 1.0000] | 0.6774 | 0.6477 | 31 |
 | TITAN | Conch1_5 | proto | 0.7321 | [0.5136, 0.9158] | 0.8214 | [0.5733, 1.0000] | 0.7419 | 0.6869 | 31 |
 | PRISM | PRISM | knn | 0.6726 | [0.4615, 0.8967] | 0.8155 | [0.6038, 0.9769] | 0.8065 | 0.6900 | 31 |
@@ -172,7 +174,7 @@ TITAN and PRISM are **slide-level encoders with no patch aggregation step**. The
 - **Protocol:** external validation
 - **Train:** TCGA (see variant)
 - **Test:** all 78 PAIP slides
-- **Threshold policy:** **Two threshold schemes in one table.** kNN is scored at k=35 (uniform weights) and cut at a tau refitted on TCGA out-of-fold probabilities at that k, so kNN is the only head whose AUROC moves. RF keeps its scores and takes a rate-matched (quantile) threshold, so its AUROC is unchanged and only the operating point moves. LR, ANN and ProtoNet keep the frozen tau_TCGA and are unchanged. Both schemes come from TCGA alone — the quantile reads PAIP scores but never PAIP labels. Applies to the `tcga_full` variant; the two fold-based variants stay entirely frozen, as does all of SurGen-EV, so kNN/RF are not comparable across the two external cohorts.
+- **Threshold policy:** All five heads use the corrected scheme (`tcga_full` variant). kNN is scored at k=35 (uniform weights) and cut at a tau refitted on TCGA out-of-fold probabilities at that k. LR, ANN, ProtoNet and RF take a rate-matched (quantile) threshold on the mean probability of the five seed models. A row's AUROC is the AUROC of that same score: the k=35 scores for kNN, the five-seed ensemble for the others. k, tau and the positive rate come from TCGA alone; the quantile reads PAIP scores but never PAIP labels. The two fold-based variants stay at the frozen tau_TCGA. The same rule is applied to both external cohorts.
 
 ### Coverage
 | Method \ Model | Conch1_5 | ConchV1 | H-Optimus-1 | PRISM | UNI2 | Virchow2 |
@@ -189,31 +191,31 @@ Sorted by balanced accuracy, with AUROC as the tie-break. AUROC is the primary m
 
 | Method | Model | Classifier | Variant | BalAcc | AUROC | Acc | MacroF1 | N_test | Threshold_scheme |
 |---|---|---|---|---|---|---|---|---|---|
+| Caption_based_aggregation | UNI2 | ann | tcga_full | 0.8956 | 0.9117 | 0.9231 | 0.8956 | 78 | quantile_rate_matched |
+| Caption_based_aggregation_15_classes | Virchow2 | lin | tcga_full | 0.8872 | 0.9099 | 0.9103 | 0.8803 | 78 | quantile_rate_matched |
 | Caption_based_aggregation | UNI2 | ann | fold_ensemble | 0.8872 | 0.9028 | 0.9103 | 0.8803 | 78 | frozen_tau_TCGA |
 | Caption_based_aggregation_15_classes | UNI2 | ann | fold_ensemble | 0.8787 | 0.9001 | 0.8974 | 0.8655 | 78 | frozen_tau_TCGA |
 | Caption_based_aggregation_15_classes | H-Optimus-1 | ann | fold_ensemble | 0.8787 | 0.8983 | 0.8974 | 0.8655 | 78 | frozen_tau_TCGA |
-| Averaging | H-Optimus-1 | proto | tcga_full | 0.8702 | 0.8742 | 0.8846 | 0.8511 | 78 | frozen_tau_TCGA |
+| Caption_based_aggregation | H-Optimus-1 | ann | tcga_full | 0.8702 | 0.8965 | 0.8846 | 0.8511 | 78 | quantile_rate_matched |
+| Caption_based_aggregation | Virchow2 | ann | tcga_full | 0.8702 | 0.8965 | 0.8846 | 0.8511 | 78 | quantile_rate_matched |
+| Caption_based_aggregation | Virchow2 | lin | tcga_full | 0.8702 | 0.8876 | 0.8846 | 0.8511 | 78 | quantile_rate_matched |
 | Caption_based_aggregation | H-Optimus-1 | ann | fold_ensemble | 0.8702 | 0.8635 | 0.8846 | 0.8511 | 78 | frozen_tau_TCGA |
+| Caption_based_aggregation_15_classes | H-Optimus-1 | ann | tcga_full | 0.8617 | 0.9019 | 0.8718 | 0.8371 | 78 | quantile_rate_matched |
+| Caption_based_aggregation | H-Optimus-1 | proto | tcga_full | 0.8617 | 0.8796 | 0.8718 | 0.8371 | 78 | quantile_rate_matched |
+| Averaging | H-Optimus-1 | proto | tcga_full | 0.8617 | 0.8742 | 0.8718 | 0.8371 | 78 | quantile_rate_matched |
 | Averaging | H-Optimus-1 | proto | fold_ensemble | 0.8608 | 0.8733 | 0.8974 | 0.8608 | 78 | frozen_tau_TCGA |
+| Averaging | H-Optimus-1 | ann | tcga_full | 0.8608 | 0.8662 | 0.8974 | 0.8608 | 78 | quantile_rate_matched |
 | Caption_based_aggregation_15_classes | H-Optimus-1 | proto | fold_ensemble | 0.8533 | 0.8787 | 0.8590 | 0.8234 | 78 | frozen_tau_TCGA |
 | Caption_based_aggregation_15_classes | Conch1_5 | ann | fold_ensemble | 0.8533 | 0.8778 | 0.8590 | 0.8234 | 78 | frozen_tau_TCGA |
-| Caption_based_aggregation | H-Optimus-1 | rf | tcga_full | 0.8524 | 0.8648 | 0.8846 | 0.8462 | 78 | quantile_rate_matched |
-| Tissue_Type_Clustering | H-Optimus-1 | rf | tcga_full | 0.8524 | 0.8614 | 0.8846 | 0.8462 | 78 | quantile_rate_matched |
-| Caption_based_aggregation | UNI2 | rf | tcga_full | 0.8524 | 0.8421 | 0.8846 | 0.8462 | 78 | quantile_rate_matched |
+| Caption_based_aggregation_15_classes | H-Optimus-1 | proto | tcga_full | 0.8533 | 0.8778 | 0.8590 | 0.8234 | 78 | quantile_rate_matched |
+| Caption_based_aggregation_15_classes | UNI2 | ann | tcga_full | 0.8524 | 0.8974 | 0.8846 | 0.8462 | 78 | quantile_rate_matched |
+| Tissue_Type_Clustering | H-Optimus-1 | rf | tcga_full | 0.8524 | 0.8680 | 0.8846 | 0.8462 | 78 | quantile_rate_matched |
+| Caption_based_aggregation | H-Optimus-1 | rf | tcga_full | 0.8524 | 0.8626 | 0.8846 | 0.8462 | 78 | quantile_rate_matched |
+| Caption_based_aggregation | UNI2 | rf | tcga_full | 0.8524 | 0.8528 | 0.8846 | 0.8462 | 78 | quantile_rate_matched |
 | Caption_based_aggregation_15_classes | Virchow2 | proto | fold_ensemble | 0.8515 | 0.8707 | 0.9103 | 0.8711 | 78 | frozen_tau_TCGA |
+| Tissue_Type_Clustering | UNI2 | proto | tcga_full | 0.8515 | 0.8555 | 0.9103 | 0.8711 | 78 | quantile_rate_matched |
 | Caption_based_aggregation_15_classes | H-Optimus-1 | ann | fold_average | 0.8502 | 0.8930 | 0.8814 | 0.8431 | 78 | frozen_tau_TCGA |
 | Caption_based_aggregation_15_classes | Virchow2 | lin | fold_average | 0.8469 | 0.8967 | 0.8494 | 0.8168 | 78 | frozen_tau_TCGA |
-| Caption_based_aggregation | H-Optimus-1 | ann | tcga_full | 0.8463 | 0.8955 | 0.8538 | 0.8182 | 78 | frozen_tau_TCGA |
-| Tissue_Type_Clustering | H-Optimus-1 | ann | tcga_full | 0.8463 | 0.8853 | 0.8538 | 0.8171 | 78 | frozen_tau_TCGA |
-| Caption_based_aggregation_15_classes | Virchow2 | lin | tcga_full | 0.8457 | 0.9099 | 0.8205 | 0.7894 | 78 | frozen_tau_TCGA |
-| Caption_based_aggregation | H-Optimus-1 | proto | fold_ensemble | 0.8448 | 0.8796 | 0.8462 | 0.8101 | 78 | frozen_tau_TCGA |
-| Caption_based_aggregation_15_classes | H-Optimus-1 | proto | tcga_full | 0.8448 | 0.8778 | 0.8462 | 0.8101 | 78 | frozen_tau_TCGA |
-| Averaging | H-Optimus-1 | ann | fold_ensemble | 0.8448 | 0.8680 | 0.8462 | 0.8101 | 78 | frozen_tau_TCGA |
-| Caption_based_aggregation_15_classes | UNI2 | rf | tcga_full | 0.8448 | 0.8409 | 0.8462 | 0.8101 | 78 | quantile_rate_matched |
-| Caption_based_aggregation | Conch1_5 | ann | fold_ensemble | 0.8439 | 0.8662 | 0.8718 | 0.8319 | 78 | frozen_tau_TCGA |
-| Caption_based_aggregation_15_classes | H-Optimus-1 | rf | tcga_full | 0.8439 | 0.8510 | 0.8718 | 0.8319 | 78 | quantile_rate_matched |
-| Caption_based_aggregation | Virchow2 | lin | fold_average | 0.8427 | 0.8827 | 0.8429 | 0.8096 | 78 | frozen_tau_TCGA |
-| Caption_based_aggregation_15_classes | H-Optimus-1 | ann | tcga_full | 0.8380 | 0.9008 | 0.8359 | 0.8009 | 78 | frozen_tau_TCGA |
 
 _Showing the top 25 of 300 rows; the full table is in `slide_classification/best_of_all_exps_metric.xlsx`._
 
@@ -223,20 +225,20 @@ TITAN and PRISM are **slide-level encoders with no patch aggregation step**. The
 | Method | Model | Classifier | Variant | BalAcc | AUROC | Acc | MacroF1 | N_test | Threshold_scheme |
 |---|---|---|---|---|---|---|---|---|---|
 | PRISM | PRISM | ann | fold_ensemble | 0.8448 | 0.8475 | 0.8462 | 0.8101 | 78 | frozen_tau_TCGA |
+| PRISM | PRISM | ann | tcga_full | 0.8439 | 0.8519 | 0.8718 | 0.8319 | 78 | quantile_rate_matched |
 | PRISM | PRISM | ann | fold_average | 0.8208 | 0.8472 | 0.8301 | 0.7919 | 78 | frozen_tau_TCGA |
+| TITAN | Conch1_5 | ann | tcga_full | 0.8176 | 0.8796 | 0.8590 | 0.8120 | 78 | quantile_rate_matched |
 | PRISM | PRISM | rf | fold_ensemble | 0.8091 | 0.8216 | 0.8462 | 0.7983 | 78 | frozen_tau_TCGA |
 | PRISM | PRISM | rf | fold_average | 0.8068 | 0.8189 | 0.8494 | 0.7998 | 78 | frozen_tau_TCGA |
 | TITAN | Conch1_5 | rf | fold_ensemble | 0.8006 | 0.8519 | 0.8333 | 0.7849 | 78 | frozen_tau_TCGA |
-| PRISM | PRISM | ann | tcga_full | 0.7953 | 0.8535 | 0.7821 | 0.7487 | 78 | frozen_tau_TCGA |
-| TITAN | Conch1_5 | rf | tcga_full | 0.7921 | 0.8426 | 0.8205 | 0.7719 | 78 | quantile_rate_matched |
+| TITAN | Conch1_5 | rf | tcga_full | 0.7921 | 0.8466 | 0.8205 | 0.7719 | 78 | quantile_rate_matched |
 | PRISM | PRISM | lin | fold_average | 0.7918 | 0.8481 | 0.7660 | 0.7324 | 78 | frozen_tau_TCGA |
 | TITAN | Conch1_5 | ann | fold_ensemble | 0.7855 | 0.8599 | 0.7564 | 0.7232 | 78 | frozen_tau_TCGA |
-| PRISM | PRISM | lin | tcga_full | 0.7855 | 0.8439 | 0.7564 | 0.7232 | 78 | frozen_tau_TCGA |
-| PRISM | PRISM | proto | tcga_full | 0.7837 | 0.8216 | 0.8077 | 0.7592 | 78 | frozen_tau_TCGA |
+| PRISM | PRISM | lin | tcga_full | 0.7855 | 0.8439 | 0.7564 | 0.7232 | 78 | quantile_rate_matched |
 | PRISM | PRISM | proto | fold_average | 0.7837 | 0.8180 | 0.8077 | 0.7589 | 78 | frozen_tau_TCGA |
 | PRISM | PRISM | lin | fold_ensemble | 0.7779 | 0.8608 | 0.7179 | 0.6936 | 78 | frozen_tau_TCGA |
-| TITAN | Conch1_5 | proto | tcga_full | 0.7770 | 0.8457 | 0.7436 | 0.7115 | 78 | frozen_tau_TCGA |
 | TITAN | Conch1_5 | proto | fold_ensemble | 0.7770 | 0.8448 | 0.7436 | 0.7115 | 78 | frozen_tau_TCGA |
+| PRISM | PRISM | proto | tcga_full | 0.7770 | 0.8216 | 0.7436 | 0.7115 | 78 | quantile_rate_matched |
 
 ---
 
@@ -245,7 +247,7 @@ TITAN and PRISM are **slide-level encoders with no patch aggregation step**. The
 - **Protocol:** 4-fold cross-validation, case-grouped
 - **Train:** SurGen folds
 - **Test:** SurGen held-out fold
-- **Threshold policy:** Folds are built at CASE level (Task 2.1). Reported at threshold 0.5.
+- **Threshold policy:** Folds are built at CASE level (Task 2.1). Reported at threshold 0.5 (random forest: 0.30).
 
 ### Coverage
 | Method \ Model | Conch1_5 | ConchV1 | H-Optimus-1 | UNI2 | Virchow2 |
@@ -307,7 +309,7 @@ TITAN and PRISM are **slide-level encoders with no patch aggregation step**. The
 - **Protocol:** external validation
 - **Train:** TCGA (see variant)
 - **Test:** all SurGen slides with features
-- **Threshold policy:** Reported at tau_TCGA. Partial coverage on the local machine by design.
+- **Threshold policy:** All five heads use the corrected scheme (`tcga_full` variant). kNN is scored at k=35 (uniform weights) and cut at a tau refitted on TCGA out-of-fold probabilities at that k. LR, ANN, ProtoNet and RF take a rate-matched (quantile) threshold on the mean probability of the five seed models. A row's AUROC is the AUROC of that same score: the k=35 scores for kNN, the five-seed ensemble for the others. k, tau and the positive rate come from TCGA alone; the quantile reads SurGen scores but never SurGen labels. The two fold-based variants stay at the frozen tau_TCGA. The same rule is applied to both external cohorts.
 
 ### Coverage
 | Method \ Model | Conch1_5 | ConchV1 | H-Optimus-1 | UNI2 | Virchow2 |
@@ -323,31 +325,31 @@ Sorted by balanced accuracy, with AUROC as the tie-break. AUROC is the primary m
 
 | Method | Model | Classifier | Variant | BalAcc | AUROC | Acc | MacroF1 | N_test | Threshold_scheme |
 |---|---|---|---|---|---|---|---|---|---|
-| Tissue_Type_Clustering | UNI2 | rf | tcga_full | 0.7786 | 0.7943 | 0.8151 | 0.6615 | 622 | quantile_rate_matched |
-| Caption_based_aggregation_15_classes | UNI2 | lin | tcga_full | 0.7750 | 0.8563 | 0.8087 | 0.6552 | 622 | frozen_tau_TCGA |
-| Caption_based_aggregation | UNI2 | lin | tcga_full | 0.7690 | 0.8543 | 0.7170 | 0.5903 | 622 | frozen_tau_TCGA |
+| Caption_based_aggregation | UNI2 | lin | tcga_full | 0.7809 | 0.8543 | 0.8328 | 0.6770 | 622 | quantile_rate_matched |
+| Tissue_Type_Clustering | UNI2 | rf | tcga_full | 0.7786 | 0.8317 | 0.8151 | 0.6615 | 622 | quantile_rate_matched |
+| Tissue_Type_Clustering | UNI2 | lin | tcga_full | 0.7694 | 0.8335 | 0.8119 | 0.6556 | 622 | quantile_rate_matched |
 | Caption_based_aggregation_15_classes | UNI2 | rf | fold_ensemble | 0.7682 | 0.8393 | 0.7830 | 0.6338 | 622 | frozen_tau_TCGA |
 | Caption_based_aggregation_15_classes | UNI2 | lin | fold_average | 0.7675 | 0.8473 | 0.7681 | 0.6248 | 622 | frozen_tau_TCGA |
+| Caption_based_aggregation_15_classes | UNI2 | lin | tcga_full | 0.7666 | 0.8563 | 0.8473 | 0.6841 | 622 | quantile_rate_matched |
 | Caption_based_aggregation_15_classes | UNI2 | lin | fold_ensemble | 0.7665 | 0.8542 | 0.7395 | 0.6039 | 622 | frozen_tau_TCGA |
-| Caption_based_aggregation | UNI2 | rf | tcga_full | 0.7504 | 0.8205 | 0.7910 | 0.6332 | 622 | quantile_rate_matched |
+| Caption_based_aggregation | UNI2 | ann | tcga_full | 0.7622 | 0.8519 | 0.7990 | 0.6433 | 622 | quantile_rate_matched |
+| Caption_based_aggregation_15_classes | UNI2 | ann | tcga_full | 0.7587 | 0.8444 | 0.7926 | 0.6373 | 622 | quantile_rate_matched |
+| Caption_based_aggregation | UNI2 | rf | tcga_full | 0.7504 | 0.8464 | 0.7910 | 0.6332 | 622 | quantile_rate_matched |
+| Tissue_Type_Clustering | UNI2 | ann | tcga_full | 0.7487 | 0.8177 | 0.7476 | 0.6035 | 622 | quantile_rate_matched |
+| Caption_based_aggregation_15_classes | H-Optimus-1 | ann | tcga_full | 0.7466 | 0.8137 | 0.7572 | 0.6090 | 622 | quantile_rate_matched |
 | Caption_based_aggregation | UNI2 | lin | fold_ensemble | 0.7377 | 0.8575 | 0.5932 | 0.5079 | 622 | frozen_tau_TCGA |
 | Caption_based_aggregation | UNI2 | lin | fold_average | 0.7361 | 0.8472 | 0.6375 | 0.5350 | 622 | frozen_tau_TCGA |
 | Caption_based_aggregation | Virchow2 | lin | fold_ensemble | 0.7341 | 0.7806 | 0.7347 | 0.5907 | 622 | frozen_tau_TCGA |
-| Caption_based_aggregation_15_classes | UNI2 | rf | tcga_full | 0.7332 | 0.8114 | 0.7331 | 0.5894 | 622 | quantile_rate_matched |
+| Caption_based_aggregation_15_classes | UNI2 | rf | tcga_full | 0.7332 | 0.8354 | 0.7331 | 0.5894 | 622 | quantile_rate_matched |
+| Caption_based_aggregation | H-Optimus-1 | ann | tcga_full | 0.7269 | 0.7842 | 0.7621 | 0.6053 | 622 | quantile_rate_matched |
 | Caption_based_aggregation | UNI2 | rf | fold_ensemble | 0.7261 | 0.8470 | 0.8682 | 0.6856 | 622 | frozen_tau_TCGA |
 | Caption_based_aggregation_15_classes | UNI2 | rf | fold_average | 0.7236 | 0.8178 | 0.7560 | 0.6009 | 622 | frozen_tau_TCGA |
-| Caption_based_aggregation_15_classes | H-Optimus-1 | rf | tcga_full | 0.7212 | 0.7235 | 0.7653 | 0.6053 | 622 | quantile_rate_matched |
+| Caption_based_aggregation_15_classes | H-Optimus-1 | rf | tcga_full | 0.7212 | 0.7652 | 0.7653 | 0.6053 | 622 | quantile_rate_matched |
+| Tissue_Type_Clustering | H-Optimus-1 | lin | tcga_full | 0.7152 | 0.7507 | 0.7814 | 0.6134 | 622 | quantile_rate_matched |
+| Caption_based_aggregation_15_classes | Virchow2 | lin | tcga_full | 0.7108 | 0.7836 | 0.7733 | 0.6065 | 622 | quantile_rate_matched |
+| Caption_based_aggregation | H-Optimus-1 | proto | tcga_full | 0.7106 | 0.7617 | 0.7460 | 0.5895 | 622 | quantile_rate_matched |
 | Caption_based_aggregation | UNI2 | knn | fold_ensemble | 0.7086 | 0.7599 | 0.6752 | 0.5480 | 622 | frozen_tau_TCGA |
-| Caption_based_aggregation_15_classes | UNI2 | knn | fold_ensemble | 0.7061 | 0.7556 | 0.5900 | 0.4991 | 622 | frozen_tau_TCGA |
-| Caption_based_aggregation | UNI2 | rf | fold_average | 0.7049 | 0.8153 | 0.8501 | 0.6598 | 622 | frozen_tau_TCGA |
-| Caption_based_aggregation | Virchow2 | ann | tcga_full | 0.6993 | 0.7668 | 0.7068 | 0.5627 | 622 | frozen_tau_TCGA |
-| Caption_based_aggregation_15_classes | Virchow2 | lin | fold_ensemble | 0.6988 | 0.7987 | 0.8055 | 0.6225 | 622 | frozen_tau_TCGA |
-| Tissue_Type_Clustering | UNI2 | lin | tcga_full | 0.6944 | 0.8335 | 0.5016 | 0.4441 | 622 | frozen_tau_TCGA |
-| Caption_based_aggregation_15_classes | Virchow2 | lin | tcga_full | 0.6940 | 0.7836 | 0.8103 | 0.6237 | 622 | frozen_tau_TCGA |
-| Caption_based_aggregation | H-Optimus-1 | rf | tcga_full | 0.6915 | 0.7047 | 0.7653 | 0.5940 | 622 | quantile_rate_matched |
-| Tissue_Type_Clustering | UNI2 | rf | fold_average | 0.6890 | 0.8008 | 0.8818 | 0.6773 | 622 | frozen_tau_TCGA |
-| Averaging | UNI2 | lin | tcga_full | 0.6875 | 0.7492 | 0.5563 | 0.4756 | 622 | frozen_tau_TCGA |
-| Caption_based_aggregation | Virchow2 | ann | fold_ensemble | 0.6839 | 0.7746 | 0.5498 | 0.4711 | 622 | frozen_tau_TCGA |
+| Caption_based_aggregation_15_classes | UNI2 | proto | tcga_full | 0.7075 | 0.7951 | 0.7942 | 0.6187 | 622 | quantile_rate_matched |
 
 _Showing the top 25 of 300 rows; the full table is in `slide_classification/best_of_all_exps_metric.xlsx`._
 
@@ -356,32 +358,34 @@ TITAN and PRISM are **slide-level encoders with no patch aggregation step**. The
 
 | Method | Model | Classifier | Variant | BalAcc | AUROC | Acc | MacroF1 | N_test | Threshold_scheme |
 |---|---|---|---|---|---|---|---|---|---|
-| TITAN | Conch1_5 | knn | tcga_full | 0.6840 | 0.6981 | 0.6576 | 0.5311 | 622 | refit_tau_k20 |
+| TITAN | Conch1_5 | proto | tcga_full | 0.6937 | 0.7643 | 0.7154 | 0.5660 | 622 | quantile_rate_matched |
+| TITAN | Conch1_5 | knn | tcga_full | 0.6751 | 0.7068 | 0.6013 | 0.4981 | 622 | refit_tau_k35 |
 | TITAN | Conch1_5 | knn | fold_ensemble | 0.6605 | 0.6745 | 0.7765 | 0.5876 | 622 | frozen_tau_TCGA |
 | TITAN | Conch1_5 | knn | fold_average | 0.6412 | 0.6477 | 0.7552 | 0.5674 | 622 | frozen_tau_TCGA |
-| TITAN | Conch1_5 | rf | tcga_full | 0.6249 | 0.7017 | 0.7122 | 0.5394 | 622 | quantile_rate_matched |
+| TITAN | Conch1_5 | rf | tcga_full | 0.6249 | 0.7134 | 0.7122 | 0.5394 | 622 | quantile_rate_matched |
+| TITAN | Conch1_5 | lin | tcga_full | 0.6245 | 0.6843 | 0.7653 | 0.5651 | 622 | quantile_rate_matched |
+| TITAN | Conch1_5 | ann | tcga_full | 0.6019 | 0.6902 | 0.7379 | 0.5417 | 622 | quantile_rate_matched |
 | TITAN | Conch1_5 | proto | fold_average | 0.5585 | 0.7575 | 0.2291 | 0.2103 | 622 | frozen_tau_TCGA |
 | TITAN | Conch1_5 | proto | fold_ensemble | 0.5480 | 0.7632 | 0.1833 | 0.1832 | 622 | frozen_tau_TCGA |
-| TITAN | Conch1_5 | proto | tcga_full | 0.5418 | 0.7643 | 0.1720 | 0.1717 | 622 | frozen_tau_TCGA |
 | TITAN | Conch1_5 | rf | fold_average | 0.5323 | 0.6874 | 0.1986 | 0.1893 | 622 | frozen_tau_TCGA |
 | TITAN | Conch1_5 | lin | fold_average | 0.5139 | 0.6723 | 0.1451 | 0.1425 | 622 | frozen_tau_TCGA |
 | TITAN | Conch1_5 | rf | fold_ensemble | 0.5121 | 0.7084 | 0.1318 | 0.1289 | 622 | frozen_tau_TCGA |
-| TITAN | Conch1_5 | ann | tcga_full | 0.5102 | 0.6674 | 0.1203 | 0.1152 | 622 | frozen_tau_TCGA |
 | TITAN | Conch1_5 | lin | fold_ensemble | 0.5027 | 0.6780 | 0.1013 | 0.0937 | 622 | frozen_tau_TCGA |
 | TITAN | Conch1_5 | ann | fold_average | 0.5023 | 0.6621 | 0.1073 | 0.1007 | 622 | frozen_tau_TCGA |
 | TITAN | Conch1_5 | ann | fold_ensemble | 0.5000 | 0.6964 | 0.0965 | 0.0880 | 622 | frozen_tau_TCGA |
-| TITAN | Conch1_5 | lin | tcga_full | 0.4934 | 0.6843 | 0.0981 | 0.0904 | 622 | frozen_tau_TCGA |
 
 ---
 
 ## Known caveats — state these in Methods
-1. **Training uses 50% of each cohort, not 75%.** The CV rotation is
-   test = fold *i*, val = fold *i+1*, train = the remaining two. Owner-confirmed as
-   deliberate. A reviewer comparing against 5-fold work will otherwise assume more
-   training data than was used.
-2. **"Validation fold" means two different things.** `combine_trainval=True` for
-   `lin`/`knn`/`proto`/`rf` merges the validation fold back into training; only the
-   ANN uses it as a true early-stopping set.
+1. **The heads do not train on the same amount of data.** The CV rotation is
+   test = fold *i*, val = fold *i+1*, train = the remaining two. The ANN trains on
+   those two folds (about 50% of the cohort) and uses the validation fold for
+   selection and early stopping. `lin`/`knn`/`proto`/`rf` merge the validation fold
+   back (`combine_trainval=True`) and train on about 75%.
+2. **The "best" rows are maxima over 100 configurations** chosen on the data they
+   are reported on, so they are optimistic. Confidence intervals, paired tests and
+   the configuration TCGA-CV itself selects are in
+   `experiments/final_analysis/SUMMARY.md`.
 3. **Fold numbering offset.** Folds are 1–4 in the CSVs and reported `Fold1..Fold4`,
    but checkpoints are saved `fold0..fold3`.
 4. **Empty tissue rows.** In Tissue_Type_Clustering an absent tissue class yields an
@@ -394,8 +398,8 @@ TITAN and PRISM are **slide-level encoders with no patch aggregation step**. The
    and the class balance came out even by luck of ordering rather than by design.
    The deciding argument, though, is that the experiment is strictly dominated:
    even repaired it would train on ~36 slides and test on 18 with ~4 positives,
-   where PAIP-IV trains on 42 and tests on 31. Previous numbers are preserved at
-   `slide_classification/PAIP_Results_ARCHIVED_20260804/`.
+   where PAIP-IV trains on 47 and tests on 31. Previous numbers are preserved in git
+   history (`slide_classification/PAIP_Results_ARCHIVED_20260804/` at commit `277a878e`).
 6. **All SurGen numbers published before 2026-08-04 are leak-inflated.** Folds were
    built at slide level while 70 of 554 cases contribute two slides each, so ~67% of
    those cases had one slide in train and the other in test. Correcting to

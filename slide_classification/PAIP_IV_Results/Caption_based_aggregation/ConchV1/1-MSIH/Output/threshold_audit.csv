@@ -1,8 +1,8 @@
 experiment,method,model,classifier,threshold_label,threshold,bacc,auroc,conf_matrix
 PAIP-IV,Caption_based_aggregation,ConchV1,lin,0.5,0.5,0.7946428571428572,0.8392857142857144,"[[21, 3], [2, 5]]"
 PAIP-IV,Caption_based_aggregation,ConchV1,lin,tau_TCGA,0.0032489040412152417,0.6696428571428572,0.8392857142857144,"[[15, 9], [2, 5]]"
-PAIP-IV,Caption_based_aggregation,ConchV1,ann,0.5,0.5,0.7619047619047619,0.8511904761904762,"[[16, 8], [1, 6]]"
-PAIP-IV,Caption_based_aggregation,ConchV1,ann,tau_TCGA,0.3815231919288635,0.6994047619047619,0.8511904761904762,"[[13, 11], [1, 6]]"
+PAIP-IV,Caption_based_aggregation,ConchV1,ann,0.5,0.5,0.7529761904761905,0.8214285714285714,"[[19, 5], [2, 5]]"
+PAIP-IV,Caption_based_aggregation,ConchV1,ann,tau_TCGA,0.3815231919288635,0.7113095238095238,0.8214285714285714,"[[17, 7], [2, 5]]"
 PAIP-IV,Caption_based_aggregation,ConchV1,knn,0.5,0.5,0.7946428571428572,0.8511904761904762,"[[21, 3], [2, 5]]"
 PAIP-IV,Caption_based_aggregation,ConchV1,knn,tau_TCGA,0.09525873179930806,0.7083333333333334,0.8511904761904762,"[[10, 14], [0, 7]]"
 PAIP-IV,Caption_based_aggregation,ConchV1,proto,0.5,0.5,0.7321428571428572,0.8273809523809523,"[[18, 6], [2, 5]]"
