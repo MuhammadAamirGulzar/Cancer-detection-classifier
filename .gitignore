@@ -70,3 +70,12 @@ slide_classification/*_ARCHIVED_*/
 *.csv.bak-*
 slide_aggregation/caption_generation/Results/*.csv.gz
 Results_Tables_Clean (1).docx
+
+# Runtime state rewritten by the pipelines on every run (not results)
+crash_diagnostics/
+
+# Pipeline test-run outputs (QC patches, per-patch features, scratch metadata)
+Complete_Pipeline/Output/
+
+# Editor backups
+*.bak
