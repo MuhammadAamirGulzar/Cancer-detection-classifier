@@ -87,20 +87,32 @@ Still open, ranked by how much a reviewer would care:
 6. **PRISM on SurGen cannot be used as is.** The embedding file for `SR386_40X_HE_T237_01` is corrupt, slide `SR386_40X_HE_T241_01` is missing 52% of its tiles, and four more slides miss 6-9 tiles each. Re-encode at least the first two.
 7. Smaller items: cross-validation is a single seed; the random forest predicts at 0.30 in cross-validation; the tissue-class subset experiments (TCGA balanced accuracy 0.85-0.87) were selected on test folds with the pre-fix ANN and were never validated; `reports/COHORT_COUNTS.md` still says PAIP has 73 slides; TCGA-CV, SurGen-CV and PAIP-IV results carry older provenance stamps.
 
-## 4. Remaining work
+## 4. Work plan to finish the paper
 
-| # | Task | Status |
-|---|---|---|
-| 1 | One threshold rule on both external cohorts | **done** (published trees regenerated) |
-| 2 | Case-level bootstrap CIs and paired tests | **done** (`experiments/final_analysis/`) |
-| 3 | TCGA-selected configuration as the primary external result | **done** (README, this page) |
-| 4 | PAIP-IV with the `ann_old` ANN protocol | **done** |
-| 5 | PRISM on SurGen | blocked until two slides are re-encoded (weak point 6) |
-| 6 | Probability ensembles | tested: the 4-fold ensemble gains 0.015-0.018 AUROC on SurGen for LR and RF and nothing on PAIP; not worth pursuing |
-| 7 | Redo the top-k tissue-class aggregation with nested cross-validation and take it to external validation | not started, about 1 day, no GPU |
-| 8 | Attention-based MIL baseline on the cached patch features | not started, 2-4 days on one GPU |
-| 9 | Finish the 991-slide SurGen encoding and re-run SurGen | in progress (owner) |
-| 10 | Regenerate the Word deliverables (`tools/build_results_docx.py`, `build_supplementary_results.py`, `build_ev_experiment_report.py`) from the new workbook | not started; `build_ev_experiment_report.py` still has a section arguing for k = 20 |
+Done on 2026-10-05: one threshold rule on both external cohorts; confidence intervals and paired tests; the TCGA-selected configuration as the primary external result; PAIP-IV with the `ann_old` ANN.
+
+### Rules, so the repository stays clean
+
+1. **One experiment, one folder**: `experiments/<name>/` with its script, a `results/` folder and a `SUMMARY.md`. Nothing is created anywhere else.
+2. **New experiments never write into the five result trees.** Only the runners do, and only with their automatic archive.
+3. **Run with the `exaonepath` conda environment** (scikit-learn 1.7.0, the version the TCGA models were trained with).
+4. **Close each experiment before starting the next**: decide whether it goes in the paper, add a ledger entry, update this page, one commit.
+5. **Anything already in the ledger's "do not repeat" list stays closed.**
+
+### Steps, in order
+
+| Step | What | Why | Needs | Effort |
+|---|---|---|---|---|
+| 1 | **Attention-based MIL baseline** on the cached patch features, with the same TCGA folds, external protocol and threshold rule | The standard learned-pooling baseline. Without it the claim "aggregation strategy matters" has no reference point; reviewers will ask | one GPU; see the data note below | 2-4 days |
+| 2 | **Tissue-class subset aggregation, redone properly**: choose the classes by nested cross-validation on TCGA, freeze, then evaluate on PAIP and SurGen | The earlier result (TCGA balanced accuracy 0.85-0.87 with tumour, mucin and stroma only) was selected on test folds and never validated. If it survives, it is the positive methodological result | CPU only | about 1 day |
+| 3 | **Robustness of the two headline claims**: repeated TCGA cross-validation with several seeds; SurGen broken down by sub-cohort and scored per case; specificity at 95% sensitivity | The "no advantage within TCGA" finding rests on one seed; SurGen mixes two sub-cohorts; a rule-out operating point is what a clinical reader looks for | CPU only | about 1 day |
+| 4 | **SurGen on 991 slides**, once the encoding is finished: aggregate, re-run SurGen-CV and SurGen-EV, re-run `experiments/final_analysis/` | 100 MSI-H slides instead of 60, so tighter intervals | the encoding (owner, in progress) | half a day after the features exist |
+| 5 | **PRISM on SurGen**: re-encode `SR386_40X_HE_T237_01` and `SR386_40X_HE_T241_01`, then evaluate | completes the slide-encoder baseline table. Optional: otherwise state it as a limitation | GPU, two slide downloads | small |
+| 6 | **Freeze and write**: regenerate the Word deliverables and figures from the final workbook, add a forest plot of the paired contrasts and ROC curves of the primary configuration, fix `reports/COHORT_COUNTS.md`, tag the commit | the paper | - | 1-2 days |
+
+Data note for step 1. Patch-level features are on this machine for TCGA and PAIP with all five encoders, but for SurGen only with CONCH 1.5 (drive D:) and Virchow2 (drive F:). SurGen patch features for UNI2, H-Optimus-1 and CONCH v1 exist only on the server. So the baseline can run here on all three cohorts for CONCH 1.5 and Virchow2, and on TCGA and PAIP for the other encoders; SurGen with UNI2 or H-Optimus-1 has to run on the server or wait for a copy.
+
+Deliberately not planned, to finish on time: re-tuning the logistic regression, stain normalisation, new encoders, ensembles across encoders, other targets (BRAF, KRAS), ten-crop features. `tools/build_ev_experiment_report.py` still contains a section arguing for k = 20 and must be edited before step 6.
 
 **SurGen 991 encoding** is being continued separately by the project owner. State on 2026-10-04: 630 of 991 slides screened (tissue filter), 622 with features, last pipeline activity 2026-09-09. Before resuming on this machine:
 
@@ -120,7 +132,7 @@ Still open, ranked by how much a reviewer would care:
 
 ## 6. October 2026 cleanup
 
-The working copy shrank by 34 GB, from about 79 GB to about 45 GB including `.git`. Nothing unique was deleted.
+The working copy shrank by about 38 GB, from about 79 GB to about 41 GB including `.git`. Nothing unique was deleted.
 
 | What | Size | Action |
 |---|---|---|
@@ -129,11 +141,13 @@ The working copy shrank by 34 GB, from about 79 GB to about 45 GB including `.gi
 | `__pycache__` folders | 3.5 MB | deleted |
 | Superseded snapshots, old model files, test outputs, old logs | 22.9 GB | moved to the archive |
 | Old `.docx` reports, backups and scratch notebooks | 103 MB | removed from git; copies in the archive |
+| Notebook autosave folders and the feature-extraction test fixtures (second pass) | 4.3 GB | moved to the archive |
+| Seven scratch result extracts; ten superseded scripts and notebooks (second pass) | under 1 MB | removed from git (copies kept); moved to `slide_classification/misc/` |
 
 The archive is next to the repository, at `KSA_project2/_archive/Cancer-detection-classifier_2026-10/`:
 
 - `MANIFEST.csv` - one row per action, with the original path. To put something back, move it to that path.
-- `tier2/` - moved material, under the same relative paths it had in the repository.
+- `tier2/`, `tier3/` - moved material, under the same relative paths it had in the repository. `tier3/` holds the second pass: notebook autosaves (some contain old access tokens) and test fixtures.
 - `from_recycle_bin/` - seven archived result trees, two SurGen reports and the untracked files of `experiments/`, recovered from the Recycle Bin before it was purged.
 - `removed_from_git/` - copies of the tracked files whose deletion was committed.
 - `audit_2026-10-04/` - the four full audit reports this page summarises.
@@ -143,7 +157,8 @@ Also recovered: `surgen_data/surgen_processed/conch1-5` (107 GB, the SurGen CONC
 Deliberately left in place:
 
 - `slide_classification/cache/` (1.1 GB) - the next analysis steps read it.
-- `data_cleaning/BG_SVM_training/training_data/` (4.9 GB), `feature_extraction/test_data/` (3.8 GB), the CRC-100K feature tensors (3.8 GB) - unique inputs; owner decision.
+- `data_cleaning/BG_SVM_training/training_data/` (4.9 GB, hand-labelled patches) and the CRC-100K feature tensors (3.8 GB) - unique inputs of pipeline stages; keep.
+- 75 ANN checkpoint files in `TCGA_FULL_Models/` (0.8 GB) that no configuration file refers to - harmless, and not worth touching the model tree for.
 - `Complete_Pipeline/logs/` from September and `Complete_Pipeline/crash_diagnostics/` - in use by the SurGen encoding.
 - The four `*_ARCHIVED_202609*` trees in `slide_classification/` - small, and cited as provenance.
 - Outside the repository: `dataset/patch_data` (824 GB) and `paip_data/patch_data` (189 GB) are PNG patch caches. Every encoder has been extracted from them, so they are needed only to add a new encoder. Owner decision.
