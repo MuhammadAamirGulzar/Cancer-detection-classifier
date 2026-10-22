@@ -1,0 +1,56 @@
+{
+ "fivecrop": {
+  "UNI2": {
+   "Caption_based_aggregation": 10.169132232666016,
+   "Caption_based_aggregation_15_classes": 10.218938827514648,
+   "Tissue_Type_Clustering": 10.011855125427246
+  },
+  "H-Optimus-1": {
+   "Caption_based_aggregation": 18.448083877563477,
+   "Caption_based_aggregation_15_classes": 18.603351593017578,
+   "Tissue_Type_Clustering": 18.401508331298828
+  },
+  "ConchV1": {
+   "Caption_based_aggregation": 18.42111587524414,
+   "Caption_based_aggregation_15_classes": 18.634111404418945,
+   "Tissue_Type_Clustering": 18.310211181640625
+  },
+  "Conch1_5": {
+   "Caption_based_aggregation": 23.6307373046875,
+   "Caption_based_aggregation_15_classes": 23.894872665405273,
+   "Tissue_Type_Clustering": 23.552101135253906
+  },
+  "Virchow2": {
+   "Caption_based_aggregation": 34.18583679199219,
+   "Caption_based_aggregation_15_classes": 34.3199462890625,
+   "Tissue_Type_Clustering": 32.87234115600586
+  }
+ },
+ "nocrop": {
+  "UNI2": {
+   "Caption_based_aggregation": 10.774507522583008,
+   "Caption_based_aggregation_15_classes": 10.895042419433594,
+   "Tissue_Type_Clustering": 10.590620040893555
+  },
+  "H-Optimus-1": {
+   "Caption_based_aggregation": 22.006874084472656,
+   "Caption_based_aggregation_15_classes": 22.318809509277344,
+   "Tissue_Type_Clustering": 22.004520416259766
+  },
+  "ConchV1": {
+   "Caption_based_aggregation": 18.97463607788086,
+   "Caption_based_aggregation_15_classes": 19.143321990966797,
+   "Tissue_Type_Clustering": 19.09776496887207
+  },
+  "Conch1_5": {
+   "Caption_based_aggregation": 23.808731079101562,
+   "Caption_based_aggregation_15_classes": 23.913820266723633,
+   "Tissue_Type_Clustering": 23.973045349121094
+  },
+  "Virchow2": {
+   "Caption_based_aggregation": 33.74224090576172,
+   "Caption_based_aggregation_15_classes": 34.06071853637695,
+   "Tissue_Type_Clustering": 34.50395584106445
+  }
+ }
+}
