@@ -1,0 +1,12 @@
+# Separate from exaonepath on purpose: installing MLflow there could move
+# numpy / pandas, and exaonepath must stay as the TCGA models were trained.
+# build_clean_store.py only reads CSV tables, so it needs nothing from exaonepath.
+#   conda env create -f tools/tracking/environment.yml
+name: mlflow_tracking
+channels:
+  - defaults
+dependencies:
+  - python=3.11
+  - pip
+  - pip:
+      - mlflow==3.17.0
