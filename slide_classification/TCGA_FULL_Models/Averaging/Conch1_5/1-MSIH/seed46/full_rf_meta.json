@@ -20,6 +20,14 @@
   "reused_from_seed": null,
   "determinism": null,
   "machine": "local",
-  "timestamp": "2026-08-04T17:41:11+00:00",
-  "git_commit": "48179b3"
+  "timestamp": "2026-10-13T11:14:08+00:00",
+  "git_commit": "77f81c4b",
+  "git_code_dirty": false,
+  "versions": {
+    "python": "3.10.18",
+    "sklearn": "1.7.0",
+    "torch": "2.2.0",
+    "numpy": "1.26.3",
+    "pandas": "2.3.1"
+  }
 }

@@ -1,11 +1,16 @@
 {
   "input_dim": 768,
-  "hidden_dim1": 128,
-  "hidden_dim2": 256,
+  "hidden_dim1": 256,
+  "hidden_dim2": 128,
+  "n_hidden_layers": 2,
+  "dropout": 0.3,
+  "patience": 20,
+  "lr": 0.0001,
+  "weight_decay": 0.0001,
   "max_iter": 500,
-  "checkpoint": "foldfull_ann_768_128_256.pth",
+  "checkpoint": "foldfull_ann_768_256_128.pth",
   "selection_metric": "",
   "selection_value": null,
   "softmax_in_graph": false,
-  "saved_at": "2026-08-04T17:41:09+00:00"
+  "saved_at": "2026-10-13T11:14:05+00:00"
 }

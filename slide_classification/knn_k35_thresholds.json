@@ -34,13 +34,14 @@
       "n_pos": 60
     },
     "Averaging|Conch1_5|MSIH": {
-      "tau": 0.17142857142857143,
+      "tau": 0.2,
       "k": 35,
       "metric": "cosine",
       "weights": "uniform",
       "fitted_on": "TCGA-CV out-of-fold",
       "n": 413,
-      "n_pos": 60
+      "n_pos": 60,
+      "refreshed": "2026-10-13: CONCH v1.5 five-crop features corrected to FiveCrop(256)"
     },
     "Averaging|ConchV1|MSIH": {
       "tau": 0.14285714285714285,
@@ -79,13 +80,14 @@
       "n_pos": 60
     },
     "Caption_based_aggregation|Conch1_5|MSIH": {
-      "tau": 0.2,
+      "tau": 0.17142857142857143,
       "k": 35,
       "metric": "manhattan",
       "weights": "uniform",
       "fitted_on": "TCGA-CV out-of-fold",
       "n": 413,
-      "n_pos": 60
+      "n_pos": 60,
+      "refreshed": "2026-10-13: CONCH v1.5 five-crop features corrected to FiveCrop(256)"
     },
     "Caption_based_aggregation|ConchV1|MSIH": {
       "tau": 0.17142857142857143,
@@ -130,7 +132,8 @@
       "weights": "uniform",
       "fitted_on": "TCGA-CV out-of-fold",
       "n": 413,
-      "n_pos": 60
+      "n_pos": 60,
+      "refreshed": "2026-10-13: CONCH v1.5 five-crop features corrected to FiveCrop(256)"
     },
     "Caption_based_aggregation_15_classes|ConchV1|MSIH": {
       "tau": 0.17142857142857143,
@@ -171,11 +174,12 @@
     "Tissue_Type_Clustering|Conch1_5|MSIH": {
       "tau": 0.2,
       "k": 35,
-      "metric": "cosine",
+      "metric": "manhattan",
       "weights": "uniform",
       "fitted_on": "TCGA-CV out-of-fold",
       "n": 413,
-      "n_pos": 60
+      "n_pos": 60,
+      "refreshed": "2026-10-13: CONCH v1.5 five-crop features corrected to FiveCrop(256)"
     },
     "Tissue_Type_Clustering|ConchV1|MSIH": {
       "tau": 0.17142857142857143,

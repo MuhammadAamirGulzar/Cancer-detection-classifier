@@ -2,7 +2,7 @@
   "classifier": "ann",
   "hparams": {
     "hidden_dim1": 512,
-    "hidden_dim2": 64,
+    "hidden_dim2": 256,
     "max_iter": 500
   },
   "seed": 45,
@@ -14,6 +14,14 @@
   "reused_from_seed": null,
   "determinism": null,
   "machine": "local",
-  "timestamp": "2026-08-04T17:48:17+00:00",
-  "git_commit": "2008d52"
+  "timestamp": "2026-10-13T11:15:22+00:00",
+  "git_commit": "77f81c4b",
+  "git_code_dirty": false,
+  "versions": {
+    "python": "3.10.18",
+    "sklearn": "1.7.0",
+    "torch": "2.2.0",
+    "numpy": "1.26.3",
+    "pandas": "2.3.1"
+  }
 }

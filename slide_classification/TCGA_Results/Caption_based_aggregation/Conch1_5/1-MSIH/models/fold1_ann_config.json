@@ -1,11 +1,16 @@
 {
   "input_dim": 10752,
-  "hidden_dim1": 512,
-  "hidden_dim2": 64,
+  "hidden_dim1": 128,
+  "hidden_dim2": 256,
+  "n_hidden_layers": 2,
+  "dropout": 0.3,
+  "patience": 20,
+  "lr": 0.0001,
+  "weight_decay": 0.0001,
   "max_iter": 500,
-  "checkpoint": "fold1_ann_10752_512_64.pth",
+  "checkpoint": "fold1_ann_10752_128_256.pth",
   "selection_metric": "val_ann_macro_f1",
-  "selection_value": 0.6975488159534691,
+  "selection_value": 0.7425287356321839,
   "softmax_in_graph": false,
-  "saved_at": "2026-08-04T17:17:55+00:00"
+  "saved_at": "2026-10-13T11:09:53+00:00"
 }

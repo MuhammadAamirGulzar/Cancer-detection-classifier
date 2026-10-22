@@ -1,7 +1,15 @@
 {
   "machine": "local",
-  "timestamp": "2026-10-05T07:20:04+00:00",
-  "git_commit": "7c66cc72",
+  "timestamp": "2026-10-13T11:20:17+00:00",
+  "git_commit": "77f81c4b",
+  "git_code_dirty": false,
+  "versions": {
+    "python": "3.10.18",
+    "sklearn": "1.7.0",
+    "torch": "2.2.0",
+    "numpy": "1.26.3",
+    "pandas": "2.3.1"
+  },
   "script": "experiments/final_analysis/01_uniform_ev_scores.py",
   "knn_k": 35,
   "rule": "knn: k=35 + tau refit on TCGA out-of-fold at that k; lin/ann/proto/rf: rate-matched quantile threshold",

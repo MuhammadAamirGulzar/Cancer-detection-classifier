@@ -1,32 +1,32 @@
 experiment,family,contrast,mean_a,mean_b,difference,lo,hi,p_boot,n_configs_a,n_configs_b,note
-TCGA-CV,method_vs_averaging,Caption-14 - Averaging,0.79509,0.770837,0.0242531,-0.00490309,0.0535023,0.111,25,25,all 5 encoders x 5 heads
-TCGA-CV,method_vs_averaging,Caption-15 - Averaging,0.781745,0.770837,0.0109084,-0.0171101,0.0403997,0.473,25,25,all 5 encoders x 5 heads
-TCGA-CV,method_vs_averaging,TTC - Averaging,0.78377,0.770837,0.012933,-0.0114729,0.0363009,0.292,25,25,all 5 encoders x 5 heads
-TCGA-CV,method_vs_averaging,mean of the three semantic methods - Averaging,0.786868,0.770837,0.0160315,-0.0100089,0.042043,0.217,75,25,all 5 encoders x 5 heads
-TCGA-CV,method_vs_averaging_by_head,semantic - Averaging | head=lin,0.857211,0.829396,0.0278155,-0.00179808,0.0602218,0.071,15,5,5 encoders
-TCGA-CV,method_vs_averaging_by_head,semantic - Averaging | head=ann,0.851593,0.81543,0.036163,0.0017751,0.0706692,0.039,15,5,5 encoders
-TCGA-CV,method_vs_averaging_by_head,semantic - Averaging | head=knn,0.687849,0.709141,-0.0212921,-0.0651219,0.0207023,0.32,15,5,5 encoders
-TCGA-CV,method_vs_averaging_by_head,semantic - Averaging | head=proto,0.695744,0.681133,0.0146113,-0.0135593,0.0454943,0.312,15,5,5 encoders
-TCGA-CV,method_vs_averaging_by_head,semantic - Averaging | head=rf,0.841944,0.819084,0.0228596,-0.00695133,0.0533409,0.144,15,5,5 encoders
+TCGA-CV,method_vs_averaging,Caption-14 - Averaging,0.797761,0.773459,0.0243022,-0.00553997,0.0536254,0.103,25,25,all 5 encoders x 5 heads
+TCGA-CV,method_vs_averaging,Caption-15 - Averaging,0.783328,0.773459,0.00986874,-0.0180696,0.0394775,0.507,25,25,all 5 encoders x 5 heads
+TCGA-CV,method_vs_averaging,TTC - Averaging,0.78408,0.773459,0.0106213,-0.013517,0.0346754,0.386,25,25,all 5 encoders x 5 heads
+TCGA-CV,method_vs_averaging,mean of the three semantic methods - Averaging,0.78839,0.773459,0.0149308,-0.0114565,0.0408993,0.253,75,25,all 5 encoders x 5 heads
+TCGA-CV,method_vs_averaging_by_head,semantic - Averaging | head=lin,0.858357,0.829953,0.0284042,-0.00271097,0.0618978,0.072,15,5,5 encoders
+TCGA-CV,method_vs_averaging_by_head,semantic - Averaging | head=ann,0.851379,0.822531,0.028848,-0.00415274,0.0630829,0.099,15,5,5 encoders
+TCGA-CV,method_vs_averaging_by_head,semantic - Averaging | head=knn,0.690233,0.712441,-0.0222081,-0.0648681,0.0172382,0.281,15,5,5 encoders
+TCGA-CV,method_vs_averaging_by_head,semantic - Averaging | head=proto,0.698269,0.684391,0.0138779,-0.0145429,0.0455274,0.351,15,5,5 encoders
+TCGA-CV,method_vs_averaging_by_head,semantic - Averaging | head=rf,0.843711,0.817979,0.0257318,-0.00316344,0.0551914,0.085,15,5,5 encoders
 TCGA-CV,method_vs_averaging_by_encoder,semantic - Averaging | encoder=H-Optimus-1,0.855955,0.852861,0.00309411,-0.0171697,0.0233102,0.791,15,5,5 heads
 TCGA-CV,method_vs_averaging_by_encoder,semantic - Averaging | encoder=UNI2,0.803933,0.790807,0.0131256,-0.0135569,0.0394393,0.334,15,5,5 heads
 TCGA-CV,method_vs_averaging_by_encoder,semantic - Averaging | encoder=Virchow2,0.790126,0.764481,0.0256453,-0.00302184,0.0539851,0.086,15,5,5 heads
-TCGA-CV,method_vs_averaging_by_encoder,semantic - Averaging | encoder=Conch1_5,0.738873,0.721511,0.0173623,-0.0232788,0.0594644,0.398,15,5,5 heads
+TCGA-CV,method_vs_averaging_by_encoder,semantic - Averaging | encoder=Conch1_5,0.746481,0.734622,0.0118587,-0.0266477,0.0546183,0.569,15,5,5 heads
 TCGA-CV,method_vs_averaging_by_encoder,semantic - Averaging | encoder=ConchV1,0.745453,0.724523,0.0209301,-0.0141877,0.0564739,0.254,15,5,5 heads
-TCGA-CV,method_pairs,Caption-15 - Caption-14,0.781745,0.79509,-0.0133447,-0.0308983,0.00508267,0.135,25,25,
-TCGA-CV,method_pairs,Caption-15 - TTC,0.781745,0.78377,-0.00202455,-0.0214432,0.0181176,0.867,25,25,
-TCGA-CV,method_pairs,Caption-14 - TTC,0.79509,0.78377,0.0113201,-0.00652028,0.0297077,0.217,25,25,
+TCGA-CV,method_pairs,Caption-15 - Caption-14,0.783328,0.797761,-0.0144334,-0.0317264,0.00417396,0.108,25,25,
+TCGA-CV,method_pairs,Caption-15 - TTC,0.783328,0.78408,-0.000752597,-0.020433,0.0191297,0.94,25,25,
+TCGA-CV,method_pairs,Caption-14 - TTC,0.797761,0.78408,0.0136808,-0.00395203,0.0316231,0.121,25,25,
 TCGA-CV,encoder_vs_best,H-Optimus-1 - UNI2,0.855182,0.800652,0.0545302,0.0325151,0.0791257,0.0005,20,20,4 methods x 5 heads
 TCGA-CV,encoder_vs_best,H-Optimus-1 - Virchow2,0.855182,0.783715,0.0714672,0.0491659,0.0959042,0.0005,20,20,4 methods x 5 heads
-TCGA-CV,encoder_vs_best,H-Optimus-1 - Conch1_5,0.855182,0.734533,0.120649,0.0896999,0.150684,0.0005,20,20,4 methods x 5 heads
+TCGA-CV,encoder_vs_best,H-Optimus-1 - Conch1_5,0.855182,0.743516,0.111665,0.0807882,0.142821,0.0005,20,20,4 methods x 5 heads
 TCGA-CV,encoder_vs_best,H-Optimus-1 - ConchV1,0.855182,0.740221,0.114961,0.0816542,0.150975,0.0005,20,20,4 methods x 5 heads
-TCGA-CV,head_vs_best,lin - ann,0.850257,0.842552,0.00770538,-0.0144434,0.0314366,0.486,20,20,4 methods x 5 encoders
-TCGA-CV,head_vs_best,lin - knn,0.850257,0.693172,0.157086,0.119122,0.194707,0.0005,20,20,4 methods x 5 encoders
-TCGA-CV,head_vs_best,lin - proto,0.850257,0.692092,0.158166,0.0924708,0.230465,0.0005,20,20,4 methods x 5 encoders
-TCGA-CV,head_vs_best,lin - rf,0.850257,0.836229,0.0140286,-0.0111834,0.0387597,0.256,20,20,4 methods x 5 encoders
-TCGA-CV,slide_encoder,mean of 100 aggregation configs - TITAN (mean over heads),0.78286,0.819995,-0.037135,-0.0685798,-0.00655836,0.014,100,5,
-TCGA-CV,slide_encoder,Conch1_5 aggregations (4 methods x 5 heads) - TITAN (5 heads),0.734533,0.819995,-0.0854627,-0.120329,-0.0522706,0.0005,20,5,same CONCH 1.5 patch features
-TCGA-CV,slide_encoder,mean of 100 aggregation configs - PRISM (mean over heads),0.78286,0.797894,-0.015034,-0.0462518,0.016099,0.347,100,5,
+TCGA-CV,head_vs_best,lin - ann,0.851256,0.844167,0.00708924,-0.0147494,0.0304055,0.516,20,20,4 methods x 5 encoders
+TCGA-CV,head_vs_best,lin - knn,0.851256,0.695785,0.155471,0.117727,0.192643,0.0005,20,20,4 methods x 5 encoders
+TCGA-CV,head_vs_best,lin - proto,0.851256,0.694799,0.156457,0.0902248,0.229912,0.0005,20,20,4 methods x 5 encoders
+TCGA-CV,head_vs_best,lin - rf,0.851256,0.837278,0.0139778,-0.0118097,0.0390771,0.258,20,20,4 methods x 5 encoders
+TCGA-CV,slide_encoder,mean of 100 aggregation configs - TITAN (mean over heads),0.784657,0.819995,-0.0353383,-0.0672328,-0.00455228,0.022,100,5,
+TCGA-CV,slide_encoder,Conch1_5 aggregations (4 methods x 5 heads) - TITAN (5 heads),0.743516,0.819995,-0.076479,-0.112157,-0.0412206,0.0005,20,5,same CONCH 1.5 patch features
+TCGA-CV,slide_encoder,mean of 100 aggregation configs - PRISM (mean over heads),0.784657,0.797894,-0.0132373,-0.0444,0.0179274,0.398,100,5,
 PAIP-IV,method_vs_averaging,Caption-14 - Averaging,0.8525,0.759762,0.0927381,0.0186845,0.189405,0.008,25,25,all 5 encoders x 5 heads
 PAIP-IV,method_vs_averaging,Caption-15 - Averaging,0.836667,0.759762,0.0769048,-0.00726786,0.172863,0.074,25,25,all 5 encoders x 5 heads
 PAIP-IV,method_vs_averaging,TTC - Averaging,0.845238,0.759762,0.0854762,0.0341607,0.150241,0.0005,25,25,all 5 encoders x 5 heads
@@ -55,40 +55,40 @@ PAIP-IV,head_vs_best,knn - rf,0.835714,0.818006,0.0177083,-0.0278311,0.0760454,0
 PAIP-IV,slide_encoder,mean of 100 aggregation configs - TITAN (mean over heads),0.823542,0.890476,-0.0669345,-0.136519,-0.0174323,0.0005,100,5,
 PAIP-IV,slide_encoder,Conch1_5 aggregations (4 methods x 5 heads) - TITAN (5 heads),0.856399,0.890476,-0.0340774,-0.0805097,0.000744048,0.058,20,5,same CONCH 1.5 patch features
 PAIP-IV,slide_encoder,mean of 100 aggregation configs - PRISM (mean over heads),0.823542,0.810119,0.0134226,-0.047247,0.0838705,0.694,100,5,
-PAIP-EV,method_vs_averaging,Caption-14 - Averaging,0.860535,0.819304,0.041231,0.00159813,0.0810598,0.041,25,25,all 5 encoders x 5 heads
-PAIP-EV,method_vs_averaging,Caption-15 - Averaging,0.869242,0.819304,0.0499376,0.0100227,0.0883702,0.016,25,25,all 5 encoders x 5 heads
-PAIP-EV,method_vs_averaging,TTC - Averaging,0.83777,0.819304,0.0184657,-0.0223104,0.05881,0.369,25,25,all 5 encoders x 5 heads
-PAIP-EV,method_vs_averaging,mean of the three semantic methods - Averaging,0.855849,0.819304,0.0365448,-0.00136916,0.0744502,0.063,75,25,all 5 encoders x 5 heads
-PAIP-EV,method_vs_averaging_by_head,semantic - Averaging | head=lin,0.872971,0.867975,0.00499554,-0.0409337,0.0463277,0.797,15,5,5 encoders
-PAIP-EV,method_vs_averaging_by_head,semantic - Averaging | head=ann,0.877371,0.825156,0.0522153,0.00551591,0.105503,0.026,15,5,5 encoders
-PAIP-EV,method_vs_averaging_by_head,semantic - Averaging | head=knn,0.82697,0.764853,0.0621172,0.00968852,0.117189,0.024,15,5,5 encoders
-PAIP-EV,method_vs_averaging_by_head,semantic - Averaging | head=proto,0.852037,0.844603,0.00743384,-0.0325335,0.0510853,0.704,15,5,5 encoders
-PAIP-EV,method_vs_averaging_by_head,semantic - Averaging | head=rf,0.849896,0.793934,0.0559619,0.00624145,0.110917,0.031,15,5,5 encoders
+PAIP-EV,method_vs_averaging,Caption-14 - Averaging,0.860339,0.818359,0.0419804,0.000766726,0.0829277,0.045,25,25,all 5 encoders x 5 heads
+PAIP-EV,method_vs_averaging,Caption-15 - Averaging,0.870491,0.818359,0.052132,0.0110232,0.090979,0.011,25,25,all 5 encoders x 5 heads
+PAIP-EV,method_vs_averaging,TTC - Averaging,0.838091,0.818359,0.0197324,-0.0227667,0.0610718,0.357,25,25,all 5 encoders x 5 heads
+PAIP-EV,method_vs_averaging,mean of the three semantic methods - Averaging,0.856307,0.818359,0.0379483,-0.00157583,0.0774526,0.06,75,25,all 5 encoders x 5 heads
+PAIP-EV,method_vs_averaging_by_head,semantic - Averaging | head=lin,0.872792,0.867261,0.00553078,-0.0442566,0.0470488,0.786,15,5,5 encoders
+PAIP-EV,method_vs_averaging_by_head,semantic - Averaging | head=ann,0.877074,0.821588,0.0554862,0.00349688,0.11497,0.033,15,5,5 encoders
+PAIP-EV,method_vs_averaging_by_head,semantic - Averaging | head=knn,0.828605,0.765656,0.0629497,0.00989221,0.117055,0.022,15,5,5 encoders
+PAIP-EV,method_vs_averaging_by_head,semantic - Averaging | head=proto,0.852869,0.845138,0.00773119,-0.0330687,0.0506869,0.7,15,5,5 encoders
+PAIP-EV,method_vs_averaging_by_head,semantic - Averaging | head=rf,0.850193,0.79215,0.0580434,0.00831995,0.112701,0.026,15,5,5 encoders
 PAIP-EV,method_vs_averaging_by_encoder,semantic - Averaging | encoder=H-Optimus-1,0.872881,0.851026,0.0218555,-0.00633809,0.0519826,0.121,15,5,5 heads
 PAIP-EV,method_vs_averaging_by_encoder,semantic - Averaging | encoder=UNI2,0.873565,0.834255,0.0393101,-0.00493979,0.0845986,0.084,15,5,5 heads
 PAIP-EV,method_vs_averaging_by_encoder,semantic - Averaging | encoder=Virchow2,0.857984,0.827921,0.0300624,-0.0165054,0.0815671,0.22,15,5,5 heads
-PAIP-EV,method_vs_averaging_by_encoder,semantic - Averaging | encoder=Conch1_5,0.842968,0.772703,0.0702646,0.00681832,0.140485,0.027,15,5,5 heads
+PAIP-EV,method_vs_averaging_by_encoder,semantic - Averaging | encoder=Conch1_5,0.845257,0.767975,0.0772822,0.00638641,0.152516,0.024,15,5,5 heads
 PAIP-EV,method_vs_averaging_by_encoder,semantic - Averaging | encoder=ConchV1,0.831847,0.810616,0.021231,-0.0457345,0.0844254,0.517,15,5,5 heads
-PAIP-EV,method_pairs,Caption-15 - Caption-14,0.869242,0.860535,0.00870651,-0.0032306,0.0223202,0.165,25,25,
-PAIP-EV,method_pairs,Caption-15 - TTC,0.869242,0.83777,0.0314719,0.0110598,0.0543979,0.001,25,25,
-PAIP-EV,method_pairs,Caption-14 - TTC,0.860535,0.83777,0.0227654,-0.00116369,0.0481365,0.066,25,25,
+PAIP-EV,method_pairs,Caption-15 - Caption-14,0.870491,0.860339,0.0101517,-0.00135816,0.0236044,0.093,25,25,
+PAIP-EV,method_pairs,Caption-15 - TTC,0.870491,0.838091,0.0323996,0.0116994,0.055669,0.001,25,25,
+PAIP-EV,method_pairs,Caption-14 - TTC,0.860339,0.838091,0.022248,-0.00273417,0.0481369,0.084,25,25,
 PAIP-EV,encoder_vs_best,H-Optimus-1 - UNI2,0.867417,0.863738,0.00367975,-0.0272608,0.0302186,0.781,20,20,4 methods x 5 heads
 PAIP-EV,encoder_vs_best,H-Optimus-1 - Virchow2,0.867417,0.850468,0.0169492,-0.00424286,0.0395462,0.123,20,20,4 methods x 5 heads
-PAIP-EV,encoder_vs_best,H-Optimus-1 - Conch1_5,0.867417,0.825401,0.0420161,-0.0356763,0.109949,0.282,20,20,4 methods x 5 heads
+PAIP-EV,encoder_vs_best,H-Optimus-1 - Conch1_5,0.867417,0.825937,0.0414808,-0.0352916,0.106691,0.279,20,20,4 methods x 5 heads
 PAIP-EV,encoder_vs_best,H-Optimus-1 - ConchV1,0.867417,0.826539,0.0408787,0.00327777,0.0760275,0.035,20,20,4 methods x 5 heads
-PAIP-EV,head_vs_best,lin - ann,0.871722,0.864318,0.0074041,-0.0088314,0.0262756,0.407,20,20,4 methods x 5 encoders
-PAIP-EV,head_vs_best,lin - knn,0.871722,0.811441,0.060281,0.00943354,0.113983,0.032,20,20,4 methods x 5 encoders
-PAIP-EV,head_vs_best,lin - proto,0.871722,0.850178,0.0215433,-0.0165065,0.0621365,0.282,20,20,4 methods x 5 encoders
-PAIP-EV,head_vs_best,lin - rf,0.871722,0.835905,0.0358162,0.00450379,0.0737768,0.018,20,20,4 methods x 5 encoders
-PAIP-EV,slide_encoder,mean of 100 aggregation configs - TITAN (mean over heads),0.846713,0.833541,0.0131713,-0.046321,0.0853091,0.738,100,5,
-PAIP-EV,slide_encoder,Conch1_5 aggregations (4 methods x 5 heads) - TITAN (5 heads),0.825401,0.833541,-0.00814005,-0.0673969,0.0659233,0.775,20,5,same CONCH 1.5 patch features
-PAIP-EV,slide_encoder,mean of 100 aggregation configs - PRISM (mean over heads),0.846713,0.82587,0.020843,-0.0200947,0.0683517,0.367,100,5,
-PAIP-EV,ensemble,4-fold ensemble - TCGA-full model (mean AUROC),0.816276,0.846713,-0.0304371,-0.0418417,-0.0185853,0.0005,100,100,KNN: fold models at their grid-searched k vs full model at k=35
-PAIP-EV,ensemble_by_head,4-fold ensemble - TCGA-full | head=lin,0.873506,0.871722,0.00178412,-0.00513381,0.00874442,0.568,20,20,
-PAIP-EV,ensemble_by_head,4-fold ensemble - TCGA-full | head=ann,0.859233,0.864318,-0.00508475,-0.0206088,0.00749442,0.457,20,20,
-PAIP-EV,ensemble_by_head,4-fold ensemble - TCGA-full | head=knn,0.658631,0.811441,-0.15281,-0.214191,-0.0918482,0.0005,20,20,
-PAIP-EV,ensemble_by_head,4-fold ensemble - TCGA-full | head=proto,0.850624,0.850178,0.00044603,-0.000491748,0.00151762,0.391,20,20,
-PAIP-EV,ensemble_by_head,4-fold ensemble - TCGA-full | head=rf,0.839384,0.835905,0.00347904,-0.00348127,0.010126,0.331,20,20,
+PAIP-EV,head_vs_best,lin - ann,0.871409,0.863202,0.00820696,-0.00923617,0.0276561,0.396,20,20,4 methods x 5 encoders
+PAIP-EV,head_vs_best,lin - knn,0.871409,0.812868,0.0585415,0.0071337,0.11182,0.035,20,20,4 methods x 5 encoders
+PAIP-EV,head_vs_best,lin - proto,0.871409,0.850937,0.0204728,-0.017665,0.0620874,0.318,20,20,4 methods x 5 encoders
+PAIP-EV,head_vs_best,lin - rf,0.871409,0.835682,0.035727,0.00222904,0.0755631,0.031,20,20,4 methods x 5 encoders
+PAIP-EV,slide_encoder,mean of 100 aggregation configs - TITAN (mean over heads),0.84682,0.833541,0.0132783,-0.0456608,0.0851573,0.731,100,5,
+PAIP-EV,slide_encoder,Conch1_5 aggregations (4 methods x 5 heads) - TITAN (5 heads),0.825937,0.833541,-0.00760482,-0.062781,0.0622614,0.777,20,5,same CONCH 1.5 patch features
+PAIP-EV,slide_encoder,mean of 100 aggregation configs - PRISM (mean over heads),0.84682,0.82587,0.02095,-0.02028,0.0681093,0.359,100,5,
+PAIP-EV,ensemble,4-fold ensemble - TCGA-full model (mean AUROC),0.815723,0.84682,-0.0310972,-0.0432835,-0.0188933,0.0005,100,100,KNN: fold models at their grid-searched k vs full model at k=35
+PAIP-EV,ensemble_by_head,4-fold ensemble - TCGA-full | head=lin,0.87306,0.871409,0.00165031,-0.00481824,0.0083876,0.567,20,20,
+PAIP-EV,ensemble_by_head,4-fold ensemble - TCGA-full | head=ann,0.860749,0.863202,-0.00245317,-0.0149877,0.00820696,0.678,20,20,
+PAIP-EV,ensemble_by_head,4-fold ensemble - TCGA-full | head=knn,0.653769,0.812868,-0.159099,-0.218466,-0.0996175,0.0005,20,20,
+PAIP-EV,ensemble_by_head,4-fold ensemble - TCGA-full | head=proto,0.851204,0.850937,0.000267618,-0.000802855,0.00138269,0.662,20,20,
+PAIP-EV,ensemble_by_head,4-fold ensemble - TCGA-full | head=rf,0.839831,0.835682,0.00414808,-0.00383586,0.0119101,0.299,20,20,
 SurGen-CV,method_vs_averaging,Caption-14 - Averaging,0.709951,0.663738,0.0462129,0.0219329,0.0714313,0.0005,25,25,all 5 encoders x 5 heads
 SurGen-CV,method_vs_averaging,Caption-15 - Averaging,0.715706,0.663738,0.051968,0.0257923,0.0786475,0.0005,25,25,all 5 encoders x 5 heads
 SurGen-CV,method_vs_averaging,TTC - Averaging,0.685972,0.663738,0.0222337,-0.00111711,0.0455429,0.062,25,25,all 5 encoders x 5 heads
@@ -116,36 +116,36 @@ SurGen-CV,head_vs_best,lin - proto,0.758971,0.673124,0.0858467,0.00362543,0.1772
 SurGen-CV,head_vs_best,lin - rf,0.758971,0.757614,0.00135676,-0.0355113,0.039374,0.927,20,20,4 methods x 5 encoders
 SurGen-CV,slide_encoder,mean of 100 aggregation configs - TITAN (mean over heads),0.693841,0.72739,-0.0335488,-0.0600821,-0.00736681,0.007,100,5,
 SurGen-CV,slide_encoder,Conch1_5 aggregations (4 methods x 5 heads) - TITAN (5 heads),0.670542,0.72739,-0.0568483,-0.0895549,-0.0271472,0.0005,20,5,same CONCH 1.5 patch features
-SurGen-EV,method_vs_averaging,Caption-14 - Averaging,0.719543,0.661733,0.0578102,0.032718,0.0792424,0.0005,25,25,all 5 encoders x 5 heads
-SurGen-EV,method_vs_averaging,Caption-15 - Averaging,0.730176,0.661733,0.0684425,0.0407617,0.0951196,0.0005,25,25,all 5 encoders x 5 heads
-SurGen-EV,method_vs_averaging,TTC - Averaging,0.697423,0.661733,0.0356898,0.0110236,0.0604648,0.005,25,25,all 5 encoders x 5 heads
-SurGen-EV,method_vs_averaging,mean of the three semantic methods - Averaging,0.715714,0.661733,0.0539808,0.0345949,0.0722616,0.0005,75,25,all 5 encoders x 5 heads
-SurGen-EV,method_vs_averaging_by_head,semantic - Averaging | head=lin,0.733221,0.636305,0.0969158,0.0639078,0.12702,0.0005,15,5,5 encoders
-SurGen-EV,method_vs_averaging_by_head,semantic - Averaging | head=ann,0.75228,0.689181,0.0630981,0.0399249,0.0884836,0.0005,15,5,5 encoders
-SurGen-EV,method_vs_averaging_by_head,semantic - Averaging | head=knn,0.654578,0.649718,0.00485963,-0.0222691,0.0320316,0.734,15,5,5 encoders
-SurGen-EV,method_vs_averaging_by_head,semantic - Averaging | head=proto,0.716331,0.689404,0.0269267,-0.00698209,0.0581355,0.113,15,5,5 encoders
-SurGen-EV,method_vs_averaging_by_head,semantic - Averaging | head=rf,0.722161,0.644057,0.078104,0.0473057,0.107107,0.0005,15,5,5 encoders
+SurGen-EV,method_vs_averaging,Caption-14 - Averaging,0.721003,0.66003,0.0609733,0.0347528,0.084034,0.0005,25,25,all 5 encoders x 5 heads
+SurGen-EV,method_vs_averaging,Caption-15 - Averaging,0.728928,0.66003,0.0688986,0.0424109,0.0949566,0.0005,25,25,all 5 encoders x 5 heads
+SurGen-EV,method_vs_averaging,TTC - Averaging,0.697676,0.66003,0.0376459,0.0114337,0.0626208,0.005,25,25,all 5 encoders x 5 heads
+SurGen-EV,method_vs_averaging,mean of the three semantic methods - Averaging,0.715869,0.66003,0.0558393,0.0356731,0.0745813,0.0005,75,25,all 5 encoders x 5 heads
+SurGen-EV,method_vs_averaging_by_head,semantic - Averaging | head=lin,0.732278,0.635065,0.0972123,0.0630963,0.12917,0.0005,15,5,5 encoders
+SurGen-EV,method_vs_averaging_by_head,semantic - Averaging | head=ann,0.753879,0.68487,0.0690095,0.043947,0.0930593,0.0005,15,5,5 encoders
+SurGen-EV,method_vs_averaging_by_head,semantic - Averaging | head=knn,0.653758,0.645371,0.0083877,-0.0191712,0.0362668,0.554,15,5,5 encoders
+SurGen-EV,method_vs_averaging_by_head,semantic - Averaging | head=proto,0.715149,0.687186,0.0279636,-0.00703068,0.0598993,0.11,15,5,5 encoders
+SurGen-EV,method_vs_averaging_by_head,semantic - Averaging | head=rf,0.72428,0.647657,0.0766232,0.0464475,0.105522,0.0005,15,5,5 encoders
 SurGen-EV,method_vs_averaging_by_encoder,semantic - Averaging | encoder=H-Optimus-1,0.742406,0.628233,0.114174,0.0679748,0.158475,0.0005,15,5,5 heads
 SurGen-EV,method_vs_averaging_by_encoder,semantic - Averaging | encoder=UNI2,0.805329,0.756809,0.0485202,0.0196734,0.0759111,0.001,15,5,5 heads
 SurGen-EV,method_vs_averaging_by_encoder,semantic - Averaging | encoder=Virchow2,0.714928,0.672076,0.0428519,0.00983143,0.0746163,0.008,15,5,5 heads
-SurGen-EV,method_vs_averaging_by_encoder,semantic - Averaging | encoder=Conch1_5,0.648174,0.638158,0.0100158,-0.0225867,0.0420732,0.536,15,5,5 heads
+SurGen-EV,method_vs_averaging_by_encoder,semantic - Averaging | encoder=Conch1_5,0.648949,0.629641,0.019308,-0.00914395,0.0453421,0.154,15,5,5 heads
 SurGen-EV,method_vs_averaging_by_encoder,semantic - Averaging | encoder=ConchV1,0.667732,0.61339,0.0543426,0.0195445,0.0891721,0.002,15,5,5 heads
-SurGen-EV,method_pairs,Caption-15 - Caption-14,0.730176,0.719543,0.0106323,-0.0103709,0.0327166,0.305,25,25,
-SurGen-EV,method_pairs,Caption-15 - TTC,0.730176,0.697423,0.0327527,-0.00175378,0.0672805,0.062,25,25,
-SurGen-EV,method_pairs,Caption-14 - TTC,0.719543,0.697423,0.0221204,-0.00871439,0.0522851,0.15,25,25,
+SurGen-EV,method_pairs,Caption-15 - Caption-14,0.728928,0.721003,0.00792527,-0.0126675,0.0296091,0.427,25,25,
+SurGen-EV,method_pairs,Caption-15 - TTC,0.728928,0.697676,0.0312527,-0.00306909,0.0655986,0.077,25,25,
+SurGen-EV,method_pairs,Caption-14 - TTC,0.721003,0.697676,0.0233274,-0.00788531,0.0546042,0.14,25,25,
 SurGen-EV,encoder_vs_best,UNI2 - H-Optimus-1,0.793199,0.713863,0.0793364,0.0289804,0.125795,0.001,20,20,4 methods x 5 heads
 SurGen-EV,encoder_vs_best,UNI2 - Virchow2,0.793199,0.704215,0.0889843,0.060547,0.122302,0.0005,20,20,4 methods x 5 heads
-SurGen-EV,encoder_vs_best,UNI2 - Conch1_5,0.793199,0.64567,0.147529,0.0931213,0.202609,0.0005,20,20,4 methods x 5 heads
+SurGen-EV,encoder_vs_best,UNI2 - Conch1_5,0.793199,0.644122,0.149077,0.0952577,0.20275,0.0005,20,20,4 methods x 5 heads
 SurGen-EV,encoder_vs_best,UNI2 - ConchV1,0.793199,0.654147,0.139052,0.0926442,0.184296,0.0005,20,20,4 methods x 5 heads
-SurGen-EV,head_vs_best,ann - lin,0.736505,0.708992,0.0275133,-0.000444041,0.0515959,0.052,20,20,4 methods x 5 encoders
-SurGen-EV,head_vs_best,ann - knn,0.736505,0.653363,0.0831421,0.0561427,0.110801,0.0005,20,20,4 methods x 5 encoders
-SurGen-EV,head_vs_best,ann - proto,0.736505,0.709599,0.0269061,-0.0069094,0.0621005,0.131,20,20,4 methods x 5 encoders
-SurGen-EV,head_vs_best,ann - rf,0.736505,0.702635,0.0338701,0.0112388,0.0552611,0.003,20,20,4 methods x 5 encoders
-SurGen-EV,slide_encoder,mean of 100 aggregation configs - TITAN (mean over heads),0.702219,0.711785,-0.00956658,-0.0516567,0.0332153,0.633,100,5,
-SurGen-EV,slide_encoder,Conch1_5 aggregations (4 methods x 5 heads) - TITAN (5 heads),0.64567,0.711785,-0.0661151,-0.127269,-0.00430955,0.038,20,5,same CONCH 1.5 patch features
-SurGen-EV,ensemble,4-fold ensemble - TCGA-full model (mean AUROC),0.702295,0.702219,7.66607e-05,-0.00578062,0.00657376,0.953,100,100,KNN: fold models at their grid-searched k vs full model at k=35
-SurGen-EV,ensemble_by_head,4-fold ensemble - TCGA-full | head=lin,0.726742,0.708992,0.0177506,0.00891555,0.0252989,0.001,20,20,
-SurGen-EV,ensemble_by_head,4-fold ensemble - TCGA-full | head=ann,0.729398,0.736505,-0.00710706,-0.0177414,0.00404905,0.218,20,20,
-SurGen-EV,ensemble_by_head,4-fold ensemble - TCGA-full | head=knn,0.627771,0.653363,-0.0255916,-0.057963,0.00829653,0.136,20,20,
-SurGen-EV,ensemble_by_head,4-fold ensemble - TCGA-full | head=proto,0.709579,0.709599,-2.00178e-05,-0.00115619,0.00101516,0.977,20,20,
-SurGen-EV,ensemble_by_head,4-fold ensemble - TCGA-full | head=rf,0.717986,0.702635,0.0153514,0.00584583,0.0251157,0.002,20,20,
+SurGen-EV,head_vs_best,ann - lin,0.736627,0.707974,0.0286521,0.00179333,0.0508591,0.033,20,20,4 methods x 5 encoders
+SurGen-EV,head_vs_best,ann - knn,0.736627,0.651661,0.0849652,0.0581722,0.113171,0.0005,20,20,4 methods x 5 encoders
+SurGen-EV,head_vs_best,ann - proto,0.736627,0.708158,0.0284683,-0.00626978,0.0631635,0.115,20,20,4 methods x 5 encoders
+SurGen-EV,head_vs_best,ann - rf,0.736627,0.705125,0.0315021,0.009207,0.0529473,0.005,20,20,4 methods x 5 encoders
+SurGen-EV,slide_encoder,mean of 100 aggregation configs - TITAN (mean over heads),0.701909,0.711785,-0.00987619,-0.0519616,0.033217,0.631,100,5,
+SurGen-EV,slide_encoder,Conch1_5 aggregations (4 methods x 5 heads) - TITAN (5 heads),0.644122,0.711785,-0.0676631,-0.126997,-0.00762326,0.032,20,5,same CONCH 1.5 patch features
+SurGen-EV,ensemble,4-fold ensemble - TCGA-full model (mean AUROC),0.701126,0.701909,-0.000782622,-0.00743052,0.00613219,0.829,100,100,KNN: fold models at their grid-searched k vs full model at k=35
+SurGen-EV,ensemble_by_head,4-fold ensemble - TCGA-full | head=lin,0.727291,0.707974,0.0193164,0.0108133,0.0265011,0.0005,20,20,
+SurGen-EV,ensemble_by_head,4-fold ensemble - TCGA-full | head=ann,0.723969,0.736627,-0.0126572,-0.0228331,-0.00212992,0.018,20,20,
+SurGen-EV,ensemble_by_head,4-fold ensemble - TCGA-full | head=knn,0.627679,0.651661,-0.0239828,-0.057394,0.00971419,0.165,20,20,
+SurGen-EV,ensemble_by_head,4-fold ensemble - TCGA-full | head=proto,0.708105,0.708158,-5.33808e-05,-0.00108801,0.000935996,0.971,20,20,
+SurGen-EV,ensemble_by_head,4-fold ensemble - TCGA-full | head=rf,0.718588,0.705125,0.0134638,0.00233921,0.0245853,0.009,20,20,
