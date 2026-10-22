@@ -79,3 +79,11 @@ Complete_Pipeline/Output/
 
 # Editor backups
 *.bak
+
+# Experiment outputs that are large and regenerable from the experiment's scripts:
+# slide-level features, redirected runner trees, run logs. Each experiment commits
+# its scripts, SUMMARY.md and results/ only.
+experiments/*/features/
+experiments/*/runs/
+experiments/*/logs/
+experiments/composition/scales/
