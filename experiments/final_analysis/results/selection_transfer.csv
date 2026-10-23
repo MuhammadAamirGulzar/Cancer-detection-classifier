@@ -1,5 +1,3 @@
 reference,other,n_configs,spearman,top10_overlap
-TCGA-CV (mean of folds),PAIP-IV,100,-0.05253,0
-TCGA-CV (mean of folds),PAIP-EV,100,0.5577,2
-TCGA-CV (mean of folds),SurGen-CV,100,0.7411,4
-TCGA-CV (mean of folds),SurGen-EV,100,0.5089,1
+TCGA-CV (mean of folds),PAIP-IV,100,0.001303,0
+TCGA-CV (mean of folds),PAIP-EV,100,0.4892,1

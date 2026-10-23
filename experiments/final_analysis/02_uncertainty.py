@@ -1,9 +1,18 @@
-"""Confidence intervals and paired tests for all five experiments.
+"""Confidence intervals and paired tests for TCGA-CV, PAIP-IV and PAIP-EV.
 
 Inputs (all per-slide, one score per slide and configuration):
-  PAIP-EV, SurGen-EV   results/ev_scores_<cohort>.csv   (uniform rule, from 01_uniform_ev_scores.py)
-  TCGA-CV, SurGen-CV   <tree>/**/oof_predictions_default.csv   (pooled out-of-fold predictions)
-  PAIP-IV              <tree>/**/predictions_<head>.csv         (31 provider test slides)
+  PAIP-EV   results/ev_scores_paip.csv   (uniform rule, from 01_uniform_ev_scores.py)
+  TCGA-CV   <tree>/**/oof_predictions_default.csv   (pooled out-of-fold predictions)
+  PAIP-IV   <tree>/**/predictions_<head>.csv         (31 provider test slides)
+
+Grouping (--grouping, default crop). Caption-14, Caption-15 and Tissue-Type Clustering use five-crop features
+in which, since 2026-10-22, every crop is grouped by its own label (experiments/crop_grouping): their predictions
+come from experiments/crop_grouping/runs/cropgroup, produced by the same runners, folds and uniform threshold
+rule. Averaging, TITAN and PRISM come from the published trees. --grouping patch reproduces the earlier analysis
+(patch-level grouping, all aggregations from the published trees).
+
+SurGen (SurGen-CV, SurGen-EV) is left out until the 991-slide set is encoded; --with-surgen adds the earlier
+622-slide SurGen results (patch-level captions; TTC per crop) back in.
 
 Method
 ------
@@ -50,6 +59,7 @@ from scipy.stats import rankdata, spearmanr
 
 HERE = Path(__file__).resolve().parent
 SC = HERE.parents[1] / "slide_classification"
+CROP = HERE.parents[1] / "experiments" / "crop_grouping" / "runs" / "cropgroup"
 OUT = HERE / "results"
 B = 2000
 SEED = 20261005
@@ -68,34 +78,63 @@ def surgen_case(s):
 
 
 # ---------------------------------------------------------------- loading
-def _combo_from_path(p: Path, tree: str):
-    parts = p.relative_to(SC / tree).parts          # (method, model, 1-MSIH, Output, file) or (PRISM, 1-MSIH, ...)
+GROUPED = AGG[1:]
+GROUPING = "crop"          # set in main(); "crop" takes the grouped aggregations from CROP
+
+
+def _combo_from_path(p: Path, root: Path):
+    parts = p.relative_to(root).parts               # (method, model, 1-MSIH, Output, file) or (PRISM, 1-MSIH, ...)
     return (parts[0], parts[0]) if parts[1].startswith("1-") else (parts[0], parts[1])
 
 
-def load_oof(tree: str) -> pd.DataFrame:
+def _split(published: pd.DataFrame, crop: pd.DataFrame) -> pd.DataFrame:
+    """Grouped aggregations from the crop-level runs, everything else from the published trees."""
+    if GROUPING == "patch":
+        return published
+    keep = published[~published.method.isin(GROUPED)]
+    crop = crop[crop.method.isin(GROUPED)]
+    assert len(crop), "no crop-level predictions found under %s" % CROP
+    return pd.concat([keep, crop], ignore_index=True)
+
+
+def _oof(root: Path, tree: str) -> pd.DataFrame:
     frames = []
-    for f in glob.glob(str(SC / tree / "**" / "oof_predictions_default.csv"), recursive=True):
-        method, model = _combo_from_path(Path(f), tree)
+    for f in glob.glob(str(root / tree / "**" / "oof_predictions_default.csv"), recursive=True):
+        method, model = _combo_from_path(Path(f), root / tree)
         d = pd.read_csv(f)
         d["method"], d["model"] = method, model
         frames.append(d.rename(columns={"WSI_ID": "slide_id", "prob_pos": "score"}))
-    return pd.concat(frames, ignore_index=True)
+    return pd.concat(frames, ignore_index=True) if frames else pd.DataFrame(columns=["method"])
 
 
-def load_paip_iv() -> pd.DataFrame:
+def load_oof(tree: str) -> pd.DataFrame:
+    if tree == "TCGA_Results":
+        return _split(_oof(SC, tree), _oof(CROP, tree))
+    return _oof(SC, tree)
+
+
+def _iv(root: Path) -> pd.DataFrame:
     frames = []
-    for f in glob.glob(str(SC / "PAIP_IV_Results" / "**" / "predictions_*.csv"), recursive=True):
+    for f in glob.glob(str(root / "PAIP_IV_Results" / "**" / "predictions_*.csv"), recursive=True):
         p = Path(f)
-        method, model = _combo_from_path(p, "PAIP_IV_Results")
+        method, model = _combo_from_path(p, root / "PAIP_IV_Results")
         d = pd.read_csv(f)
         d["method"], d["model"], d["classifier"] = method, model, p.stem.replace("predictions_", "")
         frames.append(d.rename(columns={"WSI_ID": "slide_id", "prob_pos": "score"}))
-    return pd.concat(frames, ignore_index=True)
+    return pd.concat(frames, ignore_index=True) if frames else pd.DataFrame(columns=["method"])
+
+
+def load_paip_iv() -> pd.DataFrame:
+    return _split(_iv(SC), _iv(CROP))
 
 
 def load_ev(cohort: str) -> pd.DataFrame:
-    return pd.read_csv(OUT / ("ev_scores_%s.csv" % cohort))
+    published = pd.read_csv(OUT / ("ev_scores_%s.csv" % cohort))
+    if cohort != "paip":
+        return published
+    files = sorted(glob.glob(str(CROP / "ev" / "*" / "ev_scores_paip.csv")))
+    crop = pd.concat([pd.read_csv(f) for f in files], ignore_index=True) if files else pd.DataFrame(columns=["method"])
+    return _split(published, crop[published.columns] if len(crop) else crop)
 
 
 # ---------------------------------------------------------------- core
@@ -277,17 +316,25 @@ def mean_fold_auroc(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def main():
-    ident = lambda s: s
-    tcga = load_oof("TCGA_Results")
-    surcv = load_oof("SurGen_Results")
-    paipiv = load_paip_iv()
-    paipev, surev = load_ev("paip"), load_ev("surgen")
+    import argparse
+    global GROUPING
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--grouping", choices=["crop", "patch"], default="crop",
+                    help="crop: Caption/TTC from experiments/crop_grouping (default); patch: the earlier analysis")
+    ap.add_argument("--with-surgen", action="store_true", help="add the earlier 622-slide SurGen results")
+    a = ap.parse_args()
+    GROUPING = a.grouping
+    print("grouping: %s%s" % (GROUPING, " (Caption/TTC from %s)" % CROP if GROUPING == "crop" else ""))
 
-    specs = [("TCGA-CV", tcga, ident, "score", None, None),
-             ("PAIP-IV", paipiv, ident, "score", None, None),
-             ("PAIP-EV", paipev, ident, "score_uniform", "threshold_uniform", "score_fold_ensemble"),
-             ("SurGen-CV", surcv, surgen_case, "score", None, None),
-             ("SurGen-EV", surev, surgen_case, "score_uniform", "threshold_uniform", "score_fold_ensemble")]
+    ident = lambda s: s
+    specs = [("TCGA-CV", load_oof("TCGA_Results"), ident, "score", None, None),
+             ("PAIP-IV", load_paip_iv(), ident, "score", None, None),
+             ("PAIP-EV", load_ev("paip"), ident, "score_uniform", "threshold_uniform", "score_fold_ensemble")]
+    if a.with_surgen:
+        specs += [("SurGen-CV", load_oof("SurGen_Results"), surgen_case, "score", None, None),
+                  ("SurGen-EV", load_ev("surgen"), surgen_case, "score_uniform", "threshold_uniform",
+                   "score_fold_ensemble")]
+    names = [s[0] for s in specs]
     ci, con, keep = [], [], {}
     for name, df, case_fn, sc, th, ex in specs:
         t, cols, point, A, extra = run_experiment(name, df, case_fn, sc, th, ex)
@@ -319,7 +366,7 @@ def main():
         row = {"selection_rule": rule, "method": SHORT[sel.method], "model": sel.model, "classifier": sel.classifier,
                "tcga_cv_auroc_mean_fold": sel.auroc_mean_fold, "tcga_cv_auroc_pooled": sel.auroc,
                "tcga_cv_lo": sel.auroc_lo, "tcga_cv_hi": sel.auroc_hi}
-        for ev in ("PAIP-EV", "SurGen-EV"):
+        for ev in [n for n in names if n.endswith("-EV")]:
             e_all = ci[(ci.experiment == ev) & ci.method.isin(AGG)].reset_index(drop=True)
             r = e_all[(e_all.method == key[0]) & (e_all.model == key[1]) & (e_all.classifier == key[2])].iloc[0]
             tag = ev.replace("-", "_").lower()
@@ -340,7 +387,7 @@ def main():
     # ---------------- does TCGA-CV ranking transfer?
     tr = []
     base = t.set_index(["method", "model", "classifier"])
-    for other in ("PAIP-IV", "PAIP-EV", "SurGen-CV", "SurGen-EV"):
+    for other in [n for n in names if n != "TCGA-CV"]:
         o = ci[(ci.experiment == other) & ci.method.isin(AGG)].set_index(["method", "model", "classifier"])
         j = base.join(o[["auroc"]], rsuffix="_other", how="inner")
         rho = spearmanr(j.auroc_mean_fold, j.auroc_other).correlation

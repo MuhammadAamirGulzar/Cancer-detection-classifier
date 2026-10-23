@@ -2,7 +2,7 @@
 
 Status, 2026-10-16: **complete for TCGA and PAIP**, 5 encoders × 3 grouping aggregations (Caption-14, Caption-15, Tissue-Type Clustering) × 5 heads (75 paired configurations per setting). SurGen will be added once its processing finishes.
 
-**Decision, 2026-10-22 (project owner):** crop-level grouping **replaces** the patch-level grouping as the five-crop method for Caption-14, Caption-15 and Tissue-Type Clustering. It is the faithful version of the intended method; the published TTC top-left rule was a bug. The clean MLflow store (`tools/tracking/build_clean_store.py`) now holds five-crop = Averaging, TITAN and PRISM as published, plus these crop-level runs, against no-crop. The two give the same results within noise (see below), so the change does not alter any conclusion. The paper's headline analysis (`experiments/final_analysis/`, `reports/PROJECT_STATUS.md`) is still computed from the patch-level trees and has to be regenerated from these runs.
+**Decision, 2026-10-22 (project owner):** crop-level grouping **replaces** the patch-level grouping as the five-crop method for Caption-14, Caption-15 and Tissue-Type Clustering. It is the faithful version of the intended method; the published TTC top-left rule was a bug. The clean MLflow store (`tools/tracking/build_clean_store.py`) now holds five-crop = Averaging, TITAN and PRISM as published, plus these crop-level runs, against no-crop. The two give the same results within noise (see below), so the change does not alter any conclusion. The headline analysis (`experiments/final_analysis/`, `reports/PROJECT_STATUS.md`) was regenerated from these runs on 2026-10-23 for TCGA and PAIP (ledger X59).
 
 ## Question
 

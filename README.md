@@ -6,6 +6,8 @@ The project compares **how patch embeddings are aggregated into a slide represen
 
 > **Start here:** [reports/PROJECT_STATUS.md](reports/PROJECT_STATUS.md) says where the current results live, what is finished and what is left. [reports/EXPERIMENT_LEDGER.md](reports/EXPERIMENT_LEDGER.md) lists every experiment and hyperparameter already tried, with outcomes, so nothing gets repeated.
 
+> **Update, 2026-10-23.** Since 2026-10-22 the five-crop Caption-14, Caption-15 and tissue-type-clustering results use **crop-level grouping**: every crop goes to the group of its own label, instead of one label per patch (captions) or the top-left crop's label for all five crops (tissue types). The current headline numbers are for **TCGA and PAIP**: the configuration TCGA cross-validation selects (H-Optimus-1, tissue-type clustering, logistic regression) scores **0.879** [0.734, 0.987] on PAIP. Semantic aggregation still does better than averaging on PAIP but not within TCGA: mean AUROC gain +0.086 on PAIP-IV (p = 0.001), +0.036 on PAIP-EV (p = 0.094; 14-class caption alone +0.046, p = 0.041) and +0.012 in TCGA cross-validation (p = 0.26). See [experiments/final_analysis/SUMMARY.md](experiments/final_analysis/SUMMARY.md) and [reports/PROJECT_STATUS.md](reports/PROJECT_STATUS.md). SurGen will be added back with the 991-slide set. **The highlights and tables below are still the 2026-10-05 patch-level results** and will be regenerated with the results workbook.
+
 ---
 
 ## Highlights

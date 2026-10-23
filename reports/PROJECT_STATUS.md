@@ -1,6 +1,6 @@
 # Project status - MSI-H classification from colorectal whole-slide images
 
-Last updated: 2026-10-05, after a full read-only audit (2026-10-04), a repository cleanup, and the regeneration of the external-validation and PAIP-IV results under one threshold rule.
+Last updated: 2026-10-23. Since 2026-10-22 the five-crop Caption-14, Caption-15 and Tissue-Type Clustering results use **crop-level grouping** (every crop grouped by its own label; ledger X57), and the headline analysis covers **TCGA and PAIP only** until the 991-slide SurGen set is encoded. Earlier: a full read-only audit (2026-10-04), a repository cleanup, and the regeneration of the external-validation and PAIP-IV results under one threshold rule (2026-10-05).
 
 This page answers three questions: where are the current results, can they be trusted, and what is left to do.
 For the history of what has already been tried, see [EXPERIMENT_LEDGER.md](EXPERIMENT_LEDGER.md).
@@ -21,7 +21,9 @@ Everything lives under `slide_classification/`.
 | TCGA models for EV | `TCGA_FULL_Models/` | 413 | 2026-08-04 | 22 combinations x 5 heads x seeds 42-46 |
 
 - The consolidated workbook is `slide_classification/best_of_all_exps_metric.xlsx`, rebuilt on 2026-10-05 together with `RESULTS.md` and the radar figures.
-- Confidence intervals and paired tests are in `experiments/final_analysis/` ([summary](../experiments/final_analysis/SUMMARY.md)).
+- Confidence intervals and paired tests are in `experiments/final_analysis/` ([summary](../experiments/final_analysis/SUMMARY.md)). Since 2026-10-23 they use crop-level grouping for Caption-14/15 and TTC, whose predictions are in `experiments/crop_grouping/runs/cropgroup/` (same runners, folds and threshold rule). The published trees above still hold the patch-level Caption/TTC runs; `02_uncertainty.py --grouping patch --with-surgen` reproduces the 2026-10-05 analysis from them exactly.
+- The October studies: no-crop vs five-crop (`experiments/nocrop_vs_fivecrop/`), crop-level grouping (`experiments/crop_grouping/`), composition (`experiments/composition/`, closed). Ledger section 2.8.
+- One MLflow store holds the compared configurations: `KSA_project2/mlflow_clean` (port 5001), built by `tools/tracking/build_clean_store.py --fresh`. Arms: five-crop (baseline; crop-level Caption/TTC) and no-crop.
 - `experiments/final_analysis/validate_against_published.py` checks that the analysis and the published external trees agree. It passes for all 215 classifier-combinations.
 - The three trees replaced on 2026-10-05 are in the archive under `tier2/slide_classification/*_ARCHIVED_20261005/`; the files git tracks are also at commit `7c66cc72`.
 
@@ -35,36 +37,37 @@ Files the results depend on, which must not be edited or regenerated casually:
 
 ## 2. Headline numbers
 
-**Primary external result: the configuration TCGA cross-validation selects** (H-Optimus-1 / Caption-15 / LR, TCGA-CV AUROC 0.928 [0.887, 0.960]).
+TCGA and PAIP, crop-level grouping (2026-10-23; `experiments/final_analysis/`). SurGen will be added back with the 991-slide set.
+
+**Primary external result: the configuration TCGA cross-validation selects** (best mean-of-folds AUROC, the published rule): H-Optimus-1 / TTC / LR, TCGA-CV AUROC 0.924 (pooled 0.918 [0.877, 0.952]).
 
 | Cohort | AUROC [95% CI] | Balanced accuracy [95% CI] | Rank among 100 | Compared with the best configuration |
 |---|---|---|---|---|
-| PAIP-EV | 0.879 [0.733, 0.984] | 0.799 [0.685, 0.904] | 19 | not distinguishable (gap 0.037 [-0.038, +0.125]) |
-| SurGen-EV | 0.740 [0.652, 0.821] | 0.688 [0.621, 0.758] | 32 | clearly lower (gap 0.116 [+0.050, +0.184]) |
+| PAIP-EV | 0.879 [0.734, 0.987] | 0.808 [0.697, 0.913] | 18 | not distinguishable (gap 0.037 [-0.037, +0.124]) |
+
+With patch-level grouping (2026-10-05) TCGA-CV selected H-Optimus-1 / Caption-15 / LR (0.928), which scored the same 0.879 on PAIP-EV (rank 19).
 
 **Best of 100 configurations** (optimistic: chosen on the data they are reported on).
 
 | Experiment | Best AUROC [95% CI] | Configuration |
 |---|---|---|
-| TCGA-CV | 0.928 [0.887, 0.960] | H-Optimus-1 / Caption-15 / LR |
-| PAIP-IV | 0.926 [0.774, 1.000] | CONCH 1.5 / Caption-15 / kNN |
+| TCGA-CV | 0.921 [0.876, 0.959] | H-Optimus-1 / Caption-15 / LR |
+| PAIP-IV | 0.970 [0.917, 1.000] | UNI2 / TTC / kNN (31 test slides; selection noise) |
 | PAIP-EV | 0.915 [0.829, 0.974] | UNI2 / Averaging / LR |
-| SurGen-CV | 0.853 [0.799, 0.896] | UNI2 / Caption-15 / RF |
-| SurGen-EV | 0.856 [0.800, 0.905] | UNI2 / Caption-15 / LR |
 
 **Main finding.** Mean AUROC over 5 encoders x 5 classifier heads, and the gain of the three semantic aggregations over averaging:
 
 | Experiment | Averaging | Caption-14 | Caption-15 | Tissue-type clustering | Semantic - Averaging [95% CI] | p |
 |---|---|---|---|---|---|---|
-| TCGA-CV | 0.775 | 0.802 | 0.792 | 0.794 | +0.016 [-0.010, +0.042] | 0.22 |
-| PAIP-IV | 0.760 | 0.853 | 0.837 | 0.845 | +0.085 [+0.018, +0.169] | 0.007 |
-| PAIP-EV | 0.819 | 0.861 | 0.869 | 0.838 | +0.037 [-0.001, +0.074] | 0.063 |
-| SurGen-CV | 0.665 | 0.711 | 0.718 | 0.686 | +0.040 [+0.019, +0.063] | 0.001 |
-| SurGen-EV | 0.662 | 0.720 | 0.730 | 0.697 | +0.054 [+0.035, +0.072] | < 0.001 |
+| TCGA-CV | 0.773 | 0.792 | 0.790 | 0.775 | +0.012 [-0.010, +0.035] | 0.26 |
+| PAIP-IV | 0.760 | 0.869 | 0.832 | 0.837 | +0.086 [+0.031, +0.153] | 0.001 |
+| PAIP-EV | 0.818 | 0.865 | 0.862 | 0.838 | +0.036 [-0.007, +0.076] | 0.094 |
 
-Semantic aggregation beats averaging on the external cohorts (on PAIP-EV, Caption-15 alone: +0.050, p = 0.016) but not within TCGA cross-validation. The supportable claim is that it generalises better, not that it fits better.
+Semantic aggregation beats averaging on PAIP but not within TCGA cross-validation (on PAIP-EV, Caption-14 alone: +0.046, p = 0.041; Caption-15: +0.043, p = 0.072). The supportable claim is that it generalises better, not that it fits better. With patch-level grouping, and on the 622-slide SurGen set (+0.054 externally, p < 0.001), the picture was the same.
 
-**SurGen labels.** All SurGen results use the earlier 622-slide set. None of those 622 slides changed label in the 991-slide relabel, so the results stay valid. The relabel adds 369 slides (40 MSI-H); none is encoded yet.
+**Design choices that do not matter** (ledger X56-X58): no-crop instead of five-crop features (external +0.000; H-Optimus-1 is the exception, -0.025), crop-level instead of patch-level grouping (-0.002), and appending each group's share of the slide (-0.002). Encoder and head choice move external AUROC 10-20 times more.
+
+**SurGen.** The earlier SurGen results (622 slides, patch-level captions) are out of the headline until the 991-slide set is encoded and captioned at crop level. For reference they were: TCGA-selected configuration 0.740 on SurGen-EV; best of 100 0.853 (SurGen-CV) and 0.856 (SurGen-EV), both UNI2 / Caption-15.
 
 ## 3. Weak points
 
@@ -80,7 +83,7 @@ Fixed on 2026-10-05:
 Still open, ranked by how much a reviewer would care:
 
 1. **The main effect is absent within TCGA** (section 2). Any text that says aggregation "improves MSI prediction" without qualification overstates it.
-2. **TITAN beats the aggregation methods on equal features.** On the same CONCH 1.5 patch features TITAN is better than all four aggregation methods by 0.06-0.09 mean AUROC in TCGA-CV, SurGen-CV and SurGen-EV.
+2. **TITAN beats the aggregation methods on equal features.** On the same CONCH 1.5 patch features TITAN is better than the four aggregation methods by 0.071 mean AUROC in TCGA-CV (p = 0.001; crop-level grouping), and was by 0.06 on SurGen-CV and SurGen-EV (patch-level, 622 slides). On PAIP it is not distinguishable.
 3. **The best encoder changes with the cohort**: H-Optimus-1 within TCGA, UNI2 on SurGen. The TCGA-selected configuration therefore transfers poorly to SurGen (0.740).
 4. **No learned-pooling baseline.** Attention-based MIL has never been trained on these features.
 5. **The quantile threshold is transductive**: it reads the unlabelled score distribution of the target cohort.
@@ -90,6 +93,8 @@ Still open, ranked by how much a reviewer would care:
 ## 4. Work plan to finish the paper
 
 Done on 2026-10-05: one threshold rule on both external cohorts; confidence intervals and paired tests; the TCGA-selected configuration as the primary external result; PAIP-IV with the `ann_old` ANN.
+
+Done in October 2026 (ledger 2.8): CONCH v1.5 TCGA five-crop fixed; no-crop vs five-crop; crop-level grouping, adopted as the five-crop method; composition (closed); final analysis regenerated for TCGA and PAIP with crop-level grouping; one clean MLflow store. Still to do for crop-level grouping: SurGen (crop-level captions for the 991 slides, step 4), and the workbook, `RESULTS.md`, radar figures and the README tables, which are still the 2026-10-05 patch-level numbers (step 6).
 
 ### Rules, so the repository stays clean
 
