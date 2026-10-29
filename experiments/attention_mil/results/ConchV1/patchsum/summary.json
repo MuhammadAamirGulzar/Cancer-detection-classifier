@@ -1,0 +1,9 @@
+{
+ "model": "ConchV1",
+ "method": "patchsum",
+ "tcga_cv_auroc_pooled": 0.5498583569405099,
+ "tcga_cv_auroc_mean_fold": 0.5574858519594719,
+ "tcga_cv_bacc_at_0.5": 0.5850330500472143,
+ "paip_ev_auroc": 0.7975022301516503,
+ "paip_ev_bacc": 0.7421944692239073
+}

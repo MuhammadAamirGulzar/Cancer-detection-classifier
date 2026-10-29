@@ -1,0 +1,28 @@
+{
+ "model": "ConchV1",
+ "method": "abmil",
+ "hp": {
+  "hidden": 256,
+  "attn": 128,
+  "dropout": 0.25,
+  "lr": 0.0002,
+  "wd": 0.0001,
+  "epochs": 25,
+  "max_patches": 4096,
+  "topk_frac": 0.05
+ },
+ "seeds": [
+  42,
+  43,
+  44,
+  45,
+  46
+ ],
+ "tcga_cv_auroc_pooled": 0.8368744098205854,
+ "tcga_cv_auroc_mean_fold": 0.8429491266753113,
+ "tcga_cv_bacc_at_0.5": 0.7449244570349387,
+ "tau_tcga": 0.2167234594002366,
+ "paip_ev_auroc": 0.8429973238180197,
+ "paip_ev_threshold": 0.11594504376841797,
+ "paip_ev_bacc": 0.8090990187332738
+}

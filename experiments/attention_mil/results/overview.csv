@@ -1,0 +1,71 @@
+setting,approach,model,auroc
+TCGA-CV,Averaging,H-Optimus-1,0.916006
+TCGA-CV,Averaging,UNI2,0.866053
+TCGA-CV,Averaging,Virchow2,0.857602
+TCGA-CV,Averaging,Conch1_5,0.754485
+TCGA-CV,Averaging,ConchV1,0.755619
+TCGA-CV,Caption-14,H-Optimus-1,0.917941
+TCGA-CV,Caption-14,UNI2,0.883805
+TCGA-CV,Caption-14,Virchow2,0.868839
+TCGA-CV,Caption-14,Conch1_5,0.850378
+TCGA-CV,Caption-14,ConchV1,0.824646
+TCGA-CV,Caption-15,H-Optimus-1,0.920727
+TCGA-CV,Caption-15,UNI2,0.886355
+TCGA-CV,Caption-15,Virchow2,0.86728
+TCGA-CV,Caption-15,Conch1_5,0.850189
+TCGA-CV,Caption-15,ConchV1,0.838008
+TCGA-CV,Tissue-type clustering,H-Optimus-1,0.918272
+TCGA-CV,Tissue-type clustering,UNI2,0.894145
+TCGA-CV,Tissue-type clustering,Virchow2,0.855855
+TCGA-CV,Tissue-type clustering,Conch1_5,0.83966
+TCGA-CV,Tissue-type clustering,ConchV1,0.804816
+TCGA-CV,Attention MIL,H-Optimus-1,0.9085457979225684
+TCGA-CV,Attention MIL,UNI2,0.8687440982058546
+TCGA-CV,Attention MIL,Virchow2,0.8507554296506138
+TCGA-CV,Attention MIL,Conch1_5,0.8246458923512748
+TCGA-CV,Attention MIL,ConchV1,0.8368744098205855
+TCGA-CV,Top-k MIL,H-Optimus-1,0.9010859301227572
+TCGA-CV,Top-k MIL,UNI2,0.880547686496695
+TCGA-CV,Top-k MIL,Virchow2,0.8438149197355996
+TCGA-CV,Top-k MIL,Conch1_5,0.812795089707271
+TCGA-CV,Top-k MIL,ConchV1,0.816052880075543
+TCGA-CV,Patch-sum (control),H-Optimus-1,0.5815391879131256
+TCGA-CV,Patch-sum (control),UNI2,0.621010387157696
+TCGA-CV,Patch-sum (control),Virchow2,0.3569877242681775
+TCGA-CV,Patch-sum (control),Conch1_5,0.4668083097261568
+TCGA-CV,Patch-sum (control),ConchV1,0.5498583569405099
+PAIP-EV,Averaging,H-Optimus-1,0.875112
+PAIP-EV,Averaging,UNI2,0.915254
+PAIP-EV,Averaging,Virchow2,0.891169
+PAIP-EV,Averaging,Conch1_5,0.790366
+PAIP-EV,Averaging,ConchV1,0.864407
+PAIP-EV,Caption-14,H-Optimus-1,0.879572
+PAIP-EV,Caption-14,UNI2,0.90455
+PAIP-EV,Caption-14,Virchow2,0.901873
+PAIP-EV,Caption-14,Conch1_5,0.876896
+PAIP-EV,Caption-14,ConchV1,0.844781
+PAIP-EV,Caption-15,H-Optimus-1,0.876004
+PAIP-EV,Caption-15,UNI2,0.905442
+PAIP-EV,Caption-15,Virchow2,0.900089
+PAIP-EV,Caption-15,Conch1_5,0.847458
+PAIP-EV,Caption-15,ConchV1,0.828724
+PAIP-EV,Tissue-type clustering,H-Optimus-1,0.87868
+PAIP-EV,Tissue-type clustering,UNI2,0.874219
+PAIP-EV,Tissue-type clustering,Virchow2,0.850134
+PAIP-EV,Tissue-type clustering,Conch1_5,0.864407
+PAIP-EV,Tissue-type clustering,ConchV1,0.806423
+PAIP-EV,Attention MIL,H-Optimus-1,0.872435325602141
+PAIP-EV,Attention MIL,UNI2,0.8947368421052632
+PAIP-EV,Attention MIL,Virchow2,0.9018733273862622
+PAIP-EV,Attention MIL,Conch1_5,0.8545941123996432
+PAIP-EV,Attention MIL,ConchV1,0.8429973238180196
+PAIP-EV,Top-k MIL,H-Optimus-1,0.8858162355040142
+PAIP-EV,Top-k MIL,UNI2,0.9304192685102588
+PAIP-EV,Top-k MIL,Virchow2,0.8786797502230151
+PAIP-EV,Top-k MIL,Conch1_5,0.8804638715432649
+PAIP-EV,Top-k MIL,ConchV1,0.8037466547725245
+PAIP-EV,Patch-sum (control),H-Optimus-1,0.7350579839429081
+PAIP-EV,Patch-sum (control),UNI2,0.6913470115967886
+PAIP-EV,Patch-sum (control),Virchow2,0.6280107047279215
+PAIP-EV,Patch-sum (control),Conch1_5,0.4611953612845673
+PAIP-EV,Patch-sum (control),ConchV1,0.7975022301516503

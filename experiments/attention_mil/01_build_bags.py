@@ -21,11 +21,14 @@ from tqdm import tqdm
 HERE = Path(__file__).resolve().parent
 BASE = HERE.parents[2]
 FEATURES = {
-    "tcga": {"H-Optimus-1": "H_Optimus_1_fivecrop_Updated", "UNI2": "Uni_2h_fivecrop_Updated"},
-    "paip": {"H-Optimus-1": "H_Optimus_1_fivecrop_Updated", "UNI2": "Uni_2h_fivecrop_Updated"},
+    "tcga": {"H-Optimus-1": "H_Optimus_1_fivecrop_Updated", "UNI2": "Uni_2h_fivecrop_Updated",
+             "Virchow2": "Virchow2_fivecrop", "Conch1_5": "Conch_v1_5_fivecrop_256", "ConchV1": "Conch_v1_fivecrop"},
+    "paip": {"H-Optimus-1": "H_Optimus_1_fivecrop_Updated", "UNI2": "Uni_2h_fivecrop_Updated",
+             "Virchow2": "Virchow2_fivecrop_Updated", "Conch1_5": "Conch_v1_5_fivecrop_Updated",
+             "ConchV1": "Conch_v1_fivecrop_Updated"},
 }
 COHORT_ROOT = {"tcga": BASE / "dataset", "paip": BASE / "paip_data"}
-DIM = {"H-Optimus-1": 1536, "UNI2": 1536}
+DIM = {"H-Optimus-1": 1536, "UNI2": 1536, "Virchow2": 2560, "Conch1_5": 768, "ConchV1": 512}
 
 
 def main():
