@@ -1,0 +1,28 @@
+{
+ "model": "UNI2",
+ "method": "topk",
+ "hp": {
+  "hidden": 256,
+  "attn": 128,
+  "dropout": 0.25,
+  "lr": 0.0002,
+  "wd": 0.0001,
+  "epochs": 25,
+  "max_patches": 4096,
+  "topk_frac": 0.05
+ },
+ "seeds": [
+  42,
+  43,
+  44,
+  45,
+  46
+ ],
+ "tcga_cv_auroc_pooled": 0.880547686496695,
+ "tcga_cv_auroc_mean_fold": 0.8792933292078383,
+ "tcga_cv_bacc_at_0.5": 0.767752596789424,
+ "tau_tcga": 0.0046538448659703135,
+ "paip_ev_auroc": 0.9304192685102588,
+ "paip_ev_threshold": 0.1298069430294178,
+ "paip_ev_bacc": 0.8447814451382694
+}

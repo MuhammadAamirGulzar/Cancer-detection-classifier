@@ -1,0 +1,28 @@
+{
+ "model": "H-Optimus-1",
+ "method": "topk",
+ "hp": {
+  "hidden": 256,
+  "attn": 128,
+  "dropout": 0.25,
+  "lr": 0.0002,
+  "wd": 0.0001,
+  "epochs": 25,
+  "max_patches": 4096,
+  "topk_frac": 0.05
+ },
+ "seeds": [
+  42,
+  43,
+  44,
+  45,
+  46
+ ],
+ "tcga_cv_auroc_pooled": 0.9010859301227573,
+ "tcga_cv_auroc_mean_fold": 0.8989111294787284,
+ "tcga_cv_bacc_at_0.5": 0.805169971671388,
+ "tau_tcga": 0.030158375203609467,
+ "paip_ev_auroc": 0.8858162355040142,
+ "paip_ev_threshold": 0.045884210109647466,
+ "paip_ev_bacc": 0.7997323818019626
+}

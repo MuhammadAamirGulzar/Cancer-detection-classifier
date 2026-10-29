@@ -87,3 +87,8 @@ experiments/*/features/
 experiments/*/runs/
 experiments/*/logs/
 experiments/composition/scales/
+# Per-slide attention weights and patch scores of the MIL study (regenerable, ~40 MB)
+experiments/attention_mil/results/*/*/attention/
+experiments/attention_mil/results/*/*/scores/
+# ...but keep the MIL study's result figures (8 files, about 8 MB)
+!experiments/attention_mil/results/*/*/fig_*.png

@@ -1,0 +1,9 @@
+{
+ "model": "UNI2",
+ "method": "patchsum",
+ "tcga_cv_auroc_pooled": 0.621010387157696,
+ "tcga_cv_auroc_mean_fold": 0.6388700037545909,
+ "tcga_cv_bacc_at_0.5": 0.6098677998111426,
+ "paip_ev_auroc": 0.6913470115967886,
+ "paip_ev_bacc": 0.5972346119536128
+}

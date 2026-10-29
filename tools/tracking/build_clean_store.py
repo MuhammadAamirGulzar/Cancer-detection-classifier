@@ -45,10 +45,13 @@ EXP = REPO / "experiments"
 NOCROP_TABLE = EXP / "nocrop_vs_fivecrop" / "results" / "all" / "mlflow_table.csv"
 CROP_TABLE = EXP / "crop_grouping" / "results" / "mlflow_table.csv"
 CROP_CONTRASTS = EXP / "crop_grouping" / "results" / "contrasts.csv"
+MIL_TABLE = EXP / "attention_mil" / "results" / "mlflow_table.csv"
 GROUPED = ("Caption-14", "Caption-15", "TTC")
 DELTAS = ["delta_auroc", "delta_auroc_ci_lo", "delta_auroc_ci_hi", "delta_auroc_p",
           "delta_bacc", "delta_bacc_ci_lo", "delta_bacc_ci_hi", "delta_bacc_p"]
-STUDY = {"fivecrop": "main", "nocrop": "crop_ablation (experiments/nocrop_vs_fivecrop)"}
+STUDY = {"fivecrop": "main", "nocrop": "crop_ablation (experiments/nocrop_vs_fivecrop)",
+         "mil": "patch_importance_mil (experiments/attention_mil)"}
+MIL_METHODS = ("ABMIL", "TopK-MIL", "PatchSum")
 
 SETTING = {
     "TCGA-CV": dict(validation="internal (4-fold CV, pooled out-of-fold)", train_cohort="TCGA", test_cohort="TCGA",
@@ -64,7 +67,9 @@ DESCRIPTION = {
     "PAIP-EV": "MSI-H, TCGA-trained models on PAIP 78 slides (19 MSI-H).",
 }
 NOTE = (" Arms: fivecrop = five-crop features (Caption-14/15 and TTC with crop-level grouping), baseline;"
-        " nocrop = one whole-patch feature per patch, with paired deltas to fivecrop.")
+        " nocrop = one whole-patch feature per patch, with paired deltas to fivecrop;"
+        " mil = learned patch-importance models (ABMIL, top-k MIL) and the patch-sum baseline, with deltas to"
+        " the same encoder's Averaging / LR.")
 
 
 def assemble():
@@ -91,7 +96,10 @@ def assemble():
     no = pd.concat([no[~g], regrouped], ignore_index=True)
     assert no.delta_auroc.notna().all(), "every no-crop row needs its paired five-crop delta"
 
-    t = pd.concat([five, no], ignore_index=True)
+    parts = [five, no]
+    if MIL_TABLE.exists():                      # TCGA-CV and PAIP-EV only
+        parts.append(pd.read_csv(MIL_TABLE))
+    t = pd.concat(parts, ignore_index=True)
     assert not t.duplicated(["setting", "arm", "aggregation", "model", "classifier"]).any()
     return t
 
@@ -108,6 +116,10 @@ def params_for(r):
         ttc = ("per_crop (each crop grouped by its own tissue label)" if r.arm == "fivecrop"
                else "one row per patch (no crops)")
     crop = "own pass (slide encoder)" if r.aggregation in ("TITAN", "PRISM") else r.arm
+    if r.arm == "mil":
+        crop = "fivecrop (patch = mean of its 5 crops)"
+        grouping = {"ABMIL": "learned attention weight per patch", "TopK-MIL": "learned score per patch, top 5% pooled",
+                    "PatchSum": "sum of each patch vector (unlearned), 9 distribution statistics"}[r.aggregation]
     feats = "published"
     if r.model == "Conch1_5" and r.arm == "fivecrop" and r.aggregation != "TITAN":
         feats = "Conch_v1_5_fivecrop_256 (TCGA re-extracted at 256 on 2026-10-13)"
@@ -134,7 +146,7 @@ def main():
                                        tags={"mlflow.note.content": DESCRIPTION[setting] + NOTE})
         for _, r in g.iterrows():
             run = client.create_run(eid, run_name=f"{r.model} | {r.aggregation} | {r.classifier} | {r.arm}",
-                                    tags={"role": "baseline" if r.arm == "fivecrop" else "ablation",
+                                    tags={"role": {"fivecrop": "baseline", "nocrop": "ablation"}.get(r.arm, "new method"),
                                           "study": STUDY[r.arm], "arm": r.arm})
             metrics = []
             for k in ["auroc", "auroc_ci_lo", "auroc_ci_hi", "bacc", "bacc_ci_lo", "bacc_ci_hi"] + DELTAS:

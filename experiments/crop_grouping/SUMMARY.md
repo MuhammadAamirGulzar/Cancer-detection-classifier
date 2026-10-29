@@ -86,7 +86,7 @@ Crop-level vs no-crop: on TCGA-CV crop-level grouping is lower (−0.025 AUROC, 
   - The re-cut patch reproduces the published caption scores exactly (0.629354, 0.595127), so the published features and labels were made from the healthy image.
   - The damaged copy is kept in the session scratch `damaged_backup/`.
 - **Zero-filled patch features since the 2025 extraction.**
-  - 6 UNI2 files (TCGA-5M-AAT4 ×4, TCGA-CM-4743 ×2) and 56 H-Optimus-1 files (TCGA-5M-AAT4 ×20, TCGA-CM-4743 ×4, TCGA-CM-6168 ×32) are entirely zero bytes.
+  - 6 UNI2 files (TCGA-5M-AAT4 ×4, TCGA-CM-4743 ×2) and 22 H-Optimus-1 files (TCGA-5M-AAT4 ×6, TCGA-CM-6168 ×16) are entirely zero bytes (counted directly on 2026-10-29; an earlier count of 56 double-counted log lines).
   - The published slide features left exactly these out: rebuilding without them reproduces the published UNI2 and H-Optimus-1 slide features to ≤ 5e-7.
   - `--skip-zero-filled` leaves them out the same way and logs each one.
 - **Crashes during the run.** Three access violations (0xC0000005, faulting module unknown, with a WHEA corrected hardware error the same day) and one unclean shutdown (Kernel-Power 41, 16 Oct). Every step resumed from finished outputs, and all 1,069 files written in the night before the shutdown were checked readable and non-zero.
